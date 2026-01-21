@@ -333,6 +333,6 @@ Save all measurements in metric
 
 ---
 
-*Document Version: 1.0*
+*Document Version: 0.1*
 *Last Updated: January 2026*
 *Author: GearGuru Product Team*
