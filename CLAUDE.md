@@ -23,7 +23,7 @@ This project is in the requirements/planning phase. The requirements specificati
 
 ## Key Domain Concepts
 
-- **Mondopoint**: Ski boot sizing system in mm (shell size = foot length in cm × 10)
+- **Mondopoint**: Ski boot sizing system where size equals foot length in cm (e.g., 27.5 = 275mm foot length)
 - **FA Value**: Fischer ski stiffness measurement (110-130% of body weight recommended)
 - **Boot Last**: Width measurement in mm (narrow ~97mm, medium ~100mm, wide ~102mm+)
 - **Flex Rating**: Boot stiffness - varies by gender and skill level
