@@ -86,26 +86,29 @@ Parents face several challenges when managing their children's sports activities
 
 #### 2.2 Sport Categories
 Pre-configured categories including:
-- Soccer
-- Baseball/Softball
-- Basketball
-- Football
-- Hockey (ice/field)
+
+Phase 1
+- Alpine Skiing
+- Nordic Skiing Classic
+- Noric Skiing Skate
+- Snowboarding
+
+Phase 2
+- Hockey
+- Mountain Biking
 - Lacrosse
-- Swimming
-- Gymnastics
-- Martial Arts
-- Skiing/Snowboarding
-- Tennis
-- Dance
+
+Phase 3
 - Custom categories
 
 #### 2.3 Gear Status
 - **Active**: Currently in use
 - **Stored**: In storage for future use
 - **Outgrown**: Too small, available for hand-me-down
+- **Loaned**: Loaned to friend
 - **Needs Replacement**: Worn out or damaged
 - **Retired**: No longer usable
+
 
 ### 3. Smart Notifications
 
@@ -200,7 +203,7 @@ Pre-configured categories including:
 
 #### Child Detail View
 - All sizes at a glance
-- Assigned gear list
+- Assigned gear list , easily switchable by sport
 - Growth history chart
 - Quick update buttons
 
@@ -216,10 +219,11 @@ Pre-configured categories including:
 - Save and add another option
 
 ### Accessibility
-- VoiceOver/TalkBack support
 - Dynamic text sizing
 - High contrast mode
-- Color-blind friendly color schemes
+
+Phase 2
+- VoiceOver/TalkBack support
 
 ---
 
@@ -316,16 +320,11 @@ Pre-configured categories including:
 | Inventory apps | Good for items | Not designed for kids/families |
 
 ### B. Size Category Reference
+Save all measurements in metric
 
-#### Footwear Sizes
-- Toddler: 1-13
-- Youth: 1-7
-- Adult: 6+
+#### Footwear Sizes 
+- use EU sizing as base measurement, with conversion
 
-#### Clothing Sizes
-- Baby: NB, 0-3M, 3-6M, 6-9M, 9-12M, 12-18M, 18-24M
-- Toddler: 2T, 3T, 4T, 5T
-- Kids: XS (4-5), S (6-7), M (8-10), L (12-14), XL (16-18)
 
 #### Equipment Sizes
 - Helmets: XXS, XS, S, M, L, XL (or head circumference)
