@@ -90,7 +90,7 @@ Pre-configured categories including:
 Phase 1
 - Alpine Skiing
 - Nordic Skiing Classic
-- Noric Skiing Skate
+- Nordic Skiing Skate
 - Snowboarding
 
 Phase 2
@@ -333,6 +333,6 @@ Save all measurements in metric
 
 ---
 
-*Document Version: 0.1*
+*Document Version: 0.2*
 *Last Updated: January 2026*
 *Author: GearGuru Product Team*
