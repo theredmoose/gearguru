@@ -95,6 +95,8 @@ Calculate from foot length (cm):
 | US Women's | (foot_cm + 2 × 0.847) / 0.847 − 23 |
 | US Kids | foot_cm × 1.08 / 0.847 − 11.5 + 0.4 |
 
+*Source: ISO specification (Gear Guru.xlsx > Lookup Data, rows 3-8)*
+
 #### 2.2 Nordic Skiing Sizing
 
 **Classic Skis (by height)**
@@ -125,6 +127,13 @@ Calculate from foot length (cm):
 **Nordic Boot Size**
 - Use EU shoe size calculation
 
+*Sources: (Gear Guru.xlsx > Lookup Data)*
+- *evo.com Kids Cross Country Ski Size Chart (rows 10-19)*
+- *nordicskater.com Nordic Skater Ski and Pole Lengths (rows 95-115)*
+- *Salomon Pole Size Guide - Classic: 0.83, Skate: 0.89 (rows 54-58)*
+- *Highland Nordic Equipment Needs (rows 72-84)*
+- *coastoutdoors.ca manufacturer-specific tables (rows 45-47)*
+
 #### 2.3 Alpine Skiing Sizing
 
 **Ski Length**
@@ -142,17 +151,22 @@ Based on height, weight, and skill level:
 **Boot Width (Last)**
 | Category | Last Width |
 |----------|------------|
-| Narrow | ~97mm |
+| Narrow | ~98mm |
 | Medium | ~100mm |
 | Wide | ~102mm+ |
 
 **Boot Flex Rating**
 | Skier Type | Men's Flex | Women's Flex |
 |------------|------------|--------------|
-| Beginner | 60-80 | 50-70 |
-| Intermediate | 80-100 | 70-90 |
 | Advanced | 100-120 | 90-110 |
-| Expert | 120-140 | 110-130 |
+
+*Sources: (Gear Guru.xlsx > Lookup Data)*
+- *evo.com Adult Ski Size Chart (rows 148-187)*
+- *evo.com Kids Ski Size Chart (rows 191-225)*
+- *calconi.com Mondopoint Size Chart - ISO/TS 19407:2015 (rows 231-314)*
+- *evo.com Mondopoint Conversion Chart (rows 318-360)*
+- *Nordica Boot Last/Width Guide (rows 365-368)*
+- *Nordica Boot Flex Charts - Men's, Women's, Youth (rows 370-381)*
 
 #### 2.4 Snowboard Sizing
 
@@ -165,12 +179,16 @@ Based on height and weight:
 **Boot Sizing**
 - Use standard shoe size conversions
 
+*Source: evo.com Kids Snowboard Size Chart (Gear Guru.xlsx > Lookup Data, rows 389-400)*
+
 #### 2.5 Hockey Skate Sizing
 
 **Skate Size**
 - Approximate: US shoe size − 1 to 1.5
 - Width/Fit options: D (regular), EE (wide)
 - Brand-specific charts (Bauer, CCM)
+
+*Source: Simple calculation (Gear Guru.xlsx > Measurements, rows 75-77)*
 
 ---
 
@@ -206,8 +224,8 @@ Add gear items with:
 
 | Sport | Equipment Types |
 |-------|-----------------|
-| Nordic | boot classic, boot skate, boot combi, classic ski, skate ski, backcountry ski, poles |
-| Alpine | boot, ski, poles, helmet, goggles |
+| Nordic | boot classic, boot skate, boot combi, nordic skis classic, nordic skis skate, nordic skis backcountry, poles |
+| Alpine | boot, ski (Terrain Park/Freestyle, Groomer Cruiser, All-Mountain Versatile, Glade/Tree Skiing, Race/Performance Carving), poles, helmet, goggles |
 | Snowboard | boot, board, bindings |
 | Hockey | skates, stick, helmet, pads |
 
@@ -394,6 +412,8 @@ Curated lists by category:
 
 ## Appendix
 
+*All formulas and lookup tables are sourced from: `requirements/Gear Guru.xlsx`*
+
 ### A. Sizing Formula Reference
 
 #### Nordic Classic Skis
@@ -450,11 +470,16 @@ foot_length_cm × 10
 
 ---
 
-*Document Version: 0.2*
+*Document Version: 0.3*
 *Last Updated: January 2026*
 *Author: GearGuru Product Team*
 
 ## Changelog
+
+### v0.3 (January 2026)
+- Added source references from Gear Guru.xlsx spreadsheet for all calculations
+- Updated alpine ski types (Terrain Park/Freestyle, Groomer Cruiser, All-Mountain Versatile, Glade/Tree Skiing, Race/Performance Carving)
+- Renamed nordic skis to: nordic skis classic, nordic skis skate, nordic skis backcountry
 
 ### v0.2 (January 2026)
 - Added comprehensive sizing calculators with formulas
