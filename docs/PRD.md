@@ -22,8 +22,8 @@ Parents face several challenges when managing their family's sports activities:
 ## Target Users
 
 ### Primary Users
-- **Parents/Guardians**: Adults managing gear and sizes for family members
-- **Age Range**: 25-55 years old
+- **Parents/Guardians**: Parents managing gear and sizes for family members
+- **Age Range**: 15-55 years old
 - **Sports Focus**: Winter sports families (Nordic skiing, Alpine skiing, snowboarding, hockey)
 
 ### Secondary Users
@@ -55,7 +55,10 @@ Parents face several challenges when managing their family's sports activities:
   - Sports/activities and skill levels
 
 #### 1.2 Body Measurements
-Track comprehensive measurements in metric (with imperial display):
+- Track comprehensive measurements.  
+  - By default use the metric system (store in metric system)
+  - Allow user to select which measurement system they view for each measurement (e.g default is metric but user can override height to show in feet/inch, 5'9")
+  - Ensure that user can enter measurements in any accepted system
 
 | Measurement | Unit | Used For |
 |-------------|------|----------|
@@ -71,11 +74,12 @@ Track comprehensive measurements in metric (with imperial display):
 #### 1.3 Measurement History
 - Date-stamped measurement entries
 - Track growth over time
-- Support multiple entries per measurement type
-- Use most recent value for calculations
+- Ability to edit previous entries
 
 #### 1.4 Skill Level Tracking
 Per-sport skill levels:
+
+Alpine Skiing Example
 - **Beginner**: First season, learning basics
 - **Intermediate**: Comfortable on easy/moderate terrain
 - **Advanced**: Confident on most terrain
