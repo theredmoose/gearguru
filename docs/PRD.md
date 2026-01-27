@@ -341,6 +341,8 @@ Phase 2
 
 **All measurements stored in metric (cm, kg)**
 
+> **Note**: All sizing tables must link to manufacturer-specific guides. Generic formulas are fallbacks only.
+
 #### Footwear Size Conversions (EU as base)
 | EU | US Kids | US Men | US Women | Mondopoint (mm) |
 |----|---------|--------|----------|-----------------|
@@ -351,7 +353,10 @@ Phase 2
 | 38 | 6Y | 6 | 7.5 | 240 |
 | 42 | - | 9 | 10.5 | 265 |
 
-**ISO Formulas:**
+**Reference**: ISO/TS 19407:2015 Mondopoint specification
+**Manufacturer Guides**: Salomon, Rossignol, Fischer, Atomic each have brand-specific charts
+
+**ISO Formulas** (fallback only):
 - EU size = (Foot length cm + 2 × 0.667) / 0.667
 - US Men = (Foot length cm × 1.08 / 0.847) - 24
 - US Women = US Men + 1.5
@@ -362,6 +367,13 @@ Phase 2
 **Skate Skis**: Skier height + 5-15 cm
 **Classic Poles**: Height × 0.83 (should fit uncomfortably under armpit)
 **Skate Poles**: Height × 0.89 (between chin and lips)
+
+**Manufacturer References**:
+- Fischer: fischer-sports.com/size-charts (includes FA stiffness values)
+- Salomon: salomon.com/sizing-guide
+- Rossignol: rossignol.com/size-guide
+- Madshus: madshus.com/sizing
+- Atomic: atomic.com/size-charts
 
 #### Alpine Ski Sizing
 | Skier Level | Ski Length |
@@ -374,25 +386,55 @@ Phase 2
 - Comfort fit: +5-10mm from measured length
 - Performance fit: Exact measured length
 
+**Manufacturer References**:
+- Nordica: nordica.com/boot-sizing (includes last width: 98mm, 100mm, 102mm)
+- Lange: langeskiboots.com/size-chart
+- Tecnica: tecnicausa.com/sizing
+- Head: head.com/ski-boot-size-guide
+- Atomic: atomic.com/boot-finder
+- Dalbello: dfracing.com/sizing
+
 #### Snowboard Sizing
 - Beginner: Board reaches chin when standing
 - Intermediate: Board reaches nose
 - Advanced: Board reaches forehead
 
+**Manufacturer References**:
+- Burton: burton.com/size-charts
+- Ride: ridesnowboards.com/sizing
+- K2: k2snow.com/size-guide
+- GNU/Lib Tech: gnu.com/size-charts
+
 #### Hockey Skate Sizing
 - Skate size = US shoe size - 1.5 sizes
 - Width: Tapered (Fit 1), Regular (Fit 2), Wide (Fit 3)
+
+**Manufacturer References**:
+- Bauer: bauer.com/skate-sizing (3D Fit system: Fit 1, Fit 2, Fit 3)
+- CCM: ccmhockey.com/size-charts (Tapered, Regular, Wide)
+- True: truehockey.com/fit-guide
 
 #### Equipment Sizes
 - **Helmets**: By head circumference (cm) - XXS (<51), XS (51-52), S (53-54), M (55-56), L (57-58), XL (59+)
 - **Shin guards**: By height range
 - **Shoulder pads**: By weight/height
 
-### C. External Sizing References
-- Nordic: evo.com, nordicskater.com, jskis.com
-- Alpine: evo.com, skiessentials.com
-- Hockey: Pure Hockey size charts
-- General: coastoutdoors.ca
+**Helmet Manufacturer References**:
+- Smith: smithoptics.com/size-guide
+- Giro: giro.com/size-charts
+- POC: pocsports.com/sizing
+- Sweet Protection: sweetprotection.com/size-guide
+
+### C. External Sizing Aggregators
+| Sport | Reference Sites |
+|-------|-----------------|
+| Nordic | evo.com, nordicskater.com, jskis.com, coastoutdoors.ca |
+| Alpine | evo.com, skiessentials.com, skis.com |
+| Snowboard | evo.com, tactics.com |
+| Hockey | purehockey.com, hockeymonkey.com |
+| General | rei.com/learn/expert-advice |
+
+> **App Feature**: Link directly to manufacturer sizing pages from gear entry forms
 
 ---
 
