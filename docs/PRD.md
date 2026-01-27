@@ -54,14 +54,27 @@ Parents face several challenges when managing their children's sports activities
 - Support for unlimited child profiles per account
 
 #### 1.2 Size Tracking
-- Comprehensive size categories:
-  - **Footwear**: Shoe size (US/EU/UK), width
-  - **Clothing**: Shirt, pants, shorts, jacket (with brand-specific sizing notes)
-  - **Head**: Hat size, helmet size
-  - **Hands**: Glove size
-  - **Protective Gear**: Shin guards, shoulder pads, etc.
-- Size history with dates to track growth over time
-- Measurement logging (height, weight, inseam, etc.)
+
+**Body Measurements** (stored in metric):
+- Height (cm)
+- Weight (kg)
+- Foot Length (cm)
+- Foot Width (cm)
+- Waist (cm)
+- Hand Length (cm)
+- Hand Width (cm)
+- Head Circumference (cm)
+- Inseam (cm)
+
+**Derived Sizes** (auto-calculated from measurements):
+- **Footwear**: EU size (base), with US/UK/Mondopoint conversions
+- **Clothing**: Shirt, pants, shorts, jacket
+- **Head**: Helmet size (by circumference)
+- **Hands**: Glove size
+
+**Size History**:
+- Date-stamped measurement entries
+- Track growth over time per measurement type
 - Growth projections based on historical data
 
 #### 1.3 Quick Update
@@ -85,21 +98,26 @@ Parents face several challenges when managing their children's sports activities
 - Pre-populated templates for common sports gear
 
 #### 2.2 Sport Categories
-Pre-configured categories including:
 
-Phase 1
-- Alpine Skiing
-- Nordic Skiing Classic
-- Nordic Skiing Skate
-- Snowboarding
+**Phase 1 - Winter Sports**
 
-Phase 2
-- Hockey
-- Mountain Biking
-- Lacrosse
+| Sport | Gear Types | Sizing Method |
+|-------|------------|---------------|
+| Alpine Skiing | Skis, Boots, Poles, Helmet, Goggles | Skis by height/weight/ability; Boots by Mondopoint |
+| Nordic Skiing Classic | Skis, Boots, Poles, Bindings | Skis = height + 10-20cm; Poles under armpit |
+| Nordic Skiing Skate | Skis, Boots, Poles, Bindings | Skis = height + 5-15cm; Poles chin-to-lips height |
+| Snowboarding | Board, Boots, Bindings, Helmet, Goggles | Board by height/weight |
 
-Phase 3
-- Custom categories
+**Phase 2 - Additional Sports**
+
+| Sport | Gear Types | Sizing Method |
+|-------|------------|---------------|
+| Hockey | Skates, Helmet, Stick, Gloves, Pads, Pants | Skates = US shoe - 1.5 |
+| Mountain Biking | Bike, Helmet, Gloves, Pads | Bike by height |
+| Lacrosse | Stick, Helmet, Gloves, Pads, Cleats | By age/height |
+
+**Phase 3**
+- Custom categories (user-defined sports and gear types)
 
 #### 2.3 Gear Status
 - **Active**: Currently in use
@@ -320,19 +338,64 @@ Phase 2
 | Inventory apps | Good for items | Not designed for kids/families |
 
 ### B. Size Category Reference
-Save all measurements in metric
 
-#### Footwear Sizes 
-- use EU sizing as base measurement, with conversion
+**All measurements stored in metric (cm, kg)**
 
+#### Footwear Size Conversions (EU as base)
+| EU | US Kids | US Men | US Women | Mondopoint (mm) |
+|----|---------|--------|----------|-----------------|
+| 25 | 8 | - | - | 155 |
+| 28 | 10.5 | - | - | 175 |
+| 32 | 13.5 | - | - | 200 |
+| 35 | 3Y | - | - | 220 |
+| 38 | 6Y | 6 | 7.5 | 240 |
+| 42 | - | 9 | 10.5 | 265 |
+
+**ISO Formulas:**
+- EU size = (Foot length cm + 2 × 0.667) / 0.667
+- US Men = (Foot length cm × 1.08 / 0.847) - 24
+- US Women = US Men + 1.5
+- Mondopoint = Foot length in mm
+
+#### Nordic Ski Sizing
+**Classic Skis**: Skier height + 10-20 cm
+**Skate Skis**: Skier height + 5-15 cm
+**Classic Poles**: Height × 0.83 (should fit uncomfortably under armpit)
+**Skate Poles**: Height × 0.89 (between chin and lips)
+
+#### Alpine Ski Sizing
+| Skier Level | Ski Length |
+|-------------|------------|
+| Beginner | Chin height |
+| Intermediate | Nose height |
+| Advanced | Forehead to top of head |
+
+**Boot Sizing**: Use Mondopoint (foot length in mm)
+- Comfort fit: +5-10mm from measured length
+- Performance fit: Exact measured length
+
+#### Snowboard Sizing
+- Beginner: Board reaches chin when standing
+- Intermediate: Board reaches nose
+- Advanced: Board reaches forehead
+
+#### Hockey Skate Sizing
+- Skate size = US shoe size - 1.5 sizes
+- Width: Tapered (Fit 1), Regular (Fit 2), Wide (Fit 3)
 
 #### Equipment Sizes
-- Helmets: XXS, XS, S, M, L, XL (or head circumference)
-- Shin guards: By height range
-- Shoulder pads: By weight/height
+- **Helmets**: By head circumference (cm) - XXS (<51), XS (51-52), S (53-54), M (55-56), L (57-58), XL (59+)
+- **Shin guards**: By height range
+- **Shoulder pads**: By weight/height
+
+### C. External Sizing References
+- Nordic: evo.com, nordicskater.com, jskis.com
+- Alpine: evo.com, skiessentials.com
+- Hockey: Pure Hockey size charts
+- General: coastoutdoors.ca
 
 ---
 
-*Document Version: 0.2*
+*Document Version: 0.3*
 *Last Updated: January 2026*
 *Author: GearGuru Product Team*
