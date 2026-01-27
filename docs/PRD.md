@@ -210,8 +210,8 @@ Add gear items with:
   - Skate boots, skis, poles
   - Combi boots
 - Alpine Skiing
-  - Boots, skis, poles
-  - Helmets, goggles
+- Nordic Skiing Classic
+- Nordic Skiing Skate
 - Snowboarding
   - Boots, boards, bindings
 
@@ -224,8 +224,8 @@ Add gear items with:
 
 | Sport | Equipment Types |
 |-------|-----------------|
-| Nordic | boot classic, boot skate, boot combi, nordic skis classic, nordic skis skate, nordic skis backcountry, poles |
-| Alpine | boot, ski (Terrain Park/Freestyle, Groomer Cruiser, All-Mountain Versatile, Glade/Tree Skiing, Race/Performance Carving), poles, helmet, goggles |
+| Nordic | boot classic, boot skate, boot combi, nordic skis classic, nordic skis skate, nordic skis backcountry, nordic poles classic, nordic poles skate |
+| Alpine | boot, ski (Park, Cruiser, All-Mountain, Glade, Carving), poles, helmet, goggles |
 | Snowboard | boot, board, bindings |
 | Hockey | skates, stick, helmet, pads |
 
