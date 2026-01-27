@@ -219,6 +219,76 @@ Add gear items with:
 - Hockey
   - Skates, sticks, pads
 - Custom categories
+  - Date of birth
+  - Current sizes (shoes, clothing, helmet, gloves, etc.)
+  - Sports/activities they participate in
+- Support for unlimited child profiles per account
+
+#### 1.2 Size Tracking
+
+**Body Measurements** (stored in metric):
+- Height (cm)
+- Weight (kg)
+- Foot Length (cm)
+- Foot Width (cm)
+- Waist (cm)
+- Hand Length (cm)
+- Hand Width (cm)
+- Head Circumference (cm)
+- Inseam (cm)
+
+**Derived Sizes** (auto-calculated from measurements):
+- **Footwear**: EU size (base), with US/UK/Mondopoint conversions
+- **Clothing**: Shirt, pants, shorts, jacket
+- **Head**: Helmet size (by circumference)
+- **Hands**: Glove size
+
+**Size History**:
+- Date-stamped measurement entries
+- Track growth over time per measurement type
+- Growth projections based on historical data
+
+#### 1.3 Quick Update
+- Simple interface to update sizes
+- Option to set reminders for periodic size checks
+- Photo capture of size tags for quick reference
+
+### 2. Gear Inventory
+
+#### 2.1 Equipment Catalog
+- Add gear items with:
+  - Name and description
+  - Sport/activity category
+  - Size
+  - Condition (new, good, fair, worn)
+  - Brand and model
+  - Purchase date and price (optional)
+  - Photo(s)
+  - Assigned child
+- Barcode/QR code scanning for quick item entry
+- Pre-populated templates for common sports gear
+
+#### 2.2 Sport Categories
+
+**Phase 1 - Winter Sports**
+
+| Sport | Gear Types | Sizing Method |
+|-------|------------|---------------|
+| Alpine Skiing | Skis, Boots, Poles, Helmet, Goggles | Skis by height/weight/ability; Boots by Mondopoint |
+| Nordic Skiing Classic | Skis, Boots, Poles, Bindings | Skis = height + 10-20cm; Poles under armpit |
+| Nordic Skiing Skate | Skis, Boots, Poles, Bindings | Skis = height + 5-15cm; Poles chin-to-lips height |
+| Snowboarding | Board, Boots, Bindings, Helmet, Goggles | Board by height/weight |
+
+**Phase 2 - Additional Sports**
+
+| Sport | Gear Types | Sizing Method |
+|-------|------------|---------------|
+| Hockey | Skates, Helmet, Stick, Gloves, Pads, Pants | Skates = US shoe - 1.5 |
+| Mountain Biking | Bike, Helmet, Gloves, Pads | Bike by height |
+| Lacrosse | Stick, Helmet, Gloves, Pads, Cleats | By age/height |
+
+**Phase 3**
+- Custom categories (user-defined sports and gear types)
 
 #### 3.3 Equipment Types
 
@@ -412,6 +482,115 @@ Curated lists by category:
 
 ## Appendix
 
+### A. Competitive Analysis
+
+| App | Strengths | Weaknesses |
+|-----|-----------|------------|
+| Generic note apps | Familiar, flexible | No structure, no gear features |
+| Spreadsheets | Customizable | Not mobile-friendly, no photos |
+| Kids size apps | Size focused | Limited features, no inventory |
+| Inventory apps | Good for items | Not designed for kids/families |
+
+### B. Size Category Reference
+
+**All measurements stored in metric (cm, kg)**
+
+> **Note**: All sizing tables must link to manufacturer-specific guides. Generic formulas are fallbacks only.
+
+#### Footwear Size Conversions (EU as base)
+| EU | US Kids | US Men | US Women | Mondopoint (mm) |
+|----|---------|--------|----------|-----------------|
+| 25 | 8 | - | - | 155 |
+| 28 | 10.5 | - | - | 175 |
+| 32 | 13.5 | - | - | 200 |
+| 35 | 3Y | - | - | 220 |
+| 38 | 6Y | 6 | 7.5 | 240 |
+| 42 | - | 9 | 10.5 | 265 |
+
+**Reference**: ISO/TS 19407:2015 Mondopoint specification
+**Manufacturer Guides**: Salomon, Rossignol, Fischer, Atomic each have brand-specific charts
+
+**ISO Formulas** (fallback only):
+- EU size = (Foot length cm + 2 × 0.667) / 0.667
+- US Men = (Foot length cm × 1.08 / 0.847) - 24
+- US Women = US Men + 1.5
+- Mondopoint = Foot length in mm
+
+#### Nordic Ski Sizing
+**Classic Skis**: Skier height + 10-20 cm
+**Skate Skis**: Skier height + 5-15 cm
+**Classic Poles**: Height × 0.83 (should fit uncomfortably under armpit)
+**Skate Poles**: Height × 0.89 (between chin and lips)
+
+**Manufacturer References**:
+- Fischer: fischer-sports.com/size-charts (includes FA stiffness values)
+- Salomon: salomon.com/sizing-guide
+- Rossignol: rossignol.com/size-guide
+- Madshus: madshus.com/sizing
+- Atomic: atomic.com/size-charts
+
+#### Alpine Ski Sizing
+| Skier Level | Ski Length |
+|-------------|------------|
+| Beginner | Chin height |
+| Intermediate | Nose height |
+| Advanced | Forehead to top of head |
+
+**Boot Sizing**: Use Mondopoint (foot length in mm)
+- Comfort fit: +5-10mm from measured length
+- Performance fit: Exact measured length
+
+**Manufacturer References**:
+- Nordica: nordica.com/boot-sizing (includes last width: 98mm, 100mm, 102mm)
+- Lange: langeskiboots.com/size-chart
+- Tecnica: tecnicausa.com/sizing
+- Head: head.com/ski-boot-size-guide
+- Atomic: atomic.com/boot-finder
+- Dalbello: dfracing.com/sizing
+
+#### Snowboard Sizing
+- Beginner: Board reaches chin when standing
+- Intermediate: Board reaches nose
+- Advanced: Board reaches forehead
+
+**Manufacturer References**:
+- Burton: burton.com/size-charts
+- Ride: ridesnowboards.com/sizing
+- K2: k2snow.com/size-guide
+- GNU/Lib Tech: gnu.com/size-charts
+
+#### Hockey Skate Sizing
+- Skate size = US shoe size - 1.5 sizes
+- Width: Tapered (Fit 1), Regular (Fit 2), Wide (Fit 3)
+
+**Manufacturer References**:
+- Bauer: bauer.com/skate-sizing (3D Fit system: Fit 1, Fit 2, Fit 3)
+- CCM: ccmhockey.com/size-charts (Tapered, Regular, Wide)
+- True: truehockey.com/fit-guide
+
+#### Equipment Sizes
+- **Helmets**: By head circumference (cm) - XXS (<51), XS (51-52), S (53-54), M (55-56), L (57-58), XL (59+)
+- **Shin guards**: By height range
+- **Shoulder pads**: By weight/height
+
+**Helmet Manufacturer References**:
+- Smith: smithoptics.com/size-guide
+- Giro: giro.com/size-charts
+- POC: pocsports.com/sizing
+- Sweet Protection: sweetprotection.com/size-guide
+
+### C. External Sizing Aggregators
+| Sport | Reference Sites |
+|-------|-----------------|
+| Nordic | evo.com, nordicskater.com, jskis.com, coastoutdoors.ca |
+| Alpine | evo.com, skiessentials.com, skis.com |
+| Snowboard | evo.com, tactics.com |
+| Hockey | purehockey.com, hockeymonkey.com |
+| General | rei.com/learn/expert-advice |
+
+> **App Feature**: Link directly to manufacturer sizing pages from gear entry forms
+
+---
 *All formulas and lookup tables are sourced from: `requirements/Gear Guru.xlsx`*
 
 ### A. Sizing Formula Reference
