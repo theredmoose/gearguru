@@ -69,14 +69,23 @@ Parents face several challenges when managing their family's sports activities:
 | Hand Length | cm | Glove sizing |
 | Hand Width | cm | Glove sizing |
 | Waist | cm | Clothing sizing |
+| Inseam | cm | Pants sizing |
 | Head Circumference | cm | Helmet sizing |
 
-#### 1.3 Measurement History
+#### 1.3 Derived Sizes
+Auto-calculated from body measurements:
+- **Footwear**: EU size (base), with US/UK/Mondopoint conversions
+- **Clothing**: Shirt, pants, shorts, jacket sizes
+- **Head**: Helmet size (by circumference)
+- **Hands**: Glove size
+
+#### 1.4 Measurement History
 - Date-stamped measurement entries
-- Track growth over time
+- Track growth over time per measurement type
+- Growth projections based on historical data
 - Ability to edit previous entries
 
-#### 1.4 Skill Level Tracking
+#### 1.5 Skill Level Tracking
 Per-sport skill levels:
 
 Alpine Skiing Example
@@ -84,6 +93,11 @@ Alpine Skiing Example
 - **Intermediate**: Comfortable on easy/moderate terrain
 - **Advanced**: Confident on most terrain
 - **Expert**: Aggressive, high-performance skiing
+
+#### 1.6 Quick Update
+- Simple interface to update measurements
+- Option to set reminders for periodic size checks
+- Photo capture of size tags for quick reference
 
 ---
 
@@ -200,87 +214,27 @@ Based on height and weight:
 
 #### 3.1 Equipment Catalog
 Add gear items with:
-- **Basic Info**: Name, sport, type, brand, model
-- **Sizing**: Size, shell size, last, flex (as applicable)
-- **Details**: Color, sidecut, radius (for skis)
+- **Basic Info**: Name, description, sport, type, brand, model
+- **Sizing**: Size, shell size, last, flex (as applicable for boots)
+- **Ski Details**: Color, sidecut, radius (for skis)
+- **Condition**: New, good, fair, worn
 - **Assignment**: Current owner, year in use
-- **Photo(s)**
+- **Purchase Info**: Purchase date and price (optional)
+- **Photo(s)**: Multiple photos supported
 
-#### 3.2 Sport Categories
-
-**Phase 1 (MVP)**
-- Nordic Skiing
-  - Classic boots, skis, poles
-  - Skate boots, skis, poles
-  - Combi boots
-- Alpine Skiing
-- Nordic Skiing Classic
-- Nordic Skiing Skate
-- Snowboarding
-  - Boots, boards, bindings
-
-**Phase 2**
-- Hockey
-  - Skates, sticks, pads
-- Custom categories
-  - Date of birth
-  - Current sizes (shoes, clothing, helmet, gloves, etc.)
-  - Sports/activities they participate in
-- Support for unlimited child profiles per account
-
-#### 1.2 Size Tracking
-
-**Body Measurements** (stored in metric):
-- Height (cm)
-- Weight (kg)
-- Foot Length (cm)
-- Foot Width (cm)
-- Waist (cm)
-- Hand Length (cm)
-- Hand Width (cm)
-- Head Circumference (cm)
-- Inseam (cm)
-
-**Derived Sizes** (auto-calculated from measurements):
-- **Footwear**: EU size (base), with US/UK/Mondopoint conversions
-- **Clothing**: Shirt, pants, shorts, jacket
-- **Head**: Helmet size (by circumference)
-- **Hands**: Glove size
-
-**Size History**:
-- Date-stamped measurement entries
-- Track growth over time per measurement type
-- Growth projections based on historical data
-
-#### 1.3 Quick Update
-- Simple interface to update sizes
-- Option to set reminders for periodic size checks
-- Photo capture of size tags for quick reference
-
-### 2. Gear Inventory
-
-#### 2.1 Equipment Catalog
-- Add gear items with:
-  - Name and description
-  - Sport/activity category
-  - Size
-  - Condition (new, good, fair, worn)
-  - Brand and model
-  - Purchase date and price (optional)
-  - Photo(s)
-  - Assigned child
-- Barcode/QR code scanning for quick item entry
+Additional features:
+- Barcode/QR code scanning for quick item entry (Phase 2)
 - Pre-populated templates for common sports gear
 
-#### 2.2 Sport Categories
+#### 3.2 Sport Categories
 
 **Phase 1 - Winter Sports**
 
 | Sport | Gear Types | Sizing Method |
 |-------|------------|---------------|
 | Alpine Skiing | Skis, Boots, Poles, Helmet, Goggles | Skis by height/weight/ability; Boots by Mondopoint |
-| Nordic Skiing Classic | Skis, Boots, Poles, Bindings | Skis = height + 10-20cm; Poles under armpit |
-| Nordic Skiing Skate | Skis, Boots, Poles, Bindings | Skis = height + 5-15cm; Poles chin-to-lips height |
+| Nordic Skiing Classic | Skis, Boots, Poles, Bindings | Skis = height + 10-20cm; Poles = height × 0.83 |
+| Nordic Skiing Skate | Skis, Boots, Poles, Bindings | Skis = height + 5-15cm; Poles = height × 0.89 |
 | Snowboarding | Board, Boots, Bindings, Helmet, Goggles | Board by height/weight |
 
 **Phase 2 - Additional Sports**
@@ -653,11 +607,20 @@ foot_length_cm × 10
 
 ---
 
-*Document Version: 0.3*
+*Document Version: 0.4*
 *Last Updated: January 2026*
 *Author: GearGuru Product Team*
 
 ## Changelog
+
+### v0.4 (January 2026)
+- Fixed section duplication and numbering issues
+- Merged duplicate Equipment Catalog sections (combined fields from both versions)
+- Added Section 1.3 Derived Sizes (auto-calculated from measurements)
+- Added Section 1.6 Quick Update (reminders, photo capture of size tags)
+- Added Inseam to body measurements table
+- Consolidated Sport Categories into single well-formatted table
+- Updated pole sizing formulas in Sport Categories table (height × 0.83/0.89)
 
 ### v0.3 (January 2026)
 - Added source references from Gear Guru.xlsx spreadsheet for all calculations
