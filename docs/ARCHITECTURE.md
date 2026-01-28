@@ -32,7 +32,7 @@ GearGuru is a cross-platform mobile application built with React Native, followi
 │  ┌─────────────────────────────────────────────────────────────┐│
 │  │                      Zustand Store                          ││
 │  │  ┌──────────┐ ┌──────────┐ ┌──────────┐ ┌────────────────┐ ││
-│  │  │ Children │ │   Gear   │ │   Auth   │ │  Notifications │ ││
+│  │  │  Family  │ │   Gear   │ │   Auth   │ │  Notifications │ ││
 │  │  │  Slice   │ │  Slice   │ │  Slice   │ │     Slice      │ ││
 │  │  └──────────┘ └──────────┘ └──────────┘ └────────────────┘ ││
 │  └─────────────────────────────────────────────────────────────┘│
@@ -42,8 +42,8 @@ GearGuru is a cross-platform mobile application built with React Native, followi
 ┌─────────────────────────────────────────────────────────────────┐
 │                        SERVICE LAYER                             │
 │  ┌─────────────┐ ┌─────────────┐ ┌─────────────┐ ┌────────────┐ │
-│  │   Child     │ │    Gear     │ │    Size     │ │   Image    │ │
-│  │  Service    │ │   Service   │ │  Service    │ │  Service   │ │
+│  │   Family    │ │    Gear     │ │   Sizing    │ │   Image    │ │
+│  │  Service    │ │   Service   │ │ Calculator  │ │  Service   │ │
 │  └─────────────┘ └─────────────┘ └─────────────┘ └────────────┘ │
 └─────────────────────────────────────────────────────────────────┘
                                 │
@@ -105,18 +105,18 @@ gearguru/
 ├── app/                          # Expo Router app directory
 │   ├── (tabs)/                   # Tab-based navigation
 │   │   ├── index.tsx             # Home/Dashboard
-│   │   ├── children/             # Children screens
-│   │   │   ├── index.tsx         # Children list
-│   │   │   └── [id].tsx          # Child detail
+│   │   ├── family/               # Family member screens
+│   │   │   ├── index.tsx         # Family members list
+│   │   │   └── [id].tsx          # Member detail
 │   │   ├── gear/                 # Gear screens
 │   │   │   ├── index.tsx         # Gear inventory
 │   │   │   └── [id].tsx          # Gear detail
 │   │   └── settings.tsx          # Settings screen
 │   ├── _layout.tsx               # Root layout
 │   └── modals/                   # Modal screens
-│       ├── add-child.tsx
+│       ├── add-member.tsx
 │       ├── add-gear.tsx
-│       └── size-update.tsx
+│       └── measurement-update.tsx
 │
 ├── src/
 │   ├── components/               # Reusable components
@@ -125,8 +125,8 @@ gearguru/
 │   │   │   ├── Card.tsx
 │   │   │   ├── Input.tsx
 │   │   │   └── index.ts
-│   │   ├── children/             # Child-related components
-│   │   │   ├── ChildCard.tsx
+│   │   ├── family/               # Family member components
+│   │   │   ├── MemberCard.tsx
 │   │   │   ├── SizeDisplay.tsx
 │   │   │   └── GrowthChart.tsx
 │   │   ├── gear/                 # Gear-related components
@@ -134,21 +134,21 @@ gearguru/
 │   │   │   ├── GearList.tsx
 │   │   │   └── StatusBadge.tsx
 │   │   └── forms/                # Form components
-│   │       ├── ChildForm.tsx
+│   │       ├── MemberForm.tsx
 │   │       ├── GearForm.tsx
-│   │       └── SizeForm.tsx
+│   │       └── MeasurementForm.tsx
 │   │
 │   ├── store/                    # Zustand state management
 │   │   ├── index.ts              # Store configuration
-│   │   ├── childrenSlice.ts      # Children state
+│   │   ├── familySlice.ts        # Family members state
 │   │   ├── gearSlice.ts          # Gear state
 │   │   ├── authSlice.ts          # Auth state
 │   │   └── notificationSlice.ts  # Notifications state
 │   │
 │   ├── services/                 # Business logic
-│   │   ├── childService.ts       # Child CRUD operations
+│   │   ├── familyService.ts      # Family member CRUD operations
 │   │   ├── gearService.ts        # Gear CRUD operations
-│   │   ├── sizeService.ts        # Size calculations/conversions
+│   │   ├── sizingCalculator.ts   # Size calculations/conversions
 │   │   ├── imageService.ts       # Image handling
 │   │   └── notificationService.ts
 │   │
@@ -157,13 +157,13 @@ gearguru/
 │   │   ├── migrations/           # Database migrations
 │   │   ├── client.ts             # Database client
 │   │   └── repositories/         # Data access layer
-│   │       ├── childRepository.ts
+│   │       ├── familyRepository.ts
 │   │       └── gearRepository.ts
 │   │
 │   ├── hooks/                    # Custom React hooks
-│   │   ├── useChildren.ts
+│   │   ├── useFamily.ts
 │   │   ├── useGear.ts
-│   │   ├── useSizes.ts
+│   │   ├── useSizingCalculator.ts
 │   │   └── useNotifications.ts
 │   │
 │   ├── utils/                    # Utility functions
@@ -173,9 +173,9 @@ gearguru/
 │   │   └── constants.ts
 │   │
 │   ├── types/                    # TypeScript definitions
-│   │   ├── child.ts
+│   │   ├── family.ts
 │   │   ├── gear.ts
-│   │   ├── size.ts
+│   │   ├── measurement.ts
 │   │   └── index.ts
 │   │
 │   └── config/                   # App configuration
@@ -206,79 +206,100 @@ gearguru/
 
 ```
 ┌──────────────────┐       ┌──────────────────┐
-│      Child       │       │   SizeHistory    │
+│  FamilyMember    │       │   Measurement    │
 ├──────────────────┤       ├──────────────────┤
 │ id (PK)          │───┐   │ id (PK)          │
-│ name             │   │   │ childId (FK)     │──┐
-│ dateOfBirth      │   │   │ category         │  │
-│ photoUri         │   └──▶│ value            │  │
-│ createdAt        │       │ unit             │  │
-│ updatedAt        │       │ recordedAt       │  │
-└──────────────────┘       └──────────────────┘  │
-         │                                        │
-         │ 1:N                                    │
-         ▼                                        │
-┌──────────────────┐       ┌──────────────────┐  │
-│    GearItem      │       │   GearPhoto      │  │
-├──────────────────┤       ├──────────────────┤  │
-│ id (PK)          │───┐   │ id (PK)          │  │
-│ childId (FK)     │◀──┼───│ gearId (FK)      │  │
-│ name             │   │   │ uri              │  │
-│ sport            │   │   │ isPrimary        │  │
-│ category         │   └──▶│ createdAt        │  │
-│ size             │       └──────────────────┘  │
+│ name             │   │   │ memberId (FK)    │──┐
+│ dateOfBirth      │   │   │ type             │  │
+│ sex              │   └──▶│ valueCm          │  │
+│ category (A/Y/C) │       │ recordedAt       │  │
+│ photoUri         │       └──────────────────┘  │
+│ createdAt        │                             │
+│ updatedAt        │       ┌──────────────────┐  │
+└──────────────────┘       │   SkillLevel     │  │
+         │                 ├──────────────────┤  │
+         │ 1:N             │ id (PK)          │  │
+         ▼                 │ memberId (FK)    │◀─┤
+┌──────────────────┐       │ sport            │  │
+│    GearItem      │       │ level            │  │
+├──────────────────┤       │ updatedAt        │  │
+│ id (PK)          │       └──────────────────┘  │
+│ memberId (FK)    │                             │
+│ name             │       ┌──────────────────┐  │
+│ sport            │       │   GearPhoto      │  │
+│ equipmentType    │       ├──────────────────┤  │
+│ size             │       │ id (PK)          │  │
+│ shellSize        │       │ gearId (FK)      │  │
+│ last             │       │ uri              │  │
+│ flex             │       │ isPrimary        │  │
+│ sidecut          │       │ createdAt        │  │
+│ radius           │       └──────────────────┘  │
 │ condition        │                             │
 │ status           │       ┌──────────────────┐  │
-│ brand            │       │   Measurement    │  │
+│ brand            │       │ DisplayPref      │  │
 │ model            │       ├──────────────────┤  │
-│ purchaseDate     │       │ id (PK)          │  │
-│ purchasePrice    │       │ childId (FK)     │◀─┘
-│ notes            │       │ type             │
-│ createdAt        │       │ valueCm          │
-│ updatedAt        │       │ recordedAt       │
-└──────────────────┘       └──────────────────┘
+│ yearInUse        │       │ id (PK)          │  │
+│ purchaseDate     │       │ memberId (FK)    │◀─┘
+│ purchasePrice    │       │ measurementType  │
+│ notes            │       │ displayUnit      │
+│ createdAt        │       └──────────────────┘
+│ updatedAt        │
+└──────────────────┘
 ```
 
 ### TypeScript Types
 
 ```typescript
-// src/types/child.ts
-export interface Child {
+// src/types/family.ts
+export type MemberCategory = 'A' | 'Y' | 'C';  // Adult, Youth, Child
+export type Sex = 'M' | 'F';
+
+export interface FamilyMember {
   id: string;
   name: string;
   dateOfBirth: Date;
+  sex: Sex;
+  category: MemberCategory;
   photoUri?: string;
-  sports: Sport[];
   createdAt: Date;
   updatedAt: Date;
 }
 
-// src/types/size.ts
-export type SizeCategory =
-  | 'footwear'
-  | 'shirt'
-  | 'pants'
-  | 'shorts'
-  | 'jacket'
-  | 'helmet'
-  | 'gloves';
-
-export interface SizeRecord {
+export interface SkillLevel {
   id: string;
-  childId: string;
-  category: SizeCategory;
-  value: string;
-  valueEU?: string;        // EU equivalent for footwear
-  unit: 'EU' | 'US' | 'UK' | 'CM' | 'standard';
-  recordedAt: Date;
+  memberId: string;
+  sport: Sport;
+  level: 'beginner' | 'intermediate' | 'advanced' | 'expert';
+  updatedAt: Date;
 }
+
+// src/types/measurement.ts
+export type MeasurementType =
+  | 'height'
+  | 'weight'
+  | 'foot_length'
+  | 'foot_width'
+  | 'hand_length'
+  | 'hand_width'
+  | 'waist'
+  | 'inseam'
+  | 'head_circumference';
+
+export type DisplayUnit = 'metric' | 'imperial';
 
 export interface Measurement {
   id: string;
-  childId: string;
-  type: 'height' | 'weight' | 'inseam' | 'chest' | 'waist' | 'head';
-  valueCm: number;         // All stored in metric
+  memberId: string;
+  type: MeasurementType;
+  valueCm: number;         // All stored in metric (cm for length, kg for weight)
   recordedAt: Date;
+}
+
+export interface DisplayPreference {
+  id: string;
+  memberId: string;
+  measurementType: MeasurementType;
+  displayUnit: DisplayUnit;
 }
 
 // src/types/gear.ts
@@ -295,13 +316,29 @@ export type Sport =
   // Phase 3
   | 'custom';
 
+// Equipment types per sport (from PRD section 3.3)
+export type NordicEquipment =
+  | 'boot-classic' | 'boot-skate' | 'boot-combi'
+  | 'ski-classic' | 'ski-skate' | 'ski-backcountry'
+  | 'pole-classic' | 'pole-skate';
+
+export type AlpineEquipment =
+  | 'boot'
+  | 'ski-park' | 'ski-cruiser' | 'ski-all-mountain' | 'ski-glade' | 'ski-carving'
+  | 'poles' | 'helmet' | 'goggles';
+
+export type SnowboardEquipment = 'boot' | 'board' | 'bindings';
+
+export type HockeyEquipment = 'skates' | 'stick' | 'helmet' | 'pads';
+
+// Gear status values (from PRD section 3.4)
 export type GearStatus =
-  | 'active'
-  | 'stored'
-  | 'outgrown'
-  | 'loaned'
-  | 'needs-replacement'
-  | 'retired';
+  | 'active'      // Currently assigned and in use
+  | 'available'   // In inventory, unassigned
+  | 'outgrown'    // Too small for current owner
+  | 'to-sell'     // Marked for sale
+  | 'sold'        // Sold/given away
+  | 'needs-repair'; // Requires maintenance
 
 export type GearCondition =
   | 'new'
@@ -311,19 +348,28 @@ export type GearCondition =
 
 export interface GearItem {
   id: string;
-  childId?: string;        // Optional - unassigned gear
+  memberId?: string;       // Optional - unassigned gear
   name: string;
+  description?: string;
   sport: Sport;
-  category: string;        // Sport-specific category
+  equipmentType: string;   // Sport-specific equipment type
   size: string;
   condition: GearCondition;
   status: GearStatus;
   brand?: string;
   model?: string;
+  color?: string;
+  yearInUse?: number;
   purchaseDate?: Date;
   purchasePrice?: number;
   notes?: string;
-  loanedTo?: string;       // Name if status is 'loaned'
+  // Boot-specific fields
+  shellSize?: string;
+  last?: number;           // Width in mm (e.g., 98, 100, 102)
+  flex?: number;           // Flex rating
+  // Ski-specific fields
+  sidecut?: string;
+  radius?: number;         // Turn radius in meters
   createdAt: Date;
   updatedAt: Date;
 }
@@ -343,49 +389,64 @@ export interface GearPhoto {
 // src/database/schema.ts
 import { sqliteTable, text, integer, real } from 'drizzle-orm/sqlite-core';
 
-export const children = sqliteTable('children', {
+export const familyMembers = sqliteTable('family_members', {
   id: text('id').primaryKey(),
   name: text('name').notNull(),
   dateOfBirth: integer('date_of_birth', { mode: 'timestamp' }).notNull(),
+  sex: text('sex').notNull(),                    // 'M' | 'F'
+  category: text('category').notNull(),          // 'A' | 'Y' | 'C'
   photoUri: text('photo_uri'),
-  sports: text('sports', { mode: 'json' }).$type<string[]>().default([]),
   createdAt: integer('created_at', { mode: 'timestamp' }).notNull(),
   updatedAt: integer('updated_at', { mode: 'timestamp' }).notNull(),
 });
 
-export const sizeHistory = sqliteTable('size_history', {
+export const skillLevels = sqliteTable('skill_levels', {
   id: text('id').primaryKey(),
-  childId: text('child_id').notNull().references(() => children.id),
-  category: text('category').notNull(),
-  value: text('value').notNull(),
-  valueEU: text('value_eu'),
-  unit: text('unit').notNull(),
-  recordedAt: integer('recorded_at', { mode: 'timestamp' }).notNull(),
+  memberId: text('member_id').notNull().references(() => familyMembers.id),
+  sport: text('sport').notNull(),
+  level: text('level').notNull(),                // beginner/intermediate/advanced/expert
+  updatedAt: integer('updated_at', { mode: 'timestamp' }).notNull(),
 });
 
 export const measurements = sqliteTable('measurements', {
   id: text('id').primaryKey(),
-  childId: text('child_id').notNull().references(() => children.id),
-  type: text('type').notNull(),
-  valueCm: real('value_cm').notNull(),
+  memberId: text('member_id').notNull().references(() => familyMembers.id),
+  type: text('type').notNull(),                  // height, weight, foot_length, etc.
+  valueCm: real('value_cm').notNull(),           // All stored in metric
   recordedAt: integer('recorded_at', { mode: 'timestamp' }).notNull(),
+});
+
+export const displayPreferences = sqliteTable('display_preferences', {
+  id: text('id').primaryKey(),
+  memberId: text('member_id').notNull().references(() => familyMembers.id),
+  measurementType: text('measurement_type').notNull(),
+  displayUnit: text('display_unit').notNull(),   // 'metric' | 'imperial'
 });
 
 export const gearItems = sqliteTable('gear_items', {
   id: text('id').primaryKey(),
-  childId: text('child_id').references(() => children.id),
+  memberId: text('member_id').references(() => familyMembers.id),
   name: text('name').notNull(),
+  description: text('description'),
   sport: text('sport').notNull(),
-  category: text('category').notNull(),
+  equipmentType: text('equipment_type').notNull(),
   size: text('size').notNull(),
   condition: text('condition').notNull(),
-  status: text('status').notNull().default('active'),
+  status: text('status').notNull().default('available'),
   brand: text('brand'),
   model: text('model'),
+  color: text('color'),
+  yearInUse: integer('year_in_use'),
   purchaseDate: integer('purchase_date', { mode: 'timestamp' }),
   purchasePrice: real('purchase_price'),
   notes: text('notes'),
-  loanedTo: text('loaned_to'),
+  // Boot-specific fields
+  shellSize: text('shell_size'),
+  last: integer('last'),                         // Width in mm
+  flex: integer('flex'),
+  // Ski-specific fields
+  sidecut: text('sidecut'),
+  radius: real('radius'),                        // Turn radius in meters
   createdAt: integer('created_at', { mode: 'timestamp' }).notNull(),
   updatedAt: integer('updated_at', { mode: 'timestamp' }).notNull(),
 });
@@ -418,6 +479,7 @@ export interface GearCategory {
   name: string;
   sizeType: 'footwear' | 'clothing' | 'helmet' | 'equipment' | 'custom';
   required: boolean;
+  subtypes?: string[];  // For equipment with variants (e.g., ski types)
 }
 
 export const SPORTS: SportConfig[] = [
@@ -428,7 +490,13 @@ export const SPORTS: SportConfig[] = [
     phase: 1,
     icon: 'skiing',
     gearCategories: [
-      { id: 'skis', name: 'Skis', sizeType: 'equipment', required: true },
+      {
+        id: 'skis',
+        name: 'Skis',
+        sizeType: 'equipment',
+        required: true,
+        subtypes: ['park', 'cruiser', 'all-mountain', 'glade', 'carving'],
+      },
       { id: 'boots', name: 'Ski Boots', sizeType: 'footwear', required: true },
       { id: 'helmet', name: 'Helmet', sizeType: 'helmet', required: true },
       { id: 'goggles', name: 'Goggles', sizeType: 'equipment', required: true },
@@ -444,9 +512,21 @@ export const SPORTS: SportConfig[] = [
     phase: 1,
     icon: 'skiing-nordic',
     gearCategories: [
-      { id: 'skis', name: 'Classic Skis', sizeType: 'equipment', required: true },
-      { id: 'boots', name: 'Classic Boots', sizeType: 'footwear', required: true },
-      { id: 'poles', name: 'Poles', sizeType: 'equipment', required: true },
+      {
+        id: 'skis',
+        name: 'Classic Skis',
+        sizeType: 'equipment',
+        required: true,
+        subtypes: ['classic', 'backcountry'],
+      },
+      {
+        id: 'boots',
+        name: 'Boots',
+        sizeType: 'footwear',
+        required: true,
+        subtypes: ['classic', 'combi'],
+      },
+      { id: 'poles', name: 'Classic Poles', sizeType: 'equipment', required: true },
       { id: 'bindings', name: 'Bindings', sizeType: 'equipment', required: true },
     ],
   },
@@ -457,8 +537,14 @@ export const SPORTS: SportConfig[] = [
     icon: 'skiing-nordic',
     gearCategories: [
       { id: 'skis', name: 'Skate Skis', sizeType: 'equipment', required: true },
-      { id: 'boots', name: 'Skate Boots', sizeType: 'footwear', required: true },
-      { id: 'poles', name: 'Poles', sizeType: 'equipment', required: true },
+      {
+        id: 'boots',
+        name: 'Boots',
+        sizeType: 'footwear',
+        required: true,
+        subtypes: ['skate', 'combi'],
+      },
+      { id: 'poles', name: 'Skate Poles', sizeType: 'equipment', required: true },
       { id: 'bindings', name: 'Bindings', sizeType: 'equipment', required: true },
     ],
   },
@@ -521,38 +607,151 @@ export const SPORTS: SportConfig[] = [
 
 ---
 
-## Size Conversion Utilities
+## Sizing Calculator Service
 
 ```typescript
-// src/utils/sizeConversions.ts
+// src/services/sizingCalculator.ts
 
-// EU sizing as base (per PRD requirement)
-export const FOOTWEAR_CONVERSIONS = {
-  // EU to US Kids
-  euToUsKids: (eu: number): string => {
-    const conversions: Record<number, string> = {
-      17: '2', 18: '3', 19: '4', 20: '4.5', 21: '5', 22: '6',
-      23: '6.5', 24: '7.5', 25: '8', 26: '9', 27: '9.5',
-      28: '10.5', 29: '11', 30: '12', 31: '12.5', 32: '13.5',
-      33: '1Y', 34: '2Y', 35: '3Y', 36: '4Y', 37: '5Y', 38: '6Y',
-    };
-    return conversions[eu] || `EU ${eu}`;
-  },
+import { SkillLevel } from '../types/family';
 
-  // EU to CM (mondopoint)
-  euToCm: (eu: number): number => {
-    return Math.round((eu + 1.5) * 0.667 * 10) / 10;
+// ============================================
+// SHOE SIZE CONVERSIONS (from PRD section 2.1)
+// ============================================
+export const shoeSize = {
+  // Calculate from foot length in cm
+  fromFootLength: (footCm: number) => ({
+    eu: Math.round((footCm + 2 * 0.667) / 0.667),
+    usMen: Math.round(((footCm + 2 * 0.847) / 0.847 - 24) * 2) / 2,
+    usWomen: Math.round(((footCm + 2 * 0.847) / 0.847 - 23) * 2) / 2,
+    usKids: Math.round((footCm * 1.08 / 0.847 - 11.5 + 0.4) * 2) / 2,
+    mondopoint: Math.round(footCm * 10),  // Foot length in mm
+  }),
+};
+
+// ============================================
+// NORDIC SKIING SIZING (from PRD section 2.2)
+// ============================================
+export const nordicSizing = {
+  // Classic skis: height + 10-20 cm
+  classicSkiLength: (heightCm: number) => ({
+    min: heightCm + 10,
+    ideal: heightCm + 15,
+    max: heightCm + 20,
+  }),
+
+  // Skate skis: height + 5-15 cm
+  skateSkiLength: (heightCm: number) => ({
+    min: heightCm + 5,
+    ideal: heightCm + 10,
+    max: heightCm + 15,
+  }),
+
+  // Classic poles: height × 0.83 (shoulder height)
+  classicPoleLength: (heightCm: number) => Math.round(heightCm * 0.83),
+
+  // Skate poles: height × 0.89 (chin/nose height)
+  skatePoleLength: (heightCm: number) => Math.round(heightCm * 0.89),
+
+  // Kids classic skis by weight (from PRD table)
+  kidsClassicSkiByWeight: (weightKg: number): { min: number; max: number } => {
+    if (weightKg < 16) return { min: 90, max: 100 };
+    if (weightKg < 20) return { min: 100, max: 110 };
+    if (weightKg < 25) return { min: 110, max: 120 };
+    if (weightKg < 30) return { min: 120, max: 130 };
+    if (weightKg < 35) return { min: 130, max: 140 };
+    if (weightKg < 40) return { min: 140, max: 150 };
+    if (weightKg < 45) return { min: 150, max: 160 };
+    return { min: 160, max: 180 };
   },
 };
 
-// Store all body measurements in metric (cm, kg)
+// ============================================
+// ALPINE SKIING SIZING (from PRD section 2.3)
+// ============================================
+export const alpineSizing = {
+  // Ski length based on height and skill level
+  skiLength: (heightCm: number, level: SkillLevel['level']) => {
+    const ranges: Record<typeof level, { min: number; max: number }> = {
+      beginner: { min: heightCm - 20, max: heightCm - 15 },
+      intermediate: { min: heightCm - 15, max: heightCm - 10 },
+      advanced: { min: heightCm - 10, max: heightCm - 5 },
+      expert: { min: heightCm - 5, max: heightCm },
+    };
+    return ranges[level];
+  },
+
+  // Boot sizing (Mondopoint = foot length cm × 10)
+  bootSize: (footLengthCm: number) => ({
+    mondopoint: Math.round(footLengthCm * 10),
+    shellSize: Math.round(footLengthCm * 10),  // Same as mondopoint
+  }),
+
+  // Boot width categories (last in mm)
+  bootWidth: (footWidthCm: number): 'narrow' | 'medium' | 'wide' => {
+    const widthMm = footWidthCm * 10;
+    if (widthMm < 99) return 'narrow';   // ~98mm last
+    if (widthMm < 101) return 'medium';  // ~100mm last
+    return 'wide';                        // ~102mm+ last
+  },
+
+  // Boot flex recommendation by skill and sex
+  bootFlex: (level: SkillLevel['level'], sex: 'M' | 'F') => {
+    const flexRanges = {
+      M: { beginner: [60, 80], intermediate: [80, 100], advanced: [100, 120], expert: [120, 140] },
+      F: { beginner: [50, 70], intermediate: [70, 90], advanced: [90, 110], expert: [110, 130] },
+    };
+    const [min, max] = flexRanges[sex][level];
+    return { min, max };
+  },
+};
+
+// ============================================
+// SNOWBOARD SIZING (from PRD section 2.4)
+// ============================================
+export const snowboardSizing = {
+  // Board length based on height and skill level
+  boardLength: (heightCm: number, level: SkillLevel['level']) => {
+    // Beginner: chin height, Intermediate: nose, Advanced: forehead+
+    const multipliers: Record<typeof level, { min: number; max: number }> = {
+      beginner: { min: 0.80, max: 0.85 },      // Chin height
+      intermediate: { min: 0.85, max: 0.90 },  // Nose height
+      advanced: { min: 0.90, max: 0.95 },      // Forehead
+      expert: { min: 0.95, max: 1.00 },        // Above head
+    };
+    const range = multipliers[level];
+    return {
+      min: Math.round(heightCm * range.min),
+      max: Math.round(heightCm * range.max),
+    };
+  },
+};
+
+// ============================================
+// HOCKEY SIZING (from PRD section 2.5)
+// ============================================
+export const hockeySizing = {
+  // Skate size: US shoe size - 1 to 1.5
+  skateSize: (usShoeSize: number) => ({
+    min: usShoeSize - 1.5,
+    max: usShoeSize - 1,
+  }),
+};
+
+// ============================================
+// UNIT CONVERSIONS
+// ============================================
 export const convertToMetric = {
   inchesToCm: (inches: number): number => inches * 2.54,
+  feetInchesToCm: (feet: number, inches: number): number => (feet * 12 + inches) * 2.54,
   lbsToKg: (lbs: number): number => lbs * 0.453592,
 };
 
 export const convertFromMetric = {
   cmToInches: (cm: number): number => cm / 2.54,
+  cmToFeetInches: (cm: number): { feet: number; inches: number } => {
+    const totalInches = cm / 2.54;
+    return { feet: Math.floor(totalInches / 12), inches: Math.round(totalInches % 12) };
+  },
   kgToLbs: (kg: number): number => kg / 0.453592,
 };
 ```
@@ -566,15 +765,15 @@ export const convertFromMetric = {
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { createChildrenSlice, ChildrenSlice } from './childrenSlice';
+import { createFamilySlice, FamilySlice } from './familySlice';
 import { createGearSlice, GearSlice } from './gearSlice';
 
-type StoreState = ChildrenSlice & GearSlice;
+type StoreState = FamilySlice & GearSlice;
 
 export const useStore = create<StoreState>()(
   persist(
     (...args) => ({
-      ...createChildrenSlice(...args),
+      ...createFamilySlice(...args),
       ...createGearSlice(...args),
     }),
     {
@@ -582,49 +781,49 @@ export const useStore = create<StoreState>()(
       storage: createJSONStorage(() => AsyncStorage),
       partialize: (state) => ({
         // Only persist specific state
-        selectedChildId: state.selectedChildId,
+        selectedMemberId: state.selectedMemberId,
         filterSport: state.filterSport,
       }),
     }
   )
 );
 
-// src/store/childrenSlice.ts
+// src/store/familySlice.ts
 import { StateCreator } from 'zustand';
-import { Child } from '../types';
+import { FamilyMember } from '../types';
 
-export interface ChildrenSlice {
-  children: Child[];
-  selectedChildId: string | null;
+export interface FamilySlice {
+  members: FamilyMember[];
+  selectedMemberId: string | null;
   isLoading: boolean;
 
   // Actions
-  setChildren: (children: Child[]) => void;
-  addChild: (child: Child) => void;
-  updateChild: (id: string, updates: Partial<Child>) => void;
-  deleteChild: (id: string) => void;
-  selectChild: (id: string | null) => void;
+  setMembers: (members: FamilyMember[]) => void;
+  addMember: (member: FamilyMember) => void;
+  updateMember: (id: string, updates: Partial<FamilyMember>) => void;
+  deleteMember: (id: string) => void;
+  selectMember: (id: string | null) => void;
 }
 
-export const createChildrenSlice: StateCreator<ChildrenSlice> = (set) => ({
-  children: [],
-  selectedChildId: null,
+export const createFamilySlice: StateCreator<FamilySlice> = (set) => ({
+  members: [],
+  selectedMemberId: null,
   isLoading: false,
 
-  setChildren: (children) => set({ children }),
-  addChild: (child) => set((state) => ({
-    children: [...state.children, child]
+  setMembers: (members) => set({ members }),
+  addMember: (member) => set((state) => ({
+    members: [...state.members, member]
   })),
-  updateChild: (id, updates) => set((state) => ({
-    children: state.children.map((c) =>
-      c.id === id ? { ...c, ...updates, updatedAt: new Date() } : c
+  updateMember: (id, updates) => set((state) => ({
+    members: state.members.map((m) =>
+      m.id === id ? { ...m, ...updates, updatedAt: new Date() } : m
     ),
   })),
-  deleteChild: (id) => set((state) => ({
-    children: state.children.filter((c) => c.id !== id),
-    selectedChildId: state.selectedChildId === id ? null : state.selectedChildId,
+  deleteMember: (id) => set((state) => ({
+    members: state.members.filter((m) => m.id !== id),
+    selectedMemberId: state.selectedMemberId === id ? null : state.selectedMemberId,
   })),
-  selectChild: (id) => set({ selectedChildId: id }),
+  selectMember: (id) => set({ selectedMemberId: id }),
 });
 ```
 
@@ -638,20 +837,21 @@ export const createChildrenSlice: StateCreator<ChildrenSlice> = (set) => ({
 /*
 (tabs)/
 ├── index.tsx              → Dashboard (Home)
-├── children/
-│   ├── index.tsx          → Children list
-│   └── [id].tsx           → Child detail (sizes, gear by sport)
+├── family/
+│   ├── index.tsx          → Family members list
+│   └── [id].tsx           → Member detail (measurements, gear by sport)
 ├── gear/
 │   ├── index.tsx          → All gear inventory
 │   └── [id].tsx           → Gear item detail
+├── calculator.tsx         → Sizing calculators
 └── settings.tsx           → App settings
 
 modals/
-├── add-child.tsx          → Add new child
-├── edit-child/[id].tsx    → Edit child
+├── add-member.tsx         → Add new family member
+├── edit-member/[id].tsx   → Edit family member
 ├── add-gear.tsx           → Add new gear
 ├── edit-gear/[id].tsx     → Edit gear
-├── size-update/[childId].tsx → Quick size update
+├── measurement-update/[memberId].tsx → Quick measurement update
 └── camera.tsx             → Camera for photos
 */
 ```
@@ -681,25 +881,29 @@ modals/
 ## MVP Implementation Phases
 
 ### Phase 1: Core MVP
-1. Child profile CRUD
-2. Basic size tracking (manual entry)
-3. Gear inventory (Phase 1 sports only)
-4. Local SQLite storage
-5. Basic search/filter
+1. Family member profile CRUD (with category A/Y/C, sex)
+2. Body measurement tracking (all 9 measurement types)
+3. Skill level tracking per sport
+4. Sizing calculators (shoe, nordic, alpine)
+5. Gear inventory (Phase 1 sports only)
+6. Local SQLite storage
+7. Basic search/filter
 
 ### Phase 2: Enhanced Features
 1. Phase 2 sports (Hockey, MTB, Lacrosse)
 2. Photo capture for gear
-3. Size history visualization
-4. Basic notifications
-5. Export functionality
+3. Measurement history visualization
+4. Display unit preferences per measurement
+5. Basic notifications
+6. Export functionality
 
 ### Phase 3: Advanced Features
 1. Custom sport categories
 2. Cloud sync (optional)
-3. Family sharing
+3. Multi-user family sharing
 4. Growth predictions
 5. VoiceOver/TalkBack accessibility
+6. Barcode/QR code scanning
 
 ---
 
@@ -716,5 +920,20 @@ modals/
 
 ---
 
-*Document Version: 1.0*
+*Document Version: 1.1*
 *Last Updated: January 2026*
+
+## Changelog
+
+### v1.1 (January 2026)
+- Renamed "Child" to "FamilyMember" with category (A/Y/C) and sex fields
+- Added all 9 measurement types from PRD (including inseam, foot width, hand dimensions)
+- Added SkillLevel entity for per-sport skill tracking
+- Added DisplayPreference entity for user measurement unit preferences
+- Added boot-specific fields (shellSize, last, flex) to GearItem
+- Added ski-specific fields (sidecut, radius) to GearItem
+- Aligned GearStatus values with PRD (active, available, outgrown, to-sell, sold, needs-repair)
+- Added comprehensive Sizing Calculator Service with all formulas from PRD
+- Added equipment subtypes (alpine ski types, nordic combi boots, backcountry skis)
+- Updated all references from "child" to "family member" terminology
+- Added calculator screen to navigation structure
