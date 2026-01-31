@@ -94,39 +94,36 @@ export function SportSizing({ member, onBack }: SportSizingProps) {
     const bootSizing = calculateNordicBootSizing(member.measurements);
 
     return (
-      <div className="sizing-grid">
-        <div className="sizing-card">
-          <h3>Ski Length</h3>
-          <div className="sizing-main">
-            <span className="sizing-value">{skiSizing.skiLengthRecommended}</span>
-            <span className="sizing-unit">cm</span>
+      <div className="sizing-sections">
+        <section className="sizing-section">
+          <h2>Equipment Sizing</h2>
+          <div className="sizing-list">
+            <div className="sizing-row">
+              <span className="sizing-label">Skis</span>
+              <div className="sizing-value-group">
+                <span className="sizing-value">{skiSizing.skiLengthRecommended}</span>
+                <span className="sizing-unit">cm</span>
+                <span className="sizing-range">({formatSizeRange(skiSizing.skiLengthMin, skiSizing.skiLengthMax)})</span>
+              </div>
+            </div>
+            <div className="sizing-row">
+              <span className="sizing-label">Poles</span>
+              <div className="sizing-value-group">
+                <span className="sizing-value">{skiSizing.poleLengthRecommended}</span>
+                <span className="sizing-unit">cm</span>
+                <span className="sizing-range">({formatSizeRange(skiSizing.poleLengthMin, skiSizing.poleLengthMax)})</span>
+              </div>
+            </div>
+            <div className="sizing-row">
+              <span className="sizing-label">Boots</span>
+              <div className="sizing-value-group">
+                <span className="sizing-value">{bootSizing.mondopoint}</span>
+                <span className="sizing-unit">MP</span>
+                <span className="sizing-range">(EU {bootSizing.euSize} / US {bootSizing.usSize})</span>
+              </div>
+            </div>
           </div>
-          <p className="sizing-range">
-            {formatSizeRange(skiSizing.skiLengthMin, skiSizing.skiLengthMax)}
-          </p>
-        </div>
-
-        <div className="sizing-card">
-          <h3>Pole Length</h3>
-          <div className="sizing-main">
-            <span className="sizing-value">{skiSizing.poleLengthRecommended}</span>
-            <span className="sizing-unit">cm</span>
-          </div>
-          <p className="sizing-range">
-            {formatSizeRange(skiSizing.poleLengthMin, skiSizing.poleLengthMax)}
-          </p>
-        </div>
-
-        <div className="sizing-card">
-          <h3>Boot Size</h3>
-          <div className="sizing-main">
-            <span className="sizing-value">{bootSizing.mondopoint}</span>
-            <span className="sizing-unit">MP</span>
-          </div>
-          <p className="sizing-range">
-            EU {bootSizing.euSize} / US {bootSizing.usSize}
-          </p>
-        </div>
+        </section>
       </div>
     );
   };
@@ -144,46 +141,47 @@ export function SportSizing({ member, onBack }: SportSizingProps) {
     );
 
     return (
-      <div className="sizing-grid">
-        <div className="sizing-card">
-          <h3>Ski Length</h3>
-          <div className="sizing-main">
-            <span className="sizing-value">{skiSizing.skiLengthRecommended}</span>
-            <span className="sizing-unit">cm</span>
+      <div className="sizing-sections">
+        <section className="sizing-section">
+          <h2>Equipment Sizing</h2>
+          <div className="sizing-list">
+            <div className="sizing-row">
+              <span className="sizing-label">Skis</span>
+              <div className="sizing-value-group">
+                <span className="sizing-value">{skiSizing.skiLengthRecommended}</span>
+                <span className="sizing-unit">cm</span>
+                <span className="sizing-range">({formatSizeRange(skiSizing.skiLengthMin, skiSizing.skiLengthMax)})</span>
+              </div>
+            </div>
+            <div className="sizing-row">
+              <span className="sizing-label">Boots</span>
+              <div className="sizing-value-group">
+                <span className="sizing-value">{bootSizing.mondopoint}</span>
+                <span className="sizing-unit">MP</span>
+                <span className="sizing-range">(Shell {bootSizing.shellSize}, {bootSizing.lastWidth})</span>
+              </div>
+            </div>
+            <div className="sizing-row">
+              <span className="sizing-label">Boot Flex</span>
+              <div className="sizing-value-group">
+                <span className="sizing-value">{bootSizing.flexRating.min}-{bootSizing.flexRating.max}</span>
+              </div>
+            </div>
           </div>
-          <p className="sizing-range">
-            {formatSizeRange(skiSizing.skiLengthMin, skiSizing.skiLengthMax)}
-          </p>
-        </div>
+        </section>
 
-        <div className="sizing-card">
-          <h3>DIN Setting</h3>
-          <div className="sizing-main">
-            <span className="sizing-value">
-              {skiSizing.din.min}-{skiSizing.din.max}
-            </span>
+        <section className="sizing-section">
+          <h2>Gear Settings</h2>
+          <div className="sizing-list">
+            <div className="sizing-row">
+              <span className="sizing-label">DIN</span>
+              <div className="sizing-value-group">
+                <span className="sizing-value">{skiSizing.din.min}-{skiSizing.din.max}</span>
+                <span className="sizing-note">Verify with tech</span>
+              </div>
+            </div>
           </div>
-          <p className="sizing-note">Verify with tech</p>
-        </div>
-
-        <div className="sizing-card">
-          <h3>Boot Size</h3>
-          <div className="sizing-main">
-            <span className="sizing-value">{bootSizing.mondopoint}</span>
-            <span className="sizing-unit">MP</span>
-          </div>
-          <p className="sizing-range">Shell {bootSizing.shellSize}</p>
-        </div>
-
-        <div className="sizing-card">
-          <h3>Boot Flex</h3>
-          <div className="sizing-main">
-            <span className="sizing-value">
-              {bootSizing.flexRating.min}-{bootSizing.flexRating.max}
-            </span>
-          </div>
-          <p className="sizing-range">{bootSizing.lastWidth} width</p>
-        </div>
+        </section>
       </div>
     );
   };
@@ -193,47 +191,49 @@ export function SportSizing({ member, onBack }: SportSizingProps) {
     const bootSizing = calculateSnowboardBootSizing(member.measurements);
 
     return (
-      <div className="sizing-grid">
-        <div className="sizing-card">
-          <h3>Board Length</h3>
-          <div className="sizing-main">
-            <span className="sizing-value">{boardSizing.boardLengthRecommended}</span>
-            <span className="sizing-unit">cm</span>
+      <div className="sizing-sections">
+        <section className="sizing-section">
+          <h2>Equipment Sizing</h2>
+          <div className="sizing-list">
+            <div className="sizing-row">
+              <span className="sizing-label">Board</span>
+              <div className="sizing-value-group">
+                <span className="sizing-value">{boardSizing.boardLengthRecommended}</span>
+                <span className="sizing-unit">cm</span>
+                <span className="sizing-range">({formatSizeRange(boardSizing.boardLengthMin, boardSizing.boardLengthMax)})</span>
+              </div>
+            </div>
+            <div className="sizing-row">
+              <span className="sizing-label">Board Waist</span>
+              <div className="sizing-value-group">
+                <span className="sizing-value">{boardSizing.waistWidthMin}+</span>
+                <span className="sizing-unit">mm</span>
+                <span className="sizing-range">(minimum)</span>
+              </div>
+            </div>
+            <div className="sizing-row">
+              <span className="sizing-label">Boots</span>
+              <div className="sizing-value-group">
+                <span className="sizing-value">{bootSizing.mondopoint}</span>
+                <span className="sizing-unit">MP</span>
+                <span className="sizing-range">(EU {bootSizing.euSize} / US {bootSizing.usSize})</span>
+              </div>
+            </div>
           </div>
-          <p className="sizing-range">
-            {formatSizeRange(boardSizing.boardLengthMin, boardSizing.boardLengthMax)}
-          </p>
-        </div>
+        </section>
 
-        <div className="sizing-card">
-          <h3>Waist Width</h3>
-          <div className="sizing-main">
-            <span className="sizing-value">{boardSizing.waistWidthMin}+</span>
-            <span className="sizing-unit">mm</span>
+        <section className="sizing-section">
+          <h2>Gear Settings</h2>
+          <div className="sizing-list">
+            <div className="sizing-row">
+              <span className="sizing-label">Stance Width</span>
+              <div className="sizing-value-group">
+                <span className="sizing-value">{boardSizing.stanceWidth.min}-{boardSizing.stanceWidth.max}</span>
+                <span className="sizing-unit">cm</span>
+              </div>
+            </div>
           </div>
-          <p className="sizing-range">minimum</p>
-        </div>
-
-        <div className="sizing-card">
-          <h3>Stance Width</h3>
-          <div className="sizing-main">
-            <span className="sizing-value">
-              {boardSizing.stanceWidth.min}-{boardSizing.stanceWidth.max}
-            </span>
-            <span className="sizing-unit">cm</span>
-          </div>
-        </div>
-
-        <div className="sizing-card">
-          <h3>Boot Size</h3>
-          <div className="sizing-main">
-            <span className="sizing-value">{bootSizing.mondopoint}</span>
-            <span className="sizing-unit">MP</span>
-          </div>
-          <p className="sizing-range">
-            EU {bootSizing.euSize} / US {bootSizing.usSize}
-          </p>
-        </div>
+        </section>
       </div>
     );
   };
@@ -243,30 +243,31 @@ export function SportSizing({ member, onBack }: SportSizingProps) {
     const ccmSizing = calculateHockeySkateSize(member.measurements, 'ccm');
 
     return (
-      <div className="sizing-grid">
-        <div className="sizing-card">
-          <h3>Bauer</h3>
-          <div className="sizing-main">
-            <span className="sizing-value">{bauerSizing.skateSizeUS}</span>
-            <span className="sizing-unit">{bauerSizing.width}</span>
+      <div className="sizing-sections">
+        <section className="sizing-section">
+          <h2>Equipment Sizing</h2>
+          <div className="sizing-list">
+            <div className="sizing-row">
+              <span className="sizing-label">Bauer Skates</span>
+              <div className="sizing-value-group">
+                <span className="sizing-value">{bauerSizing.skateSizeUS}</span>
+                <span className="sizing-unit">{bauerSizing.width}</span>
+                <span className="sizing-range">(EU {bauerSizing.skateSizeEU})</span>
+              </div>
+            </div>
+            <div className="sizing-row">
+              <span className="sizing-label">CCM Skates</span>
+              <div className="sizing-value-group">
+                <span className="sizing-value">{ccmSizing.skateSizeUS}</span>
+                <span className="sizing-unit">{ccmSizing.width}</span>
+                <span className="sizing-range">(EU {ccmSizing.skateSizeEU})</span>
+              </div>
+            </div>
           </div>
-          <p className="sizing-range">EU {bauerSizing.skateSizeEU}</p>
-        </div>
-
-        <div className="sizing-card">
-          <h3>CCM</h3>
-          <div className="sizing-main">
-            <span className="sizing-value">{ccmSizing.skateSizeUS}</span>
-            <span className="sizing-unit">{ccmSizing.width}</span>
-          </div>
-          <p className="sizing-range">EU {ccmSizing.skateSizeEU}</p>
-        </div>
-
-        <div className="sizing-card sizing-card-wide">
           <p className="sizing-tip">
             Hockey skates run 1-1.5 sizes smaller than shoes. Try with hockey socks.
           </p>
-        </div>
+        </section>
       </div>
     );
   };

@@ -26,8 +26,8 @@ describe('SportSizing', () => {
       render(<SportSizing {...defaultProps} />);
       // Nordic Classic appears in both tab and header
       expect(screen.getAllByText('Nordic Classic').length).toBeGreaterThanOrEqual(1);
-      expect(screen.getByText('Ski Length')).toBeInTheDocument();
-      expect(screen.getByText('Pole Length')).toBeInTheDocument();
+      expect(screen.getByText('Skis')).toBeInTheDocument();
+      expect(screen.getByText('Poles')).toBeInTheDocument();
     });
 
     it('displays all sport tabs', () => {
@@ -62,22 +62,22 @@ describe('SportSizing', () => {
     it('switches to Alpine tab when clicked', () => {
       render(<SportSizing {...defaultProps} />);
       fireEvent.click(screen.getByRole('button', { name: /alpine/i }));
-      expect(screen.getByText('DIN Setting')).toBeInTheDocument();
+      expect(screen.getByText('DIN')).toBeInTheDocument();
       expect(screen.getByText('Boot Flex')).toBeInTheDocument();
     });
 
     it('switches to Snowboard tab when clicked', () => {
       render(<SportSizing {...defaultProps} />);
       fireEvent.click(screen.getByRole('button', { name: /snowboard/i }));
-      expect(screen.getByText('Board Length')).toBeInTheDocument();
-      expect(screen.getByText('Waist Width')).toBeInTheDocument();
+      expect(screen.getByText('Board')).toBeInTheDocument();
+      expect(screen.getByText('Board Waist')).toBeInTheDocument();
     });
 
     it('switches to Hockey tab when clicked', () => {
       render(<SportSizing {...defaultProps} />);
       fireEvent.click(screen.getByRole('button', { name: /hockey/i }));
-      expect(screen.getByText('Bauer')).toBeInTheDocument();
-      expect(screen.getByText('CCM')).toBeInTheDocument();
+      expect(screen.getByText('Bauer Skates')).toBeInTheDocument();
+      expect(screen.getByText('CCM Skates')).toBeInTheDocument();
     });
 
     it('hides skill selector for Hockey', () => {
