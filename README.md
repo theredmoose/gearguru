@@ -1,73 +1,128 @@
 # GearGuru
 
-A mobile app to help parents track their children's sizes and manage sports gear inventory.
+A mobile-first web app to help families track body measurements and get equipment sizing recommendations for sports gear.
 
-## Problem
+## Features
 
-Parents struggle to keep track of rapidly changing kids' sizes across multiple children and sports, leading to:
-- Wrong size purchases
-- Duplicate gear buying
-- Forgotten equipment between seasons
-- Missed hand-me-down opportunities
-
-## Solution
-
-GearGuru provides a centralized platform for:
-- **Size Tracking** - Body measurements with growth history
-- **Gear Inventory** - Equipment catalog organized by sport
-- **Smart Sizing** - Auto-calculated sizes from measurements
-- **Hand-Me-Down Management** - Sibling matching when gear is outgrown
+- **Family Member Profiles** - Track measurements for each family member
+- **Equipment Sizing** - Auto-calculated sizes for skis, boots, boards, and skates
+- **Shoe Size Converter** - Convert between EU, US, UK, and Mondopoint systems
+- **Multi-Sport Support** - Nordic, Alpine, Snowboard, and Hockey sizing
 
 ## Sports Supported
 
-| Phase | Sports |
-|-------|--------|
-| Phase 1 | Alpine Skiing, Nordic Skiing (Classic/Skate), Snowboarding |
-| Phase 2 | Hockey, Mountain Biking, Lacrosse |
-| Phase 3 | Custom categories |
+| Sport | Equipment Sized |
+|-------|-----------------|
+| Nordic Classic | Skis, Poles, Boots |
+| Nordic Skate | Skis, Poles, Boots |
+| Alpine Skiing | Skis, Boots, DIN Settings |
+| Snowboarding | Board, Boots, Stance |
+| Hockey | Skates (Bauer, CCM) |
 
 ## Tech Stack
 
-- **Framework**: React Native + Expo
-- **Language**: TypeScript
-- **Database**: SQLite (local-first)
-- **State**: Zustand
-- **UI**: React Native Paper + NativeWind
+- **Framework**: React 18 + TypeScript
+- **Build Tool**: Vite
+- **Database**: Firebase Firestore
+- **Testing**: Vitest + React Testing Library
+- **CI/CD**: GitHub Actions
 
-## Documentation
+## Getting Started
 
-- [Product Requirements (PRD)](docs/PRD.md) - v0.3
-- [System Architecture](docs/ARCHITECTURE.md)
-- [Requirements Spreadsheet](requirements/Gear%20Guru.xlsx)
+### Prerequisites
 
-## Key Features
+- Node.js 20+
+- npm 10+
 
-### Size Tracking
-- Metric measurements (height, weight, foot, hand, head, inseam)
-- EU sizing as base with US/UK/Mondopoint conversions
-- Manufacturer-specific sizing references
+### Installation
 
-### Gear Inventory
-- Track equipment by sport, child, and status
-- Status options: Active, Stored, Outgrown, Loaned, Needs Replacement, Retired
-- Photo capture and brand/model tracking
+```bash
+# Clone the repository
+git clone https://github.com/theredmoose/gearguru.git
+cd gearguru
 
-### Privacy
-- Local-first architecture (works offline)
-- COPPA compliant
-- No third-party data sharing
+# Install dependencies
+npm install
 
-## Project Status
+# Copy environment template
+cp .env.example .env.local
+# Edit .env.local with your Firebase credentials
+```
 
-**Current Phase**: Documentation & Planning
+### Firebase Setup
 
-- [x] Product Requirements Document (PRD v0.3)
-- [x] System Architecture
-- [x] Requirements Spreadsheet
-- [ ] Project Setup (Expo + TypeScript)
-- [ ] Database Layer
-- [ ] Core Screens
-- [ ] MVP Release
+1. Go to [Firebase Console](https://console.firebase.google.com/)
+2. Create a new project
+3. Add a Web app to the project
+4. Copy the config values to `.env.local`
+5. Enable Firestore in the console
+6. Deploy security rules: `firebase deploy --only firestore:rules`
+
+### Development
+
+```bash
+# Start dev server
+npm run dev
+
+# Run tests
+npm test
+
+# Run tests with coverage
+npm run test:coverage
+
+# Build for production
+npm run build
+```
+
+## Project Structure
+
+```
+src/
+├── components/       # React components
+├── services/         # Business logic (sizing, conversions)
+├── hooks/            # React hooks (Firebase integration)
+├── types/            # TypeScript type definitions
+└── config/           # Firebase configuration
+
+tests/
+├── fixtures/         # Test data
+└── setup.ts          # Test environment setup
+
+docs/
+├── testing/          # Testing documentation
+└── PRD.md            # Product requirements
+```
+
+## Test Coverage
+
+All tests pass with 80%+ coverage:
+
+| Area | Tests |
+|------|-------|
+| Sizing Calculations | 39 |
+| Shoe Conversions | 35 |
+| Component Tests | 49 |
+| **Total** | **123** |
+
+## Sizing Formulas
+
+### Nordic Skiing
+- Classic Ski: height + 10-20cm (skill dependent)
+- Skate Ski: height + 5-15cm (skill dependent)
+- Classic Poles: height × 0.83
+- Skate Poles: height × 0.89-0.91
+
+### Alpine Skiing
+- Ski Length: chin to forehead height (skill dependent)
+- DIN: 1-12 (weight and skill dependent)
+- Boot Flex: 60-140 (skill and gender dependent)
+
+### Snowboard
+- Board Length: height - 15-25cm (skill dependent)
+- Waist Width: based on boot size
+
+### Hockey
+- Skate Size: shoe size - 1.5 (runs smaller than shoes)
 
 ## License
 
