@@ -26,12 +26,24 @@ const SPORTS: { id: Sport; label: string; icon: string; color: string }[] = [
 
 export function SportSizing({ member, onBack }: SportSizingProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [skillLevel, setSkillLevel] = useState<SkillLevel>('intermediate');
+  const [skillLevels, setSkillLevels] = useState<Record<Sport, SkillLevel>>({
+    'nordic-classic': 'intermediate',
+    'nordic-skate': 'intermediate',
+    'nordic-combi': 'intermediate',
+    'alpine': 'intermediate',
+    'snowboard': 'intermediate',
+    'hockey': 'intermediate',
+  });
   const containerRef = useRef<HTMLDivElement>(null);
   const touchStartX = useRef(0);
   const touchEndX = useRef(0);
 
   const currentSport = SPORTS[currentIndex];
+  const skillLevel = skillLevels[currentSport.id];
+
+  const setSkillLevel = (level: SkillLevel) => {
+    setSkillLevels(prev => ({ ...prev, [currentSport.id]: level }));
+  };
 
   const handleTouchStart = (e: React.TouchEvent) => {
     touchStartX.current = e.touches[0].clientX;
