@@ -12,7 +12,7 @@ import type { FamilyMember } from './types';
 type View = 'home' | 'add' | 'edit' | 'detail' | 'sizing' | 'converter';
 
 function App() {
-  const { members, loading, error, addMember, updateMember, deleteMember } =
+  const { members, loading, error, addMember, updateMember, updateSkillLevels, deleteMember } =
     useFamilyMembers();
   const [view, setView] = useState<View>('home');
   const [selectedMember, setSelectedMember] = useState<FamilyMember | null>(null);
@@ -90,6 +90,7 @@ function App() {
         <SportSizing
           member={selectedMember}
           onBack={() => setView('detail')}
+          onSkillLevelChange={(levels) => updateSkillLevels(selectedMember.id, levels)}
         />
       </div>
     );

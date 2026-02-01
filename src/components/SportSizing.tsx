@@ -14,6 +14,7 @@ import {
 interface SportSizingProps {
   member: FamilyMember;
   onBack: () => void;
+  onSkillLevelChange?: (skillLevels: Partial<Record<Sport, SkillLevel>>) => void;
 }
 
 const SPORTS: { id: Sport; label: string; icon: string; color: string }[] = [
@@ -24,16 +25,16 @@ const SPORTS: { id: Sport; label: string; icon: string; color: string }[] = [
   { id: 'hockey', label: 'Hockey', icon: '🏒', color: '#dc2626' },
 ];
 
-export function SportSizing({ member, onBack }: SportSizingProps) {
+export function SportSizing({ member, onBack, onSkillLevelChange }: SportSizingProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [skillLevels, setSkillLevels] = useState<Record<Sport, SkillLevel>>({
-    'nordic-classic': 'intermediate',
-    'nordic-skate': 'intermediate',
-    'nordic-combi': 'intermediate',
-    'alpine': 'intermediate',
-    'snowboard': 'intermediate',
-    'hockey': 'intermediate',
-  });
+  const [skillLevels, setSkillLevels] = useState<Record<Sport, SkillLevel>>(() => ({
+    'nordic-classic': member.skillLevels?.['nordic-classic'] ?? 'intermediate',
+    'nordic-skate': member.skillLevels?.['nordic-skate'] ?? 'intermediate',
+    'nordic-combi': member.skillLevels?.['nordic-combi'] ?? 'intermediate',
+    'alpine': member.skillLevels?.['alpine'] ?? 'intermediate',
+    'snowboard': member.skillLevels?.['snowboard'] ?? 'intermediate',
+    'hockey': member.skillLevels?.['hockey'] ?? 'intermediate',
+  }));
   const containerRef = useRef<HTMLDivElement>(null);
   const touchStartX = useRef(0);
   const touchEndX = useRef(0);
@@ -42,7 +43,9 @@ export function SportSizing({ member, onBack }: SportSizingProps) {
   const skillLevel = skillLevels[currentSport.id];
 
   const setSkillLevel = (level: SkillLevel) => {
-    setSkillLevels(prev => ({ ...prev, [currentSport.id]: level }));
+    const newSkillLevels = { ...skillLevels, [currentSport.id]: level };
+    setSkillLevels(newSkillLevels);
+    onSkillLevelChange?.(newSkillLevels);
   };
 
   const handleTouchStart = (e: React.TouchEvent) => {

@@ -8,6 +8,7 @@ export interface FamilyMember {
   dateOfBirth: string; // ISO date string
   gender: 'male' | 'female' | 'other';
   measurements: Measurements;
+  skillLevels?: Partial<Record<Sport, SkillLevel>>;
   createdAt: string;
   updatedAt: string;
 }

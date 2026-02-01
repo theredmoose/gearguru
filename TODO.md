@@ -18,7 +18,7 @@
 - [x] Deployed to Firebase Hosting
 
 ## Next Up
-- [ ] Persist skill levels per member in database
+- [x] Persist skill levels per member in database
 - [ ] Add gear inventory tracking (owned equipment)
 - [ ] Add authentication (Google sign-in)
 - [ ] Add data export (PDF/CSV)

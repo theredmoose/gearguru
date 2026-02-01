@@ -18,6 +18,8 @@ import type {
   GearItem,
   Measurements,
   FirestoreTimestamp,
+  Sport,
+  SkillLevel,
 } from '../types';
 
 // ============================================
@@ -116,6 +118,17 @@ export async function updateMeasurements(
       ...measurements,
       measuredAt: now(),
     },
+    updatedAt: toFirestoreTimestamp(now()),
+  });
+}
+
+export async function updateSkillLevels(
+  memberId: string,
+  skillLevels: Partial<Record<Sport, SkillLevel>>
+): Promise<void> {
+  const docRef = doc(db, COLLECTIONS.FAMILY_MEMBERS, memberId);
+  await updateDoc(docRef, {
+    skillLevels,
     updatedAt: toFirestoreTimestamp(now()),
   });
 }

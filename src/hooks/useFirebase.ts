@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import type { FamilyMember, GearItem, Measurements } from '../types';
+import type { FamilyMember, GearItem, Measurements, Sport, SkillLevel } from '../types';
 import * as firebaseService from '../services/firebase';
 
 // ============================================
@@ -29,6 +29,7 @@ interface UseFamilyMembersReturn {
     data: Partial<Omit<FamilyMember, 'id' | 'createdAt' | 'updatedAt'>>
   ) => Promise<void>;
   updateMeasurements: (id: string, measurements: Measurements) => Promise<void>;
+  updateSkillLevels: (id: string, skillLevels: Partial<Record<Sport, SkillLevel>>) => Promise<void>;
   deleteMember: (id: string) => Promise<void>;
 }
 
@@ -98,6 +99,19 @@ export function useFamilyMembers(): UseFamilyMembersReturn {
     []
   );
 
+  const updateSkillLevels = useCallback(
+    async (id: string, skillLevels: Partial<Record<Sport, SkillLevel>>) => {
+      await firebaseService.updateSkillLevels(id, skillLevels);
+      setState((prev) => ({
+        ...prev,
+        data: prev.data
+          ? prev.data.map((m) => (m.id === id ? { ...m, skillLevels } : m))
+          : null,
+      }));
+    },
+    []
+  );
+
   const deleteMember = useCallback(async (id: string) => {
     await firebaseService.deleteFamilyMember(id);
     setState((prev) => ({
@@ -114,6 +128,7 @@ export function useFamilyMembers(): UseFamilyMembersReturn {
     addMember,
     updateMember,
     updateMeasurements,
+    updateSkillLevels,
     deleteMember,
   };
 }
