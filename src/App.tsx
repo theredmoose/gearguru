@@ -5,13 +5,26 @@ import {
   MemberDetail,
   SportSizing,
   ShoeSizeConverter,
+  AuthForm,
 } from './components';
-import { useFamilyMembers } from './hooks';
+import { useFamilyMembers, useAuth } from './hooks';
 import type { FamilyMember } from './types';
 
 type View = 'home' | 'add' | 'edit' | 'detail' | 'sizing' | 'converter';
 
 function App() {
+  const {
+    user,
+    loading: authLoading,
+    error: authError,
+    signIn,
+    signUp,
+    signInGoogle,
+    signInFacebook,
+    signOut,
+    sendPasswordReset,
+    clearError: clearAuthError,
+  } = useAuth();
   const { members, loading, error, addMember, updateMember, deleteMember } =
     useFamilyMembers();
   const [view, setView] = useState<View>('home');
@@ -51,6 +64,34 @@ function App() {
     setSelectedMember(member);
     setView('edit');
   };
+
+  // Auth Loading Screen
+  if (authLoading) {
+    return (
+      <div className="app">
+        <div className="auth-loading">
+          <h1>Gear Guru</h1>
+          <p className="loading">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Auth Screen (not logged in)
+  if (!user) {
+    return (
+      <AuthForm
+        onEmailSignIn={signIn}
+        onEmailSignUp={signUp}
+        onGoogleSignIn={signInGoogle}
+        onFacebookSignIn={signInFacebook}
+        onPasswordReset={sendPasswordReset}
+        error={authError}
+        loading={authLoading}
+        onClearError={clearAuthError}
+      />
+    );
+  }
 
   // Member Form View
   if (view === 'add' || view === 'edit') {
@@ -115,8 +156,21 @@ function App() {
   return (
     <div className="app">
       <header className="header">
-        <h1>Gear Guru</h1>
-        <p>Sports Equipment Sizing Calculator</p>
+        <div className="header-top">
+          <div className="header-title">
+            <h1>Gear Guru</h1>
+            <p>Sports Equipment Sizing Calculator</p>
+          </div>
+          <div className="user-header">
+            <span className="user-name">{user.displayName || user.email}</span>
+            <button
+              className="btn btn-secondary btn-signout"
+              onClick={signOut}
+            >
+              Sign Out
+            </button>
+          </div>
+        </div>
       </header>
 
       <main className="main">

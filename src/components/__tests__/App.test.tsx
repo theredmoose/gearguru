@@ -12,6 +12,18 @@ vi.mock('../../hooks', () => ({
     updateMember: vi.fn(),
     deleteMember: vi.fn(),
   })),
+  useAuth: vi.fn(() => ({
+    user: { displayName: 'Test User', email: 'test@example.com' },
+    loading: false,
+    error: null,
+    signIn: vi.fn(),
+    signUp: vi.fn(),
+    signInGoogle: vi.fn(),
+    signInFacebook: vi.fn(),
+    signOut: vi.fn(),
+    sendPasswordReset: vi.fn(),
+    clearError: vi.fn(),
+  })),
 }));
 
 describe('App Integration', () => {
