@@ -3,3 +3,5 @@ export {
   useFamilyMember,
   useGearItems,
 } from './useFirebase';
+
+export { useAuth } from './useAuth';
