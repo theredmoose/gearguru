@@ -15,7 +15,7 @@ The application manages personal measurements (height, weight, foot dimensions, 
 
 ## Project Status
 
-This project is in the requirements/planning phase. The requirements specification is in `docs/requirements/Gear Guru.xlsx` which contains:
+This project is in the requirements/planning phase. The requirements specification is in `requirements/Gear Guru.xlsx` which contains:
 - Data entry forms for family member measurements
 - Lookup tables for equipment sizing from various vendors
 - Sizing calculation formulas and conversion charts
