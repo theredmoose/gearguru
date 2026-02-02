@@ -1,5 +1,5 @@
 import { useState, useRef } from 'react';
-import type { FamilyMember, SkillLevel, Sport } from '../types';
+import type { FamilyMember, GearItem, SkillLevel, Sport } from '../types';
 import {
   calculateNordicSkiSizing,
   calculateNordicBootSizing,
@@ -10,11 +10,16 @@ import {
   calculateHockeySkateSize,
   formatSizeRange,
 } from '../services/sizing';
+import { GearCard } from './GearCard';
 
 interface SportSizingProps {
   member: FamilyMember;
+  gearItems?: GearItem[];
   onBack: () => void;
   onSkillLevelChange?: (skillLevels: Partial<Record<Sport, SkillLevel>>) => void;
+  onAddGear?: (sport: Sport) => void;
+  onEditGear?: (item: GearItem) => void;
+  onDeleteGear?: (item: GearItem) => void;
 }
 
 const SPORTS: { id: Sport; label: string; icon: string; color: string }[] = [
@@ -25,7 +30,15 @@ const SPORTS: { id: Sport; label: string; icon: string; color: string }[] = [
   { id: 'hockey', label: 'Hockey', icon: '🏒', color: '#dc2626' },
 ];
 
-export function SportSizing({ member, onBack, onSkillLevelChange }: SportSizingProps) {
+export function SportSizing({
+  member,
+  gearItems = [],
+  onBack,
+  onSkillLevelChange,
+  onAddGear,
+  onEditGear,
+  onDeleteGear,
+}: SportSizingProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [skillLevels, setSkillLevels] = useState<Record<Sport, SkillLevel>>(() => ({
     'nordic-classic': member.skillLevels?.['nordic-classic'] ?? 'intermediate',
@@ -41,6 +54,9 @@ export function SportSizing({ member, onBack, onSkillLevelChange }: SportSizingP
 
   const currentSport = SPORTS[currentIndex];
   const skillLevel = skillLevels[currentSport.id];
+
+  // Filter gear items for current sport
+  const sportGearItems = gearItems.filter((item) => item.sport === currentSport.id);
 
   const setSkillLevel = (level: SkillLevel) => {
     const newSkillLevels = { ...skillLevels, [currentSport.id]: level };
@@ -344,6 +360,41 @@ export function SportSizing({ member, onBack, onSkillLevelChange }: SportSizingP
         )}
 
         {renderSportContent()}
+
+        {/* My Gear Section */}
+        {(onAddGear || onEditGear || onDeleteGear) && (
+          <div className="sizing-sections">
+            <section className="sizing-section gear-section">
+              <div className="section-header">
+                <h2>My Gear</h2>
+                {onAddGear && (
+                  <button
+                    className="btn-link"
+                    onClick={() => onAddGear(currentSport.id)}
+                  >
+                    + Add
+                  </button>
+                )}
+              </div>
+              {sportGearItems.length === 0 ? (
+                <p className="gear-empty-hint">
+                  No gear yet for {currentSport.label}.
+                </p>
+              ) : (
+                <div className="gear-list">
+                  {sportGearItems.map((item) => (
+                    <GearCard
+                      key={item.id}
+                      item={item}
+                      onEdit={onEditGear ?? (() => {})}
+                      onDelete={onDeleteGear ?? (() => {})}
+                    />
+                  ))}
+                </div>
+              )}
+            </section>
+          </div>
+        )}
 
         {/* Swipe indicator */}
         <div className="swipe-indicator">

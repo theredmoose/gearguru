@@ -10,7 +10,19 @@ vi.mock('../../hooks', () => ({
     error: null,
     addMember: vi.fn(),
     updateMember: vi.fn(),
+    updateMeasurements: vi.fn(),
+    updateSkillLevels: vi.fn(),
     deleteMember: vi.fn(),
+    refresh: vi.fn(),
+  })),
+  useGearItems: vi.fn(() => ({
+    items: [],
+    loading: false,
+    error: null,
+    addItem: vi.fn(),
+    updateItem: vi.fn(),
+    deleteItem: vi.fn(),
+    refresh: vi.fn(),
   })),
   useAuth: vi.fn(() => ({
     user: { displayName: 'Test User', email: 'test@example.com' },
@@ -66,7 +78,7 @@ describe('App Integration', () => {
 
   describe('with members loaded', () => {
     beforeEach(async () => {
-      const { useFamilyMembers } = await import('../../hooks');
+      const { useFamilyMembers, useGearItems } = await import('../../hooks');
       vi.mocked(useFamilyMembers).mockReturnValue({
         members: [
           {
@@ -81,15 +93,27 @@ describe('App Integration', () => {
               footLengthRight: 27,
               measuredAt: new Date().toISOString(),
             },
-            createdAt: new Date(),
-            updatedAt: new Date(),
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString(),
           },
         ],
         loading: false,
         error: null,
         addMember: vi.fn(),
         updateMember: vi.fn(),
+        updateMeasurements: vi.fn(),
+        updateSkillLevels: vi.fn(),
         deleteMember: vi.fn(),
+        refresh: vi.fn(),
+      });
+      vi.mocked(useGearItems).mockReturnValue({
+        items: [],
+        loading: false,
+        error: null,
+        addItem: vi.fn(),
+        updateItem: vi.fn(),
+        deleteItem: vi.fn(),
+        refresh: vi.fn(),
       });
     });
 

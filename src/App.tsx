@@ -6,11 +6,13 @@ import {
   SportSizing,
   ShoeSizeConverter,
   AuthForm,
+  GearForm,
+  GearInventory,
 } from './components';
-import { useFamilyMembers, useAuth } from './hooks';
-import type { FamilyMember } from './types';
+import { useFamilyMembers, useAuth, useGearItems } from './hooks';
+import type { FamilyMember, GearItem, Sport } from './types';
 
-type View = 'home' | 'add' | 'edit' | 'detail' | 'sizing' | 'converter';
+type View = 'home' | 'add' | 'edit' | 'detail' | 'sizing' | 'converter' | 'inventory' | 'add-gear' | 'edit-gear';
 
 function App() {
   const {
@@ -27,8 +29,13 @@ function App() {
   } = useAuth();
   const { members, loading, error, addMember, updateMember, updateSkillLevels, deleteMember } =
     useFamilyMembers();
+  const { items: gearItems, addItem: addGearItem, updateItem: updateGearItem, deleteItem: deleteGearItem } =
+    useGearItems();
   const [view, setView] = useState<View>('home');
   const [selectedMember, setSelectedMember] = useState<FamilyMember | null>(null);
+  const [selectedGearItem, setSelectedGearItem] = useState<GearItem | null>(null);
+  const [gearOwnerId, setGearOwnerId] = useState<string | null>(null);
+  const [gearDefaultSport, setGearDefaultSport] = useState<Sport | undefined>(undefined);
 
   const handleAddMember = async (
     data: Omit<FamilyMember, 'id' | 'createdAt' | 'updatedAt'>
@@ -63,6 +70,58 @@ function App() {
   const handleEditMember = (member: FamilyMember) => {
     setSelectedMember(member);
     setView('edit');
+  };
+
+  // Gear handlers
+  const handleAddGearFromSizing = (sport: Sport) => {
+    if (selectedMember) {
+      setGearOwnerId(selectedMember.id);
+      setGearDefaultSport(sport);
+      setSelectedGearItem(null);
+      setView('add-gear');
+    }
+  };
+
+  const handleAddGearFromInventory = (ownerId: string) => {
+    setGearOwnerId(ownerId);
+    setGearDefaultSport(undefined);
+    setSelectedGearItem(null);
+    setView('add-gear');
+  };
+
+  const handleEditGear = (item: GearItem) => {
+    setSelectedGearItem(item);
+    setGearOwnerId(item.ownerId);
+    setGearDefaultSport(item.sport);
+    setView('edit-gear');
+  };
+
+  const handleDeleteGear = async (item: GearItem) => {
+    await deleteGearItem(item.id);
+  };
+
+  const handleGearSubmit = async (data: Omit<GearItem, 'id' | 'createdAt' | 'updatedAt'>) => {
+    if (selectedGearItem) {
+      await updateGearItem(selectedGearItem.id, data);
+    } else {
+      await addGearItem(data);
+    }
+    // Return to previous view
+    if (view === 'add-gear' || view === 'edit-gear') {
+      if (gearDefaultSport && selectedMember) {
+        setView('sizing');
+      } else {
+        setView('inventory');
+      }
+    }
+  };
+
+  const handleGearCancel = () => {
+    if (gearDefaultSport && selectedMember) {
+      setView('sizing');
+    } else {
+      setView('inventory');
+    }
   };
 
   // Auth Loading Screen
@@ -126,12 +185,17 @@ function App() {
 
   // Sport Sizing View (swipeable)
   if (view === 'sizing' && selectedMember) {
+    const memberGear = gearItems.filter((item) => item.ownerId === selectedMember.id);
     return (
       <div className="app">
         <SportSizing
           member={selectedMember}
+          gearItems={memberGear}
           onBack={() => setView('detail')}
           onSkillLevelChange={(levels) => updateSkillLevels(selectedMember.id, levels)}
+          onAddGear={handleAddGearFromSizing}
+          onEditGear={handleEditGear}
+          onDeleteGear={handleDeleteGear}
         />
       </div>
     );
@@ -148,6 +212,37 @@ function App() {
         <ShoeSizeConverter
           footLengthCm={footLength}
           onClose={() => setView('detail')}
+        />
+      </div>
+    );
+  }
+
+  // Gear Inventory View
+  if (view === 'inventory') {
+    return (
+      <div className="app">
+        <GearInventory
+          members={members}
+          gearItems={gearItems}
+          onBack={() => setView('home')}
+          onAddGear={handleAddGearFromInventory}
+          onEditGear={handleEditGear}
+          onDeleteGear={handleDeleteGear}
+        />
+      </div>
+    );
+  }
+
+  // Gear Form View (Add/Edit)
+  if ((view === 'add-gear' || view === 'edit-gear') && gearOwnerId) {
+    return (
+      <div className="app">
+        <GearForm
+          item={view === 'edit-gear' ? selectedGearItem ?? undefined : undefined}
+          ownerId={gearOwnerId}
+          defaultSport={gearDefaultSport}
+          onSubmit={handleGearSubmit}
+          onCancel={handleGearCancel}
         />
       </div>
     );
@@ -212,6 +307,17 @@ function App() {
             + Add Family Member
           </button>
         </section>
+
+        {members.length > 0 && (
+          <section className="section">
+            <button
+              className="btn btn-secondary"
+              onClick={() => setView('inventory')}
+            >
+              Family Gear Inventory
+            </button>
+          </section>
+        )}
 
         {members.length > 0 && (
           <section className="section">

@@ -120,6 +120,12 @@ body {
   background: var(--color-bg);
   border-radius: var(--radius-md);
   margin-bottom: var(--spacing-sm);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.member-card:hover {
+  background: #eff6ff;
 }
 
 .member-name {
@@ -232,22 +238,6 @@ label {
 }
 
 /* Member Card - Enhanced */
-.member-card {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: var(--spacing-md);
-  background: var(--color-bg);
-  border-radius: var(--radius-md);
-  margin-bottom: var(--spacing-sm);
-  cursor: pointer;
-  transition: all 0.15s ease;
-}
-
-.member-card:hover {
-  background: #eff6ff;
-}
-
 .member-card-main {
   display: flex;
   align-items: center;
@@ -270,10 +260,6 @@ label {
 .member-info {
   display: flex;
   flex-direction: column;
-}
-
-.member-name {
-  font-weight: 500;
 }
 
 .member-details {
@@ -1264,6 +1250,199 @@ label {
   color: var(--color-primary);
 }
 
+/* Gear Card */
+.gear-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--spacing-md);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  margin-bottom: var(--spacing-sm);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.gear-card:hover {
+  border-color: var(--color-primary);
+  background: #f8fafc;
+}
+
+.gear-card-main {
+  flex: 1;
+  min-width: 0;
+}
+
+.gear-card-info {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+}
+
+.gear-card-header {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+.gear-type {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.gear-condition {
+  font-size: 0.625rem;
+  font-weight: 500;
+  color: white;
+  padding: 2px 6px;
+  border-radius: 9999px;
+  text-transform: capitalize;
+}
+
+.gear-brand-model {
+  font-weight: 500;
+  color: var(--color-text);
+}
+
+.gear-details {
+  display: flex;
+  gap: var(--spacing-md);
+  font-size: 0.875rem;
+  color: var(--color-text-muted);
+}
+
+.gear-size {
+  font-weight: 500;
+}
+
+.gear-year {
+  color: var(--color-text-muted);
+}
+
+.gear-owner,
+.gear-sport {
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+}
+
+.gear-card-actions {
+  display: flex;
+  gap: var(--spacing-xs);
+  flex-shrink: 0;
+}
+
+/* Gear Form */
+.gear-form {
+  padding: var(--spacing-lg);
+}
+
+.gear-form h2 {
+  font-size: 1.25rem;
+  margin-bottom: var(--spacing-lg);
+}
+
+/* Gear List */
+.gear-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.gear-empty-hint {
+  color: var(--color-text-muted);
+  font-size: 0.875rem;
+  padding: var(--spacing-md);
+  text-align: center;
+  background: var(--color-bg);
+  border-radius: var(--radius-md);
+}
+
+/* Gear Section in SportSizing */
+.gear-section {
+  margin-top: var(--spacing-md);
+}
+
+.gear-section .section-header {
+  margin-bottom: var(--spacing-sm);
+}
+
+/* Gear Inventory */
+.gear-inventory {
+  min-height: 100vh;
+}
+
+.gear-inventory .detail-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.gear-inventory .detail-header h1 {
+  font-size: 1.125rem;
+  font-weight: 600;
+  margin: 0;
+}
+
+.inventory-content {
+  padding: var(--spacing-md);
+}
+
+.inventory-filter {
+  margin-bottom: var(--spacing-lg);
+}
+
+.inventory-filter label {
+  display: block;
+  margin-bottom: var(--spacing-xs);
+}
+
+.inventory-groups {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+}
+
+.inventory-group {
+  background: var(--color-bg);
+  border-radius: var(--radius-md);
+  padding: var(--spacing-md);
+}
+
+.inventory-group-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--spacing-md);
+  padding-bottom: var(--spacing-sm);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.inventory-group-header h2 {
+  font-size: 1rem;
+  font-weight: 600;
+  margin: 0;
+}
+
+.inventory-group-empty {
+  color: var(--color-text-muted);
+  font-size: 0.875rem;
+  text-align: center;
+  padding: var(--spacing-sm);
+}
+
+.inventory-add-section {
+  margin-top: var(--spacing-lg);
+  text-align: center;
+}
+
+.inventory-add-hint {
+  color: var(--color-text-muted);
+  font-size: 0.875rem;
+}
+
 /* Responsive - tablet and up */
 @media (min-width: 768px) {
   .app {
@@ -1280,7 +1459,8 @@ label {
   .member-detail,
   .sizing-results,
   .sport-sizing,
-  .size-converter {
+  .size-converter,
+  .gear-inventory {
     min-height: auto;
   }
 

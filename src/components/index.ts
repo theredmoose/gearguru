@@ -4,3 +4,6 @@ export { MemberDetail } from './MemberDetail';
 export { SportSizing } from './SportSizing';
 export { ShoeSizeConverter } from './ShoeSizeConverter';
 export { AuthForm } from './AuthForm';
+export { GearCard } from './GearCard';
+export { GearForm } from './GearForm';
+export { GearInventory } from './GearInventory';
