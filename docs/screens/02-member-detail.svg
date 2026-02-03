@@ -1,0 +1,90 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 375 812" width="375" height="812">
+  <!-- Background -->
+  <rect width="375" height="812" fill="#f8fafc"/>
+
+  <!-- Status Bar -->
+  <rect width="375" height="44" fill="#3b82f6"/>
+  <text x="187" y="28" font-family="system-ui, sans-serif" font-size="14" fill="white" text-anchor="middle">9:41</text>
+
+  <!-- Header -->
+  <rect y="44" width="375" height="60" fill="#3b82f6"/>
+  <text x="50" y="82" font-family="system-ui, sans-serif" font-size="18" font-weight="600" fill="white">Member Profile</text>
+  <text x="20" y="82" font-family="system-ui, sans-serif" font-size="22" fill="white">&lt;</text>
+  <text x="340" y="82" font-family="system-ui, sans-serif" font-size="14" fill="white">Edit</text>
+
+  <!-- Hero Section -->
+  <rect y="104" width="375" height="120" fill="linear-gradient(180deg, #3b82f6 0%, #1d4ed8 100%)"/>
+  <rect y="104" width="375" height="120" fill="#2563eb"/>
+  <circle cx="187" cy="155" r="40" fill="white"/>
+  <text x="187" y="168" font-family="system-ui, sans-serif" font-size="32" font-weight="bold" fill="#3b82f6" text-anchor="middle">J</text>
+  <text x="187" y="210" font-family="system-ui, sans-serif" font-size="20" font-weight="bold" fill="white" text-anchor="middle">John</text>
+
+  <!-- Body Measurements Card -->
+  <text x="20" y="250" font-family="system-ui, sans-serif" font-size="14" font-weight="600" fill="#64748b">BODY MEASUREMENTS</text>
+  <rect x="16" y="260" width="343" height="90" rx="12" fill="white" stroke="#e2e8f0" stroke-width="1"/>
+
+  <text x="70" y="295" font-family="system-ui, sans-serif" font-size="13" fill="#64748b" text-anchor="middle">Height</text>
+  <text x="70" y="320" font-family="system-ui, sans-serif" font-size="22" font-weight="bold" fill="#1e293b" text-anchor="middle">180</text>
+  <text x="70" y="338" font-family="system-ui, sans-serif" font-size="11" fill="#94a3b8" text-anchor="middle">cm</text>
+
+  <line x1="130" y1="280" x2="130" y2="340" stroke="#e2e8f0" stroke-width="1"/>
+
+  <text x="187" y="295" font-family="system-ui, sans-serif" font-size="13" fill="#64748b" text-anchor="middle">Weight</text>
+  <text x="187" y="320" font-family="system-ui, sans-serif" font-size="22" font-weight="bold" fill="#1e293b" text-anchor="middle">82</text>
+  <text x="187" y="338" font-family="system-ui, sans-serif" font-size="11" fill="#94a3b8" text-anchor="middle">kg</text>
+
+  <line x1="245" y1="280" x2="245" y2="340" stroke="#e2e8f0" stroke-width="1"/>
+
+  <text x="305" y="295" font-family="system-ui, sans-serif" font-size="13" fill="#64748b" text-anchor="middle">Age</text>
+  <text x="305" y="320" font-family="system-ui, sans-serif" font-size="22" font-weight="bold" fill="#1e293b" text-anchor="middle">42</text>
+  <text x="305" y="338" font-family="system-ui, sans-serif" font-size="11" fill="#94a3b8" text-anchor="middle">years</text>
+
+  <!-- Foot Measurements Card -->
+  <text x="20" y="380" font-family="system-ui, sans-serif" font-size="14" font-weight="600" fill="#64748b">FOOT MEASUREMENTS</text>
+  <rect x="16" y="390" width="343" height="90" rx="12" fill="white" stroke="#e2e8f0" stroke-width="1"/>
+
+  <text x="100" y="425" font-family="system-ui, sans-serif" font-size="13" fill="#64748b" text-anchor="middle">Left Foot</text>
+  <text x="100" y="450" font-family="system-ui, sans-serif" font-size="22" font-weight="bold" fill="#1e293b" text-anchor="middle">27.5</text>
+  <text x="100" y="468" font-family="system-ui, sans-serif" font-size="11" fill="#94a3b8" text-anchor="middle">cm</text>
+
+  <line x1="187" y1="410" x2="187" y2="470" stroke="#e2e8f0" stroke-width="1"/>
+
+  <text x="275" y="425" font-family="system-ui, sans-serif" font-size="13" fill="#64748b" text-anchor="middle">Right Foot</text>
+  <text x="275" y="450" font-family="system-ui, sans-serif" font-size="22" font-weight="bold" fill="#1e293b" text-anchor="middle">27.5</text>
+  <text x="275" y="468" font-family="system-ui, sans-serif" font-size="11" fill="#94a3b8" text-anchor="middle">cm</text>
+
+  <!-- Shoe Size Converter -->
+  <text x="20" y="510" font-family="system-ui, sans-serif" font-size="14" font-weight="600" fill="#64748b">SHOE SIZE CONVERSIONS</text>
+  <rect x="16" y="520" width="343" height="130" rx="12" fill="white" stroke="#e2e8f0" stroke-width="1"/>
+
+  <!-- Size grid -->
+  <text x="70" y="550" font-family="system-ui, sans-serif" font-size="12" fill="#64748b" text-anchor="middle">EU</text>
+  <text x="70" y="572" font-family="system-ui, sans-serif" font-size="18" font-weight="bold" fill="#1e293b" text-anchor="middle">44</text>
+
+  <text x="130" y="550" font-family="system-ui, sans-serif" font-size="12" fill="#64748b" text-anchor="middle">US Men</text>
+  <text x="130" y="572" font-family="system-ui, sans-serif" font-size="18" font-weight="bold" fill="#1e293b" text-anchor="middle">10.5</text>
+
+  <text x="195" y="550" font-family="system-ui, sans-serif" font-size="12" fill="#64748b" text-anchor="middle">UK</text>
+  <text x="195" y="572" font-family="system-ui, sans-serif" font-size="18" font-weight="bold" fill="#1e293b" text-anchor="middle">9.5</text>
+
+  <text x="260" y="550" font-family="system-ui, sans-serif" font-size="12" fill="#64748b" text-anchor="middle">Mondo</text>
+  <text x="260" y="572" font-family="system-ui, sans-serif" font-size="18" font-weight="bold" fill="#2563eb" text-anchor="middle">275</text>
+
+  <text x="320" y="550" font-family="system-ui, sans-serif" font-size="12" fill="#64748b" text-anchor="middle">CM</text>
+  <text x="320" y="572" font-family="system-ui, sans-serif" font-size="18" font-weight="bold" fill="#1e293b" text-anchor="middle">27.5</text>
+
+  <line x1="32" y1="590" x2="343" y2="590" stroke="#e2e8f0" stroke-width="1"/>
+
+  <text x="187" y="615" font-family="system-ui, sans-serif" font-size="11" fill="#64748b" text-anchor="middle">Ski Boot Shell Size: 275mm (27-28 range)</text>
+  <text x="187" y="635" font-family="system-ui, sans-serif" font-size="11" fill="#64748b" text-anchor="middle">Recommended Width: 100-102mm (Medium-Wide)</text>
+
+  <!-- View Sizing Button -->
+  <rect x="16" y="670" width="343" height="48" rx="10" fill="#2563eb"/>
+  <text x="187" y="700" font-family="system-ui, sans-serif" font-size="15" font-weight="600" fill="white" text-anchor="middle">View Sport Sizing</text>
+
+  <!-- Last Updated -->
+  <text x="187" y="745" font-family="system-ui, sans-serif" font-size="12" fill="#94a3b8" text-anchor="middle">Last measured: Jan 15, 2026</text>
+
+  <!-- Home Indicator -->
+  <rect x="120" y="795" width="135" height="5" rx="2.5" fill="#1e293b"/>
+</svg>

@@ -1,0 +1,50 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 375 812" width="375" height="812">
+  <!-- Background -->
+  <rect width="375" height="812" fill="#f8fafc"/>
+
+  <!-- Status Bar -->
+  <rect width="375" height="44" fill="#f8fafc"/>
+  <text x="187" y="28" font-family="system-ui, sans-serif" font-size="14" fill="#1e293b" text-anchor="middle">9:41</text>
+
+  <!-- Logo Area -->
+  <circle cx="187" cy="140" r="50" fill="#2563eb"/>
+  <text x="187" y="152" font-family="system-ui, sans-serif" font-size="36" font-weight="bold" fill="white" text-anchor="middle">GG</text>
+  <text x="187" y="215" font-family="system-ui, sans-serif" font-size="28" font-weight="bold" fill="#1e293b" text-anchor="middle">Gear Guru</text>
+  <text x="187" y="242" font-family="system-ui, sans-serif" font-size="14" fill="#64748b" text-anchor="middle">Track your family's gear sizing</text>
+
+  <!-- Sign In Form -->
+  <text x="20" y="300" font-family="system-ui, sans-serif" font-size="12" font-weight="500" fill="#64748b">EMAIL</text>
+  <rect x="16" y="310" width="343" height="48" rx="8" fill="white" stroke="#e2e8f0" stroke-width="1"/>
+  <text x="32" y="340" font-family="system-ui, sans-serif" font-size="15" fill="#94a3b8">your@email.com</text>
+
+  <text x="20" y="385" font-family="system-ui, sans-serif" font-size="12" font-weight="500" fill="#64748b">PASSWORD</text>
+  <rect x="16" y="395" width="343" height="48" rx="8" fill="white" stroke="#e2e8f0" stroke-width="1"/>
+  <text x="32" y="425" font-family="system-ui, sans-serif" font-size="15" fill="#94a3b8">••••••••</text>
+
+  <text x="340" y="465" font-family="system-ui, sans-serif" font-size="13" fill="#2563eb" text-anchor="end">Forgot password?</text>
+
+  <!-- Sign In Button -->
+  <rect x="16" y="490" width="343" height="50" rx="10" fill="#2563eb"/>
+  <text x="187" y="522" font-family="system-ui, sans-serif" font-size="16" font-weight="600" fill="white" text-anchor="middle">Sign In</text>
+
+  <!-- Divider -->
+  <line x1="16" y1="570" x2="160" y2="570" stroke="#e2e8f0" stroke-width="1"/>
+  <text x="187" y="575" font-family="system-ui, sans-serif" font-size="13" fill="#94a3b8" text-anchor="middle">or</text>
+  <line x1="215" y1="570" x2="359" y2="570" stroke="#e2e8f0" stroke-width="1"/>
+
+  <!-- Social Sign In -->
+  <rect x="16" y="600" width="343" height="48" rx="10" fill="white" stroke="#e2e8f0" stroke-width="1"/>
+  <text x="60" y="630" font-family="system-ui, sans-serif" font-size="20">G</text>
+  <text x="187" y="630" font-family="system-ui, sans-serif" font-size="15" font-weight="500" fill="#1e293b" text-anchor="middle">Continue with Google</text>
+
+  <rect x="16" y="660" width="343" height="48" rx="10" fill="#1877f2"/>
+  <text x="60" y="690" font-family="system-ui, sans-serif" font-size="18" fill="white">f</text>
+  <text x="187" y="690" font-family="system-ui, sans-serif" font-size="15" font-weight="500" fill="white" text-anchor="middle">Continue with Facebook</text>
+
+  <!-- Sign Up Link -->
+  <text x="130" y="745" font-family="system-ui, sans-serif" font-size="14" fill="#64748b">Don't have an account?</text>
+  <text x="297" y="745" font-family="system-ui, sans-serif" font-size="14" font-weight="600" fill="#2563eb">Sign Up</text>
+
+  <!-- Home Indicator -->
+  <rect x="120" y="795" width="135" height="5" rx="2.5" fill="#1e293b"/>
+</svg>
