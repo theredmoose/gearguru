@@ -38,5 +38,22 @@
     "typescript-eslint": "^8.11.0",
     "vite": "^6.0.1",
     "vitest": "^4.0.18"
-  }
+  },
+  "description": "A mobile-first web app to help families track body measurements and get equipment sizing recommendations for sports gear.",
+  "main": "index.js",
+  "directories": {
+    "doc": "docs",
+    "test": "tests"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/theredmoose/gearguru.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/theredmoose/gearguru/issues"
+  },
+  "homepage": "https://github.com/theredmoose/gearguru#readme"
 }

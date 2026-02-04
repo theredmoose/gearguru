@@ -7,3 +7,4 @@ export { AuthForm } from './AuthForm';
 export { GearCard } from './GearCard';
 export { GearForm } from './GearForm';
 export { GearInventory } from './GearInventory';
+export { PhotoCapture } from './PhotoCapture';
