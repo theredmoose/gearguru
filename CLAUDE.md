@@ -35,3 +35,9 @@ Nordic Skate Skis: height (cm) + 5-15 cm
 Classic Poles: height × 0.83
 Skate Poles: height × 0.89
 Hockey Skates: US shoe size - 1 (approximately)
+
+
+
+## Best Practise 
+
+Always create a new branch for changes moving forward. Use standard naming conventions such as : /feature /fix /update before the actual branch name.
