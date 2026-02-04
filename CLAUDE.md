@@ -38,6 +38,35 @@ Hockey Skates: US shoe size - 1 (approximately)
 
 
 
-## Best Practise 
+## Git Practices
 
-Always create a new branch for changes moving forward. Use standard naming conventions such as : /feature /fix /update before the actual branch name.
+### Branch Naming
+Always create a new branch for changes. Use standard naming conventions:
+- `feature/` - new features (e.g., `feature/gear-photo-analysis`)
+- `fix/` - bug fixes (e.g., `fix/sizing-calculation-error`)
+- `update/` - updates to existing functionality (e.g., `update/member-form-validation`)
+- `refactor/` - code refactoring (e.g., `refactor/services-cleanup`)
+
+### Workflow
+1. **Create a feature branch** from `main` before making changes
+2. **Run all tests** before committing (`npm test`)
+3. **Ensure tests pass** - do not commit with failing tests
+4. **Write descriptive commit messages** explaining the "why" not just the "what"
+5. **Create a PR** for review before merging to `main`
+6. **All tests must pass** before merging a branch
+
+### Commit Message Format
+```
+<type>: <short description>
+
+<detailed description if needed>
+
+Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>
+```
+
+Types: `Add`, `Fix`, `Update`, `Refactor`, `Remove`, `Move`
+
+### Testing Requirements
+- All new features must include tests
+- All existing tests must pass before merging
+- Run `npm test` to execute the test suite
