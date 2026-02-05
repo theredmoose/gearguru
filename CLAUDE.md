@@ -66,6 +66,11 @@ Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>
 
 Types: `Add`, `Fix`, `Update`, `Refactor`, `Remove`, `Move`
 
+### Bug Tracking
+- Maintain bugs in both GitHub Issues (with `bug` label) and the `TODO.md` Known Issues section
+- When creating a bug, add it to both locations with matching description and priority
+- When resolving a bug, close the GitHub Issue and check off the item in `TODO.md`
+
 ### Testing Requirements
 - All new features must include tests
 - All existing tests must pass before merging

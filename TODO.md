@@ -37,7 +37,28 @@
 - [ ] Increase test coverage to 80%+ for branches/functions
 
 ## Known Issues
-- None currently
+
+### Critical
+- [ ] skillLevels field lost on Firestore read — `docToFamilyMember()` in `src/services/firebase.ts` doesn't include `skillLevels` in the returned object, losing skill level data on every fetch
+- [ ] No user-scoped Firebase queries — `getAllFamilyMembers()` and `getAllGearItems()` don't filter by user ID, potential data leakage if Firestore rules are misconfigured
+
+### Medium
+- [ ] Negative/zero size values after conversion — shoe size and equipment size calculations can produce negative or zero values with edge-case inputs
+- [ ] Zero foot measurements cause invalid shoe sizes — `getShoeSizesFromFootLength(0)` returns bad data instead of "N/A" in `src/components/MemberDetail.tsx`
+- [ ] No validation for negative/zero measurements — weight and foot measurements in MemberForm accept 0 or negative values
+- [ ] Missing Firebase env var validation — `src/config/firebase.ts` silently accepts undefined env vars, causing cryptic runtime crash
+- [ ] No account linking flow — users get stuck signing in with Google after creating email account with same address
+- [ ] No offline error handling — Firebase operations show raw errors when offline
+
+### Low
+- [ ] `parseFloat(value) || undefined` treats 0 as undefined — optional numeric fields in MemberForm save 0 values as undefined
+- [ ] No date-of-birth bounds validation — future dates and unrealistic ages accepted in MemberForm
+- [ ] nordic-combi in skillLevels but not in SPORTS array — skill levels initialized for a sport that isn't selectable
+- [ ] US shoe size conversion inconsistency — different functions use different EU-to-US formulas
+- [ ] Potential undefined skillLevel access — `skillLevels[currentSport.id]` in SportSizing has no fallback
+- [ ] No loading state for gear operations — gear delete/submit in App.tsx show no loading indicators
+- [ ] Race condition in useAuth — `setLoading(false)` can fire after component unmounts
+- [ ] No email verification on signup — email accounts created without verifying address
 
 ## Notes
 - App URL: https://gearguru-b3bc8.web.app
