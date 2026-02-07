@@ -1,5 +1,5 @@
 import { useState, useRef } from 'react';
-import type { FamilyMember, GearItem, SkillLevel, Sport } from '../types';
+import type { FamilyMember, GearItem, SkillLevel, Sport, GearType } from '../types';
 import {
   calculateNordicSkiSizing,
   calculateNordicBootSizing,
@@ -11,13 +11,15 @@ import {
   formatSizeRange,
 } from '../services/sizing';
 import { GearCard } from './GearCard';
+import { GearLoadoutPanel } from './GearLoadoutPanel';
+import { MemberInfoTable } from './MemberInfoTable';
 
 interface SportSizingProps {
   member: FamilyMember;
   gearItems?: GearItem[];
   onBack: () => void;
   onSkillLevelChange?: (skillLevels: Partial<Record<Sport, SkillLevel>>) => void;
-  onAddGear?: (sport: Sport) => void;
+  onAddGear?: (sport: Sport, gearType?: GearType) => void;
   onEditGear?: (item: GearItem) => void;
   onDeleteGear?: (item: GearItem) => void;
 }
@@ -57,6 +59,16 @@ export function SportSizing({
 
   // Filter gear items for current sport
   const sportGearItems = gearItems.filter((item) => item.sport === currentSport.id);
+
+  const handleSlotTap = (slotType: GearType) => {
+    // Check if there's already gear of this type
+    const existingGear = sportGearItems.find((item) => item.type === slotType);
+    if (existingGear && onEditGear) {
+      onEditGear(existingGear);
+    } else if (onAddGear) {
+      onAddGear(currentSport.id, slotType);
+    }
+  };
 
   const setSkillLevel = (level: SkillLevel) => {
     const newSkillLevels = { ...skillLevels, [currentSport.id]: level };
@@ -358,6 +370,22 @@ export function SportSizing({
             </div>
           </div>
         )}
+
+        {/* Gear Loadout Panel */}
+        <div className="sizing-sections">
+          <GearLoadoutPanel
+            member={member}
+            sport={currentSport.id}
+            gearItems={sportGearItems}
+            onSlotTap={handleSlotTap}
+            color={currentSport.color}
+          />
+          <MemberInfoTable
+            member={member}
+            sport={currentSport.id}
+            skillLevel={skillLevel}
+          />
+        </div>
 
         {renderSportContent()}
 

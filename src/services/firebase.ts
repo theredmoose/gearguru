@@ -8,7 +8,6 @@ import {
   deleteDoc,
   query,
   where,
-  orderBy,
   Timestamp,
   type DocumentData,
 } from 'firebase/firestore';
@@ -16,6 +15,7 @@ import { db } from '../config/firebase';
 import type {
   FamilyMember,
   GearItem,
+  GearPhoto,
   Measurements,
   FirestoreTimestamp,
   Sport,
@@ -47,6 +47,43 @@ function now(): string {
   return new Date().toISOString();
 }
 
+// Remove undefined values recursively (Firestore doesn't accept them)
+function removeUndefined<T>(obj: T): T {
+  if (obj === null || obj === undefined) {
+    return obj;
+  }
+  if (Array.isArray(obj)) {
+    return obj.map(removeUndefined) as T;
+  }
+  if (typeof obj === 'object') {
+    return Object.fromEntries(
+      Object.entries(obj)
+        .filter(([, v]) => v !== undefined)
+        .map(([k, v]) => [k, removeUndefined(v)])
+    ) as T;
+  }
+  return obj;
+}
+
+// Clean photos array for Firestore (ensure only plain objects with valid properties)
+function cleanPhotos(photos: GearPhoto[] | undefined): Array<{id: string; type: string; url: string; createdAt: string; caption?: string}> | undefined {
+  if (!photos || photos.length === 0) return undefined;
+  // Use JSON parse/stringify to create completely clean plain objects
+  const cleaned = photos.map((photo) => {
+    const cleanPhoto: {id: string; type: string; url: string; createdAt: string; caption?: string} = {
+      id: String(photo.id),
+      type: String(photo.type),
+      url: String(photo.url),
+      createdAt: String(photo.createdAt),
+    };
+    if (photo.caption) {
+      cleanPhoto.caption = String(photo.caption);
+    }
+    return cleanPhoto;
+  });
+  return JSON.parse(JSON.stringify(cleaned));
+}
+
 // ============================================
 // FAMILY MEMBERS
 // ============================================
@@ -54,12 +91,14 @@ function now(): string {
 export async function getAllFamilyMembers(userId: string): Promise<FamilyMember[]> {
   const q = query(
     collection(db, COLLECTIONS.FAMILY_MEMBERS),
-    where('userId', '==', userId),
-    orderBy('name', 'asc')
+    where('userId', '==', userId)
   );
   const snapshot = await getDocs(q);
 
-  return snapshot.docs.map((doc) => docToFamilyMember(doc.id, doc.data()));
+  // Sort client-side for now (until indexes are built)
+  return snapshot.docs
+    .map((doc) => docToFamilyMember(doc.id, doc.data()))
+    .sort((a, b) => a.name.localeCompare(b.name));
 }
 
 export async function getFamilyMember(
@@ -80,7 +119,7 @@ export async function createFamilyMember(
 ): Promise<FamilyMember> {
   const timestamp = now();
   const docData = {
-    ...data,
+    ...removeUndefined(data),
     createdAt: toFirestoreTimestamp(timestamp),
     updatedAt: toFirestoreTimestamp(timestamp),
   };
@@ -104,7 +143,7 @@ export async function updateFamilyMember(
 ): Promise<void> {
   const docRef = doc(db, COLLECTIONS.FAMILY_MEMBERS, id);
   await updateDoc(docRef, {
-    ...data,
+    ...removeUndefined(data),
     updatedAt: toFirestoreTimestamp(now()),
   });
 }
@@ -157,23 +196,27 @@ export async function deleteFamilyMember(id: string): Promise<void> {
 export async function getAllGearItems(userId: string): Promise<GearItem[]> {
   const q = query(
     collection(db, COLLECTIONS.GEAR_ITEMS),
-    where('userId', '==', userId),
-    orderBy('createdAt', 'desc')
+    where('userId', '==', userId)
   );
   const snapshot = await getDocs(q);
 
-  return snapshot.docs.map((doc) => docToGearItem(doc.id, doc.data()));
+  // Sort client-side for now (until indexes are built)
+  return snapshot.docs
+    .map((doc) => docToGearItem(doc.id, doc.data()))
+    .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
 }
 
 export async function getGearItemsByOwner(ownerId: string): Promise<GearItem[]> {
   const q = query(
     collection(db, COLLECTIONS.GEAR_ITEMS),
-    where('ownerId', '==', ownerId),
-    orderBy('createdAt', 'desc')
+    where('ownerId', '==', ownerId)
   );
   const snapshot = await getDocs(q);
 
-  return snapshot.docs.map((doc) => docToGearItem(doc.id, doc.data()));
+  // Sort client-side for now (until indexes are built)
+  return snapshot.docs
+    .map((doc) => docToGearItem(doc.id, doc.data()))
+    .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
 }
 
 export async function getGearItem(id: string): Promise<GearItem | null> {
@@ -191,11 +234,28 @@ export async function createGearItem(
   data: Omit<GearItem, 'id' | 'createdAt' | 'updatedAt'>
 ): Promise<GearItem> {
   const timestamp = now();
-  const docData = {
-    ...data,
+  // Build document explicitly to avoid any prototype chain issues
+  const docData: DocumentData = {
+    userId: data.userId,
+    ownerId: data.ownerId,
+    sport: data.sport,
+    type: data.type,
+    brand: data.brand,
+    model: data.model,
+    size: data.size,
+    condition: data.condition,
     createdAt: toFirestoreTimestamp(timestamp),
     updatedAt: toFirestoreTimestamp(timestamp),
   };
+  // Add optional fields only if defined
+  if (data.year !== undefined) docData.year = data.year;
+  if (data.status !== undefined) docData.status = data.status;
+  if (data.location !== undefined) docData.location = data.location;
+  if (data.checkedOutTo !== undefined) docData.checkedOutTo = data.checkedOutTo;
+  if (data.checkedOutDate !== undefined) docData.checkedOutDate = data.checkedOutDate;
+  if (data.notes !== undefined) docData.notes = data.notes;
+  if (data.photos && data.photos.length > 0) docData.photos = cleanPhotos(data.photos);
+  if (data.extendedDetails !== undefined) docData.extendedDetails = JSON.parse(JSON.stringify(data.extendedDetails));
 
   const docRef = await addDoc(collection(db, COLLECTIONS.GEAR_ITEMS), docData);
 
@@ -212,10 +272,29 @@ export async function updateGearItem(
   data: Partial<Omit<GearItem, 'id' | 'createdAt' | 'updatedAt'>>
 ): Promise<void> {
   const docRef = doc(db, COLLECTIONS.GEAR_ITEMS, id);
-  await updateDoc(docRef, {
-    ...data,
+  // Build update object explicitly to avoid any prototype chain issues
+  const updateData: DocumentData = {
     updatedAt: toFirestoreTimestamp(now()),
-  });
+  };
+  // Add only the fields that are being updated
+  if (data.userId !== undefined) updateData.userId = data.userId;
+  if (data.ownerId !== undefined) updateData.ownerId = data.ownerId;
+  if (data.sport !== undefined) updateData.sport = data.sport;
+  if (data.type !== undefined) updateData.type = data.type;
+  if (data.brand !== undefined) updateData.brand = data.brand;
+  if (data.model !== undefined) updateData.model = data.model;
+  if (data.size !== undefined) updateData.size = data.size;
+  if (data.condition !== undefined) updateData.condition = data.condition;
+  if (data.year !== undefined) updateData.year = data.year;
+  if (data.status !== undefined) updateData.status = data.status;
+  if (data.location !== undefined) updateData.location = data.location;
+  if (data.checkedOutTo !== undefined) updateData.checkedOutTo = data.checkedOutTo;
+  if (data.checkedOutDate !== undefined) updateData.checkedOutDate = data.checkedOutDate;
+  if (data.notes !== undefined) updateData.notes = data.notes;
+  if (data.photos !== undefined) updateData.photos = data.photos && data.photos.length > 0 ? cleanPhotos(data.photos) : [];
+  if (data.extendedDetails !== undefined) updateData.extendedDetails = JSON.parse(JSON.stringify(data.extendedDetails));
+
+  await updateDoc(docRef, updateData);
 }
 
 export async function deleteGearItem(id: string): Promise<void> {

@@ -4,18 +4,18 @@ service cloud.firestore {
   match /databases/{database}/documents {
     // Family members collection
     match /familyMembers/{memberId} {
-      // Allow read/write for authenticated users who own the document
-      allow read: if request.auth != null && resource.data.userId == request.auth.uid;
-      allow create: if request.auth != null && request.resource.data.userId == request.auth.uid;
-      allow update, delete: if request.auth != null && resource.data.userId == request.auth.uid;
+      allow read, update, delete: if request.auth != null &&
+        request.auth.uid == resource.data.userId;
+      allow create: if request.auth != null &&
+        request.auth.uid == request.resource.data.userId;
     }
 
     // Gear items collection
     match /gearItems/{itemId} {
-      // Allow read/write for authenticated users who own the document
-      allow read: if request.auth != null && resource.data.userId == request.auth.uid;
-      allow create: if request.auth != null && request.resource.data.userId == request.auth.uid;
-      allow update, delete: if request.auth != null && resource.data.userId == request.auth.uid;
+      allow read, update, delete: if request.auth != null &&
+        request.auth.uid == resource.data.userId;
+      allow create: if request.auth != null &&
+        request.auth.uid == request.resource.data.userId;
     }
   }
 }

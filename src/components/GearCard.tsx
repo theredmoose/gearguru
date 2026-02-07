@@ -1,4 +1,5 @@
 import type { GearItem, FamilyMember } from '../types';
+import { GearStatusBadge } from './GearStatusBadge';
 
 interface GearCardProps {
   item: GearItem;
@@ -92,6 +93,9 @@ export function GearCard({
             >
               {item.condition}
             </span>
+            {item.status && item.status !== 'available' && (
+              <GearStatusBadge status={item.status} size="small" />
+            )}
           </div>
           <div className="gear-brand-model">
             {item.brand} {item.model}
@@ -117,6 +121,19 @@ export function GearCard({
                   {alpineDetails.bindings.brand} {alpineDetails.bindings.model}
                 </span>
               )}
+            </div>
+          )}
+
+          {item.location && (
+            <div className="gear-location">
+              <span className="gear-location-icon">📍</span>
+              {item.location}
+            </div>
+          )}
+
+          {item.status === 'checked-out' && item.checkedOutTo && (
+            <div className="gear-checkout-info">
+              Checked out to: {item.checkedOutTo}
             </div>
           )}
 

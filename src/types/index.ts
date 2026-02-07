@@ -32,6 +32,8 @@ export interface Measurements {
   // Optional additional measurements
   armLength?: number; // shoulder to wrist, for poles
   inseam?: number; // for stance width calculations
+  headCircumference?: number; // cm, for helmet sizing
+  handSize?: number; // cm, wrist to fingertip
 
   // Last measured date
   measuredAt: string;
@@ -199,6 +201,8 @@ export type ExtendedGearDetails =
 // GEAR INVENTORY
 // ============================================
 
+export type GearStatus = 'available' | 'checked-out' | 'maintenance';
+
 export interface GearItem {
   id: string;
   userId: string; // Firebase Auth user ID
@@ -210,6 +214,10 @@ export interface GearItem {
   size: string; // varies by gear type
   year?: number;
   condition: 'new' | 'good' | 'fair' | 'worn';
+  status?: GearStatus;
+  location?: string;
+  checkedOutTo?: string;
+  checkedOutDate?: string;
   notes?: string;
   photos?: GearPhoto[];
   extendedDetails?: ExtendedGearDetails;

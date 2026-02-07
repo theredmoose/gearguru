@@ -279,6 +279,50 @@ export function MemberForm({ member, onSubmit, onCancel }: MemberFormProps) {
         </div>
       </div>
 
+      <div className="form-section">
+        <h3>Head & Hand (Optional)</h3>
+
+        <div className="form-row">
+          <div className="form-group">
+            <label htmlFor="headCircumference">Head Circumference (cm)</label>
+            <input
+              id="headCircumference"
+              type="number"
+              value={measurements.headCircumference || ''}
+              onChange={(e) =>
+                updateMeasurement(
+                  'headCircumference',
+                  parseFloat(e.target.value) || undefined
+                )
+              }
+              placeholder="57"
+              min="40"
+              max="70"
+              step="0.5"
+            />
+          </div>
+
+          <div className="form-group">
+            <label htmlFor="handSize">Hand Size (cm)</label>
+            <input
+              id="handSize"
+              type="number"
+              value={measurements.handSize || ''}
+              onChange={(e) =>
+                updateMeasurement(
+                  'handSize',
+                  parseFloat(e.target.value) || undefined
+                )
+              }
+              placeholder="19"
+              min="10"
+              max="30"
+              step="0.5"
+            />
+          </div>
+        </div>
+      </div>
+
       <div className="form-actions">
         <button
           type="button"

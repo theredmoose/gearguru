@@ -14,7 +14,7 @@ const PHOTO_TYPES: { id: GearPhotoType; label: string; description: string }[] =
 ];
 
 export function PhotoCapture({ photos, onPhotosChange, disabled }: PhotoCaptureProps) {
-  const [activeType, setActiveType] = useState<GearPhotoType>('fullView');
+  const [activeType, setActiveType] = useState<GearPhotoType | null>(null);
   const [capturing, setCapturing] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -27,7 +27,7 @@ export function PhotoCapture({ photos, onPhotosChange, disabled }: PhotoCaptureP
 
   const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (!file) return;
+    if (!file || !activeType) return;
 
     const reader = new FileReader();
     reader.onload = (event) => {
@@ -61,7 +61,7 @@ export function PhotoCapture({ photos, onPhotosChange, disabled }: PhotoCaptureP
   };
 
   const capturePhoto = () => {
-    if (!videoRef.current || !canvasRef.current) return;
+    if (!videoRef.current || !canvasRef.current || !activeType) return;
 
     const video = videoRef.current;
     const canvas = canvasRef.current;
@@ -110,7 +110,18 @@ export function PhotoCapture({ photos, onPhotosChange, disabled }: PhotoCaptureP
   };
 
   const handleTypeClick = (type: GearPhotoType) => {
+    // Toggle selection - clicking same slot again deselects it
+    setActiveType(activeType === type ? null : type);
+  };
+
+  const handleUploadClick = (type: GearPhotoType) => {
     setActiveType(type);
+    fileInputRef.current?.click();
+  };
+
+  const handleTakeClick = (type: GearPhotoType) => {
+    setActiveType(type);
+    startCamera();
   };
 
   if (capturing) {
@@ -128,7 +139,7 @@ export function PhotoCapture({ photos, onPhotosChange, disabled }: PhotoCaptureP
           <div style={{ width: 80 }} />
         </div>
         <p className="camera-hint">
-          Taking {PHOTO_TYPES.find((t) => t.id === activeType)?.label} photo
+          Taking {PHOTO_TYPES.find((t) => t.id === activeType)?.label || 'Full View'} photo
         </p>
       </div>
     );
@@ -174,37 +185,51 @@ export function PhotoCapture({ photos, onPhotosChange, disabled }: PhotoCaptureP
                       </button>
                     )}
                   </div>
+                  {isActive && !disabled && (
+                    <div className="photo-slot-actions" onClick={(e) => e.stopPropagation()}>
+                      <button
+                        type="button"
+                        className="btn btn-small"
+                        onClick={() => handleUploadClick(photoType.id)}
+                      >
+                        Replace
+                      </button>
+                    </div>
+                  )}
                 </>
               ) : (
-                <div className="photo-placeholder">
-                  <span className="placeholder-icon">+</span>
-                  <span className="placeholder-label">{photoType.label}</span>
-                  <span className="placeholder-desc">{photoType.description}</span>
-                </div>
+                <>
+                  <div className="photo-placeholder">
+                    <span className="placeholder-icon">+</span>
+                    <span className="placeholder-label">{photoType.label}</span>
+                    {!isActive && (
+                      <span className="placeholder-desc">{photoType.description}</span>
+                    )}
+                  </div>
+                  {isActive && !disabled && (
+                    <div className="photo-slot-actions" onClick={(e) => e.stopPropagation()}>
+                      <button
+                        type="button"
+                        className="btn btn-small"
+                        onClick={() => handleUploadClick(photoType.id)}
+                      >
+                        Upload
+                      </button>
+                      <button
+                        type="button"
+                        className="btn btn-small"
+                        onClick={() => handleTakeClick(photoType.id)}
+                      >
+                        Take
+                      </button>
+                    </div>
+                  )}
+                </>
               )}
             </div>
           );
         })}
       </div>
-
-      {!disabled && (
-        <div className="photo-actions">
-          <button
-            type="button"
-            className="btn btn-secondary photo-btn"
-            onClick={() => fileInputRef.current?.click()}
-          >
-            Upload Photo
-          </button>
-          <button
-            type="button"
-            className="btn btn-secondary photo-btn"
-            onClick={startCamera}
-          >
-            Take Photo
-          </button>
-        </div>
-      )}
 
       {/* Additional photos */}
       {photos.filter((p) => p.type === 'other').length > 0 && (
