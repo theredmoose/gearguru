@@ -39,7 +39,7 @@ function toFirestoreTimestamp(isoString: string): Timestamp {
   return Timestamp.fromDate(new Date(isoString));
 }
 
-function fromFirestoreTimestamp(timestamp: FirestoreTimestamp): string {
+export function fromFirestoreTimestamp(timestamp: FirestoreTimestamp): string {
   return new Date(timestamp.seconds * 1000).toISOString();
 }
 
@@ -224,10 +224,10 @@ export async function deleteGearItem(id: string): Promise<void> {
 }
 
 // ============================================
-// DOCUMENT CONVERTERS
+// DOCUMENT CONVERTERS (exported for testing)
 // ============================================
 
-function docToFamilyMember(id: string, data: DocumentData): FamilyMember {
+export function docToFamilyMember(id: string, data: DocumentData): FamilyMember {
   return {
     id,
     userId: data.userId,
@@ -241,7 +241,7 @@ function docToFamilyMember(id: string, data: DocumentData): FamilyMember {
   };
 }
 
-function docToGearItem(id: string, data: DocumentData): GearItem {
+export function docToGearItem(id: string, data: DocumentData): GearItem {
   return {
     id,
     userId: data.userId,
