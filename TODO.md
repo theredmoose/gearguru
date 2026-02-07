@@ -32,7 +32,7 @@
 - [ ] Multiple families / sharing
 
 ## Technical Debt
-- [ ] Code-split Firebase to reduce bundle size (currently 630KB)
+- [ ] Code-split Firebase to reduce bundle size — chunks exceed 500KB after minification (currently 680KB), use dynamic imports
 - [ ] Add E2E tests with Playwright
 - [ ] Increase test coverage to 80%+ for branches/functions
 
@@ -40,6 +40,7 @@
 
 ### Critical
 - [ ] skillLevels field lost on Firestore read — `docToFamilyMember()` in `src/services/firebase.ts` doesn't include `skillLevels` in the returned object, losing skill level data on every fetch
+- [ ] photos/extendedDetails fields lost on Firestore read — `docToGearItem()` in `src/services/firebase.ts` doesn't include `photos` or `extendedDetails` in the returned object, losing photo and extended detail data on every fetch
 - [ ] No user-scoped Firebase queries — `getAllFamilyMembers()` and `getAllGearItems()` don't filter by user ID, potential data leakage if Firestore rules are misconfigured
 
 ### Medium
