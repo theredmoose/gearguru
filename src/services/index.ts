@@ -42,3 +42,14 @@ export {
   type SizeSystem,
   type AllShoeSizes,
 } from './shoeSize';
+
+export {
+  // Gear Photo Analysis
+  analyzeGearPhotos,
+  parseSkiSize,
+  parseProfile,
+  parseRadius,
+  formatProfile,
+  formatSkiDetails,
+  type GearAnalysisResult,
+} from './gearAnalysis';

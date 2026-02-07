@@ -113,6 +113,88 @@ export interface HockeySkateSize {
 }
 
 // ============================================
+// GEAR PHOTOS
+// ============================================
+
+export type GearPhotoType = 'fullView' | 'labelView' | 'other';
+
+export interface GearPhoto {
+  id: string;
+  type: GearPhotoType;
+  url: string; // URL or base64 data URL
+  caption?: string;
+  createdAt: string;
+}
+
+// ============================================
+// EXTENDED GEAR DETAILS
+// ============================================
+
+// Profile dimensions (tip/waist/tail in mm)
+export interface SkiProfile {
+  tip: number;
+  waist: number;
+  tail: number;
+}
+
+// Alpine ski specific details
+export interface AlpineSkiDetails {
+  lengthCm: number;
+  profile?: SkiProfile;
+  radiusM?: number; // Turn radius in meters (R value)
+  bindings?: {
+    brand: string;
+    model: string;
+    dinRange?: string; // e.g., "3-10"
+  };
+  rocker?: string; // e.g., "tip rocker", "full rocker", "camber"
+}
+
+// Nordic ski specific details
+export interface NordicSkiDetails {
+  lengthCm: number;
+  style?: 'classic' | 'skate' | 'combi';
+  stiffness?: string; // e.g., "soft", "medium", "stiff" or FA value
+  grip?: string; // e.g., "waxable", "skin", "zero"
+}
+
+// Snowboard specific details
+export interface SnowboardDetails {
+  lengthCm: number;
+  profile?: SkiProfile;
+  flex?: number; // 1-10 scale
+  shape?: 'directional' | 'twin' | 'directional-twin';
+  bindings?: {
+    brand: string;
+    model: string;
+    size: string;
+  };
+}
+
+// Boot specific details
+export interface BootDetails {
+  mondopoint?: number;
+  flex?: number;
+  lastWidth?: number; // mm
+}
+
+// Hockey skate specific details
+export interface SkateDetails {
+  sizeUS?: number;
+  width?: 'C' | 'D' | 'EE' | 'R' | 'W';
+  holder?: string; // blade holder model
+  steel?: string; // blade steel type
+}
+
+// Union type for extended details
+export type ExtendedGearDetails =
+  | { type: 'alpineSki'; details: AlpineSkiDetails }
+  | { type: 'nordicSki'; details: NordicSkiDetails }
+  | { type: 'snowboard'; details: SnowboardDetails }
+  | { type: 'boot'; details: BootDetails }
+  | { type: 'skate'; details: SkateDetails };
+
+// ============================================
 // GEAR INVENTORY
 // ============================================
 
@@ -127,6 +209,8 @@ export interface GearItem {
   year?: number;
   condition: 'new' | 'good' | 'fair' | 'worn';
   notes?: string;
+  photos?: GearPhoto[];
+  extendedDetails?: ExtendedGearDetails;
   createdAt: string;
   updatedAt: string;
 }
