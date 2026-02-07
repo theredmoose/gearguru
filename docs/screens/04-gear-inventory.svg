@@ -1,0 +1,80 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 375 812" width="375" height="812">
+  <!-- Background -->
+  <rect width="375" height="812" fill="#f8fafc"/>
+
+  <!-- Status Bar -->
+  <rect width="375" height="44" fill="#7c3aed"/>
+  <text x="187" y="28" font-family="system-ui, sans-serif" font-size="14" fill="white" text-anchor="middle">9:41</text>
+
+  <!-- Header -->
+  <rect y="44" width="375" height="60" fill="#7c3aed"/>
+  <text x="50" y="82" font-family="system-ui, sans-serif" font-size="18" font-weight="600" fill="white">Gear Inventory</text>
+  <text x="20" y="82" font-family="system-ui, sans-serif" font-size="22" fill="white">&lt;</text>
+  <text x="340" y="82" font-family="system-ui, sans-serif" font-size="22" fill="white">+</text>
+
+  <!-- Filter Section -->
+  <rect y="104" width="375" height="50" fill="white" stroke="#e2e8f0" stroke-width="1"/>
+  <text x="20" y="135" font-family="system-ui, sans-serif" font-size="13" fill="#64748b">Filter by owner:</text>
+  <rect x="130" y="115" width="110" height="30" rx="6" fill="#f1f5f9" stroke="#e2e8f0"/>
+  <text x="185" y="135" font-family="system-ui, sans-serif" font-size="13" fill="#1e293b" text-anchor="middle">All Members ▾</text>
+
+  <!-- Owner Section: John -->
+  <rect y="154" width="375" height="32" fill="#f1f5f9"/>
+  <text x="20" y="176" font-family="system-ui, sans-serif" font-size="13" font-weight="600" fill="#64748b">John's Gear (4 items)</text>
+
+  <!-- Gear Card 1 -->
+  <rect x="16" y="196" width="343" height="85" rx="12" fill="white" stroke="#e2e8f0" stroke-width="1"/>
+  <circle cx="50" cy="238" r="22" fill="#0891b2" opacity="0.15"/>
+  <text x="50" y="244" font-family="system-ui, sans-serif" font-size="18" text-anchor="middle">⛷️</text>
+  <text x="85" y="222" font-family="system-ui, sans-serif" font-size="14" font-weight="600" fill="#1e293b">Fischer RCS Classic Skis</text>
+  <text x="85" y="240" font-family="system-ui, sans-serif" font-size="12" fill="#64748b">197cm | Nordic Classic</text>
+  <text x="85" y="258" font-family="system-ui, sans-serif" font-size="11" fill="#94a3b8">2024 season</text>
+  <rect x="280" y="218" width="60" height="22" rx="4" fill="#22c55e" opacity="0.15"/>
+  <text x="310" y="233" font-family="system-ui, sans-serif" font-size="10" fill="#16a34a" text-anchor="middle">Good</text>
+
+  <!-- Gear Card 2 -->
+  <rect x="16" y="291" width="343" height="85" rx="12" fill="white" stroke="#e2e8f0" stroke-width="1"/>
+  <circle cx="50" cy="333" r="22" fill="#3b82f6" opacity="0.15"/>
+  <text x="50" y="339" font-family="system-ui, sans-serif" font-size="18" text-anchor="middle">🎿</text>
+  <text x="85" y="317" font-family="system-ui, sans-serif" font-size="14" font-weight="600" fill="#1e293b">Nordica Dobermann GP</text>
+  <text x="85" y="335" font-family="system-ui, sans-serif" font-size="12" fill="#64748b">175cm | Alpine</text>
+  <text x="85" y="353" font-family="system-ui, sans-serif" font-size="11" fill="#94a3b8">2023 season</text>
+  <rect x="280" y="313" width="60" height="22" rx="4" fill="#22c55e" opacity="0.15"/>
+  <text x="310" y="328" font-family="system-ui, sans-serif" font-size="10" fill="#16a34a" text-anchor="middle">Good</text>
+
+  <!-- Owner Section: Sarah -->
+  <rect y="391" width="375" height="32" fill="#f1f5f9"/>
+  <text x="20" y="413" font-family="system-ui, sans-serif" font-size="13" font-weight="600" fill="#64748b">Sarah's Gear (3 items)</text>
+
+  <!-- Gear Card 3 -->
+  <rect x="16" y="433" width="343" height="85" rx="12" fill="white" stroke="#e2e8f0" stroke-width="1"/>
+  <circle cx="50" cy="475" r="22" fill="#f97316" opacity="0.15"/>
+  <text x="50" y="481" font-family="system-ui, sans-serif" font-size="18" text-anchor="middle">🏂</text>
+  <text x="85" y="459" font-family="system-ui, sans-serif" font-size="14" font-weight="600" fill="#1e293b">Burton Custom</text>
+  <text x="85" y="477" font-family="system-ui, sans-serif" font-size="12" fill="#64748b">148cm | Snowboard</text>
+  <text x="85" y="495" font-family="system-ui, sans-serif" font-size="11" fill="#94a3b8">2025 season</text>
+  <rect x="280" y="455" width="60" height="22" rx="4" fill="#3b82f6" opacity="0.15"/>
+  <text x="310" y="470" font-family="system-ui, sans-serif" font-size="10" fill="#2563eb" text-anchor="middle">New</text>
+
+  <!-- Owner Section: Emma -->
+  <rect y="528" width="375" height="32" fill="#f1f5f9"/>
+  <text x="20" y="550" font-family="system-ui, sans-serif" font-size="13" font-weight="600" fill="#64748b">Emma's Gear (2 items)</text>
+
+  <!-- Gear Card 4 -->
+  <rect x="16" y="570" width="343" height="85" rx="12" fill="white" stroke="#e2e8f0" stroke-width="1"/>
+  <circle cx="50" cy="612" r="22" fill="#dc2626" opacity="0.15"/>
+  <text x="50" y="618" font-family="system-ui, sans-serif" font-size="18" text-anchor="middle">🏒</text>
+  <text x="85" y="596" font-family="system-ui, sans-serif" font-size="14" font-weight="600" fill="#1e293b">Bauer Supreme 3S</text>
+  <text x="85" y="614" font-family="system-ui, sans-serif" font-size="12" fill="#64748b">Size 5.5D | Hockey Skates</text>
+  <text x="85" y="632" font-family="system-ui, sans-serif" font-size="11" fill="#94a3b8">2024 season</text>
+  <rect x="280" y="592" width="60" height="22" rx="4" fill="#f59e0b" opacity="0.15"/>
+  <text x="310" y="607" font-family="system-ui, sans-serif" font-size="10" fill="#d97706" text-anchor="middle">Fair</text>
+
+  <!-- Summary Footer -->
+  <rect y="680" width="375" height="60" fill="white" stroke="#e2e8f0" stroke-width="1"/>
+  <text x="187" y="705" font-family="system-ui, sans-serif" font-size="13" fill="#64748b" text-anchor="middle">Total: 12 items across 4 family members</text>
+  <text x="187" y="725" font-family="system-ui, sans-serif" font-size="11" fill="#94a3b8" text-anchor="middle">6 New | 4 Good | 2 Fair | 0 Worn</text>
+
+  <!-- Home Indicator -->
+  <rect x="120" y="795" width="135" height="5" rx="2.5" fill="#1e293b"/>
+</svg>
