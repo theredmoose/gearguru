@@ -2,6 +2,10 @@
 
 A mobile-first web app to help families track body measurements and get equipment sizing recommendations for sports gear.
 
+## Live Demo
+
+Try the app online: **https://gearguru-b3bc8.web.app**
+
 ## Features
 
 - **Family Member Profiles** - Track measurements for each family member
@@ -58,20 +62,38 @@ cp .env.example .env.local
 5. Enable Firestore in the console
 6. Deploy security rules: `firebase deploy --only firestore:rules`
 
-### Development
+### Local Testing
 
 ```bash
 # Start dev server
 npm run dev
+# App runs at http://localhost:5173
 
-# Run tests
+# Run unit tests
 npm test
+
+# Run tests in watch mode
+npm run test:watch
 
 # Run tests with coverage
 npm run test:coverage
 
 # Build for production
 npm run build
+
+# Preview production build locally
+npm run preview
+```
+
+### Online Testing
+
+The app is deployed at https://gearguru-b3bc8.web.app
+
+To deploy your own changes:
+```bash
+# Build and deploy to Firebase Hosting
+npm run build
+firebase deploy --only hosting
 ```
 
 ## Project Structure
@@ -101,8 +123,9 @@ All tests pass with 80%+ coverage:
 |------|-------|
 | Sizing Calculations | 39 |
 | Shoe Conversions | 35 |
-| Component Tests | 49 |
-| **Total** | **123** |
+| Gear Analysis | 32 |
+| Component Tests | 100 |
+| **Total** | **206** |
 
 ## Sizing Formulas
 
