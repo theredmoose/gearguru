@@ -28,9 +28,9 @@ function App() {
     clearError: clearAuthError,
   } = useAuth();
   const { members, loading, error, addMember, updateMember, updateSkillLevels, deleteMember } =
-    useFamilyMembers();
+    useFamilyMembers(user?.uid ?? null);
   const { items: gearItems, addItem: addGearItem, updateItem: updateGearItem, deleteItem: deleteGearItem } =
-    useGearItems();
+    useGearItems(user?.uid ?? null);
   const [view, setView] = useState<View>('home');
   const [selectedMember, setSelectedMember] = useState<FamilyMember | null>(null);
   const [selectedGearItem, setSelectedGearItem] = useState<GearItem | null>(null);
@@ -38,14 +38,15 @@ function App() {
   const [gearDefaultSport, setGearDefaultSport] = useState<Sport | undefined>(undefined);
 
   const handleAddMember = async (
-    data: Omit<FamilyMember, 'id' | 'createdAt' | 'updatedAt'>
+    data: Omit<FamilyMember, 'id' | 'userId' | 'createdAt' | 'updatedAt'>
   ) => {
-    await addMember(data);
+    if (!user) return;
+    await addMember({ ...data, userId: user.uid });
     setView('home');
   };
 
   const handleUpdateMember = async (
-    data: Omit<FamilyMember, 'id' | 'createdAt' | 'updatedAt'>
+    data: Omit<FamilyMember, 'id' | 'userId' | 'createdAt' | 'updatedAt'>
   ) => {
     if (selectedMember) {
       await updateMember(selectedMember.id, data);
@@ -100,11 +101,12 @@ function App() {
     await deleteGearItem(item.id);
   };
 
-  const handleGearSubmit = async (data: Omit<GearItem, 'id' | 'createdAt' | 'updatedAt'>) => {
+  const handleGearSubmit = async (data: Omit<GearItem, 'id' | 'userId' | 'createdAt' | 'updatedAt'>) => {
+    if (!user) return;
     if (selectedGearItem) {
       await updateGearItem(selectedGearItem.id, data);
     } else {
-      await addGearItem(data);
+      await addGearItem({ ...data, userId: user.uid });
     }
     // Return to previous view
     if (view === 'add-gear' || view === 'edit-gear') {

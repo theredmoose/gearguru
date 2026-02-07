@@ -7,7 +7,7 @@ interface GearFormProps {
   item?: GearItem;
   ownerId: string;
   defaultSport?: Sport;
-  onSubmit: (data: Omit<GearItem, 'id' | 'createdAt' | 'updatedAt'>) => Promise<void>;
+  onSubmit: (data: Omit<GearItem, 'id' | 'userId' | 'createdAt' | 'updatedAt'>) => Promise<void>;
   onCancel: () => void;
 }
 

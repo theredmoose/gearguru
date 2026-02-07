@@ -33,7 +33,7 @@ interface UseFamilyMembersReturn {
   deleteMember: (id: string) => Promise<void>;
 }
 
-export function useFamilyMembers(): UseFamilyMembersReturn {
+export function useFamilyMembers(userId: string | null): UseFamilyMembersReturn {
   const [state, setState] = useState<AsyncState<FamilyMember[]>>({
     data: null,
     loading: true,
@@ -41,9 +41,13 @@ export function useFamilyMembers(): UseFamilyMembersReturn {
   });
 
   const refresh = useCallback(async () => {
+    if (!userId) {
+      setState({ data: [], loading: false, error: null });
+      return;
+    }
     setState((prev) => ({ ...prev, loading: true, error: null }));
     try {
-      const members = await firebaseService.getAllFamilyMembers();
+      const members = await firebaseService.getAllFamilyMembers(userId);
       setState({ data: members, loading: false, error: null });
     } catch (err) {
       setState({
@@ -52,7 +56,7 @@ export function useFamilyMembers(): UseFamilyMembersReturn {
         error: err instanceof Error ? err : new Error('Unknown error'),
       });
     }
-  }, []);
+  }, [userId]);
 
   useEffect(() => {
     refresh();
@@ -201,7 +205,7 @@ interface UseGearItemsReturn {
   deleteItem: (id: string) => Promise<void>;
 }
 
-export function useGearItems(ownerId?: string): UseGearItemsReturn {
+export function useGearItems(userId: string | null, ownerId?: string): UseGearItemsReturn {
   const [state, setState] = useState<AsyncState<GearItem[]>>({
     data: null,
     loading: true,
@@ -209,11 +213,15 @@ export function useGearItems(ownerId?: string): UseGearItemsReturn {
   });
 
   const refresh = useCallback(async () => {
+    if (!userId) {
+      setState({ data: [], loading: false, error: null });
+      return;
+    }
     setState((prev) => ({ ...prev, loading: true, error: null }));
     try {
       const items = ownerId
         ? await firebaseService.getGearItemsByOwner(ownerId)
-        : await firebaseService.getAllGearItems();
+        : await firebaseService.getAllGearItems(userId);
       setState({ data: items, loading: false, error: null });
     } catch (err) {
       setState({
@@ -222,7 +230,7 @@ export function useGearItems(ownerId?: string): UseGearItemsReturn {
         error: err instanceof Error ? err : new Error('Unknown error'),
       });
     }
-  }, [ownerId]);
+  }, [userId, ownerId]);
 
   useEffect(() => {
     refresh();

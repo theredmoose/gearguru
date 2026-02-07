@@ -51,9 +51,10 @@ function now(): string {
 // FAMILY MEMBERS
 // ============================================
 
-export async function getAllFamilyMembers(): Promise<FamilyMember[]> {
+export async function getAllFamilyMembers(userId: string): Promise<FamilyMember[]> {
   const q = query(
     collection(db, COLLECTIONS.FAMILY_MEMBERS),
+    where('userId', '==', userId),
     orderBy('name', 'asc')
   );
   const snapshot = await getDocs(q);
@@ -153,9 +154,10 @@ export async function deleteFamilyMember(id: string): Promise<void> {
 // GEAR ITEMS
 // ============================================
 
-export async function getAllGearItems(): Promise<GearItem[]> {
+export async function getAllGearItems(userId: string): Promise<GearItem[]> {
   const q = query(
     collection(db, COLLECTIONS.GEAR_ITEMS),
+    where('userId', '==', userId),
     orderBy('createdAt', 'desc')
   );
   const snapshot = await getDocs(q);
@@ -228,10 +230,12 @@ export async function deleteGearItem(id: string): Promise<void> {
 function docToFamilyMember(id: string, data: DocumentData): FamilyMember {
   return {
     id,
+    userId: data.userId,
     name: data.name,
     dateOfBirth: data.dateOfBirth,
     gender: data.gender,
     measurements: data.measurements,
+    skillLevels: data.skillLevels,
     createdAt: fromFirestoreTimestamp(data.createdAt),
     updatedAt: fromFirestoreTimestamp(data.updatedAt),
   };
@@ -240,6 +244,7 @@ function docToFamilyMember(id: string, data: DocumentData): FamilyMember {
 function docToGearItem(id: string, data: DocumentData): GearItem {
   return {
     id,
+    userId: data.userId,
     ownerId: data.ownerId,
     sport: data.sport,
     type: data.type,
@@ -249,6 +254,8 @@ function docToGearItem(id: string, data: DocumentData): GearItem {
     year: data.year,
     condition: data.condition,
     notes: data.notes,
+    photos: data.photos,
+    extendedDetails: data.extendedDetails,
     createdAt: fromFirestoreTimestamp(data.createdAt),
     updatedAt: fromFirestoreTimestamp(data.updatedAt),
   };

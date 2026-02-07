@@ -4,7 +4,7 @@ import type { FamilyMember, Measurements } from '../types';
 interface MemberFormProps {
   member?: FamilyMember;
   onSubmit: (
-    data: Omit<FamilyMember, 'id' | 'createdAt' | 'updatedAt'>
+    data: Omit<FamilyMember, 'id' | 'userId' | 'createdAt' | 'updatedAt'>
   ) => Promise<void>;
   onCancel: () => void;
 }

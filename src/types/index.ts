@@ -4,6 +4,7 @@
 
 export interface FamilyMember {
   id: string;
+  userId: string; // Firebase Auth user ID
   name: string;
   dateOfBirth: string; // ISO date string
   gender: 'male' | 'female' | 'other';
@@ -200,6 +201,7 @@ export type ExtendedGearDetails =
 
 export interface GearItem {
   id: string;
+  userId: string; // Firebase Auth user ID
   ownerId: string; // FamilyMember id
   sport: Sport;
   type: GearType;
