@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import type { GearItem, GearType, Sport, GearPhoto, ExtendedGearDetails, AlpineSkiDetails, SkiProfile } from '../types';
+import type { GearItem, GearType, Sport, GearPhoto, ExtendedGearDetails, AlpineSkiDetails, SkiProfile, GearStatus } from '../types';
 import { PhotoCapture } from './PhotoCapture';
 import { analyzeGearPhotos } from '../services/gearAnalysis';
 
@@ -7,7 +7,7 @@ interface GearFormProps {
   item?: GearItem;
   ownerId: string;
   defaultSport?: Sport;
-  onSubmit: (data: Omit<GearItem, 'id' | 'createdAt' | 'updatedAt'>) => Promise<void>;
+  onSubmit: (data: Omit<GearItem, 'id' | 'userId' | 'createdAt' | 'updatedAt'>) => Promise<void>;
   onCancel: () => void;
 }
 
@@ -33,6 +33,12 @@ const GEAR_TYPES: { id: GearType; label: string }[] = [
 
 const CONDITIONS = ['new', 'good', 'fair', 'worn'] as const;
 
+const STATUSES: { id: GearStatus; label: string }[] = [
+  { id: 'available', label: 'Available' },
+  { id: 'checked-out', label: 'Checked Out' },
+  { id: 'maintenance', label: 'In Maintenance' },
+];
+
 export function GearForm({
   item,
   ownerId,
@@ -54,6 +60,9 @@ export function GearForm({
   const [extendedDetails, setExtendedDetails] = useState<ExtendedGearDetails | undefined>(
     item?.extendedDetails
   );
+  const [status, setStatus] = useState<GearStatus>(item?.status ?? 'available');
+  const [location, setLocation] = useState(item?.location ?? '');
+  const [checkedOutTo, setCheckedOutTo] = useState(item?.checkedOutTo ?? '');
 
   // Extended detail fields for alpine skis
   const [profileTip, setProfileTip] = useState(
@@ -190,6 +199,10 @@ export function GearForm({
         size: size.trim(),
         year: year ? parseInt(year, 10) : undefined,
         condition,
+        status,
+        location: location.trim() || undefined,
+        checkedOutTo: status === 'checked-out' ? checkedOutTo.trim() || undefined : undefined,
+        checkedOutDate: status === 'checked-out' ? new Date().toISOString() : undefined,
         notes: notes.trim() || undefined,
         photos: photos.length > 0 ? photos : undefined,
         extendedDetails: finalExtendedDetails,
@@ -327,20 +340,61 @@ export function GearForm({
           </div>
         </div>
 
-        <div className="form-group">
-          <label htmlFor="condition">Condition</label>
-          <select
-            id="condition"
-            value={condition}
-            onChange={(e) => setCondition(e.target.value as typeof condition)}
-          >
-            {CONDITIONS.map((c) => (
-              <option key={c} value={c}>
-                {c.charAt(0).toUpperCase() + c.slice(1)}
-              </option>
-            ))}
-          </select>
+        <div className="form-row">
+          <div className="form-group">
+            <label htmlFor="condition">Condition</label>
+            <select
+              id="condition"
+              value={condition}
+              onChange={(e) => setCondition(e.target.value as typeof condition)}
+            >
+              {CONDITIONS.map((c) => (
+                <option key={c} value={c}>
+                  {c.charAt(0).toUpperCase() + c.slice(1)}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div className="form-group">
+            <label htmlFor="status">Status</label>
+            <select
+              id="status"
+              value={status}
+              onChange={(e) => setStatus(e.target.value as GearStatus)}
+            >
+              {STATUSES.map((s) => (
+                <option key={s.id} value={s.id}>
+                  {s.label}
+                </option>
+              ))}
+            </select>
+          </div>
         </div>
+
+        <div className="form-group">
+          <label htmlFor="location">Location (optional)</label>
+          <input
+            id="location"
+            type="text"
+            value={location}
+            onChange={(e) => setLocation(e.target.value)}
+            placeholder="e.g., Garage, Ski locker, Car"
+          />
+        </div>
+
+        {status === 'checked-out' && (
+          <div className="form-group">
+            <label htmlFor="checkedOutTo">Checked Out To</label>
+            <input
+              id="checkedOutTo"
+              type="text"
+              value={checkedOutTo}
+              onChange={(e) => setCheckedOutTo(e.target.value)}
+              placeholder="e.g., Friend's name, Rental shop"
+            />
+          </div>
+        )}
       </div>
 
       {/* Extended Details for Alpine Skis */}

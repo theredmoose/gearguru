@@ -26,8 +26,9 @@ describe('SportSizing', () => {
       render(<SportSizing {...defaultProps} />);
       // Nordic Classic appears in both tab and header
       expect(screen.getAllByText('Nordic Classic').length).toBeGreaterThanOrEqual(1);
-      expect(screen.getByText('Skis')).toBeInTheDocument();
-      expect(screen.getByText('Poles')).toBeInTheDocument();
+      // Skis and Poles appear in both loadout legend and sizing sections
+      expect(screen.getAllByText('Skis').length).toBeGreaterThanOrEqual(1);
+      expect(screen.getAllByText('Poles').length).toBeGreaterThanOrEqual(1);
     });
 
     it('displays all sport tabs', () => {
@@ -69,7 +70,8 @@ describe('SportSizing', () => {
     it('switches to Snowboard tab when clicked', () => {
       render(<SportSizing {...defaultProps} />);
       fireEvent.click(screen.getByRole('button', { name: /snowboard/i }));
-      expect(screen.getByText('Board')).toBeInTheDocument();
+      // Board appears in both loadout legend and sizing sections
+      expect(screen.getAllByText('Board').length).toBeGreaterThanOrEqual(1);
       expect(screen.getByText('Board Waist')).toBeInTheDocument();
     });
 

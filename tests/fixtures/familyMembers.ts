@@ -8,6 +8,7 @@ export const createFamilyMember = (
   overrides?: Partial<FamilyMember>
 ): FamilyMember => ({
   id: 'test-member-1',
+  userId: 'test-user-1',
   name: 'John Doe',
   dateOfBirth: '1990-05-15',
   gender: 'male',

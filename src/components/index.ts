@@ -8,3 +8,6 @@ export { GearCard } from './GearCard';
 export { GearForm } from './GearForm';
 export { GearInventory } from './GearInventory';
 export { PhotoCapture } from './PhotoCapture';
+export { GearStatusBadge } from './GearStatusBadge';
+export { MemberInfoTable } from './MemberInfoTable';
+export { GearLoadoutPanel } from './GearLoadoutPanel';

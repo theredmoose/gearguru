@@ -507,3 +507,42 @@ export function formatSizeRange(min: number, max: number, unit = 'cm'): string {
   }
   return `${min}-${max} ${unit}`;
 }
+
+// ============================================
+// HELMET SIZING
+// ============================================
+
+export type HelmetSize = 'XS' | 'S' | 'M' | 'L' | 'XL' | 'XXL';
+
+export interface HelmetSizing {
+  size: HelmetSize;
+  rangeMin: number; // cm
+  rangeMax: number; // cm
+}
+
+/**
+ * Calculate helmet sizing based on head circumference
+ *
+ * Size ranges:
+ * - XS: 51-54cm
+ * - S: 55-56cm
+ * - M: 57-58cm
+ * - L: 59-60cm
+ * - XL: 61-62cm
+ * - XXL: 63+cm
+ */
+export function calculateHelmetSizing(headCircumference: number): HelmetSizing {
+  if (headCircumference < 55) {
+    return { size: 'XS', rangeMin: 51, rangeMax: 54 };
+  } else if (headCircumference < 57) {
+    return { size: 'S', rangeMin: 55, rangeMax: 56 };
+  } else if (headCircumference < 59) {
+    return { size: 'M', rangeMin: 57, rangeMax: 58 };
+  } else if (headCircumference < 61) {
+    return { size: 'L', rangeMin: 59, rangeMax: 60 };
+  } else if (headCircumference < 63) {
+    return { size: 'XL', rangeMin: 61, rangeMax: 62 };
+  } else {
+    return { size: 'XXL', rangeMin: 63, rangeMax: 65 };
+  }
+}
