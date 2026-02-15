@@ -60,8 +60,6 @@ Always create a new branch for changes. Use standard naming conventions:
 <type>: <short description>
 
 <detailed description if needed>
-
-Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>
 ```
 
 Types: `Add`, `Fix`, `Update`, `Refactor`, `Remove`, `Move`
