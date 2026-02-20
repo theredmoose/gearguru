@@ -42,14 +42,16 @@ export function useAuth(): AuthState & AuthActions {
 
   // Listen for auth state changes
   useEffect(() => {
-    const unsubscribe = onAuthChange((user) => {
+    let cleanup: (() => void) | undefined;
+    onAuthChange((user) => {
       if (mountedRef.current) {
         setUser(user);
         setLoading(false);
       }
+    }).then((unsubscribe) => {
+      cleanup = unsubscribe;
     });
-
-    return () => unsubscribe();
+    return () => cleanup?.();
   }, []);
 
   // Clear error

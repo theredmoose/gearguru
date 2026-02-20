@@ -1,25 +1,5 @@
-import {
-  signInWithEmailAndPassword,
-  createUserWithEmailAndPassword,
-  signInWithPopup,
-  signOut,
-  GoogleAuthProvider,
-  FacebookAuthProvider,
-  onAuthStateChanged,
-  sendPasswordResetEmail,
-  updateProfile,
-  User,
-  UserCredential,
-} from 'firebase/auth';
-import { auth } from '../config/firebase';
-
-// Auth providers
-const googleProvider = new GoogleAuthProvider();
-const facebookProvider = new FacebookAuthProvider();
-
-// Add scopes for Facebook
-facebookProvider.addScope('email');
-facebookProvider.addScope('public_profile');
+import { getFirebaseAuth } from '../config/firebase';
+import type { User, UserCredential } from 'firebase/auth';
 
 export interface AuthError {
   code: string;
@@ -32,6 +12,8 @@ export const signUpWithEmail = async (
   password: string,
   displayName?: string
 ): Promise<UserCredential> => {
+  const { createUserWithEmailAndPassword, updateProfile } = await import('firebase/auth');
+  const auth = await getFirebaseAuth();
   const userCredential = await createUserWithEmailAndPassword(auth, email, password);
 
   // Update display name if provided
@@ -46,36 +28,55 @@ export const signInWithEmail = async (
   email: string,
   password: string
 ): Promise<UserCredential> => {
+  const { signInWithEmailAndPassword } = await import('firebase/auth');
+  const auth = await getFirebaseAuth();
   return signInWithEmailAndPassword(auth, email, password);
 };
 
 // Google Authentication
 export const signInWithGoogle = async (): Promise<UserCredential> => {
+  const { signInWithPopup, GoogleAuthProvider } = await import('firebase/auth');
+  const auth = await getFirebaseAuth();
+  const googleProvider = new GoogleAuthProvider();
   return signInWithPopup(auth, googleProvider);
 };
 
 // Facebook Authentication
 export const signInWithFacebook = async (): Promise<UserCredential> => {
+  const { signInWithPopup, FacebookAuthProvider } = await import('firebase/auth');
+  const auth = await getFirebaseAuth();
+  const facebookProvider = new FacebookAuthProvider();
+  facebookProvider.addScope('email');
+  facebookProvider.addScope('public_profile');
   return signInWithPopup(auth, facebookProvider);
 };
 
 // Sign Out
 export const logOut = async (): Promise<void> => {
+  const { signOut } = await import('firebase/auth');
+  const auth = await getFirebaseAuth();
   return signOut(auth);
 };
 
 // Password Reset
 export const resetPassword = async (email: string): Promise<void> => {
+  const { sendPasswordResetEmail } = await import('firebase/auth');
+  const auth = await getFirebaseAuth();
   return sendPasswordResetEmail(auth, email);
 };
 
 // Auth State Observer
-export const onAuthChange = (callback: (user: User | null) => void) => {
+export const onAuthChange = async (
+  callback: (user: User | null) => void
+): Promise<() => void> => {
+  const { onAuthStateChanged } = await import('firebase/auth');
+  const auth = await getFirebaseAuth();
   return onAuthStateChanged(auth, callback);
 };
 
 // Get current user
-export const getCurrentUser = (): User | null => {
+export const getCurrentUser = async (): Promise<User | null> => {
+  const auth = await getFirebaseAuth();
   return auth.currentUser;
 };
 

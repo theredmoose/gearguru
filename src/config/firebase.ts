@@ -1,6 +1,4 @@
 import { initializeApp } from 'firebase/app';
-import { getFirestore } from 'firebase/firestore';
-import { getAuth } from 'firebase/auth';
 
 // Firebase configuration - replace with your actual config
 // Get these values from Firebase Console > Project Settings
@@ -30,11 +28,27 @@ const firebaseConfig = {
   appId: import.meta.env.VITE_FIREBASE_APP_ID,
 };
 
-// Initialize Firebase
+// Initialize Firebase app (static — tiny, needed immediately)
 const app = initializeApp(firebaseConfig);
 
-// Initialize services
-export const db = getFirestore(app);
-export const auth = getAuth(app);
+// Lazy Firestore singleton
+let _db: import('firebase/firestore').Firestore | null = null;
+export async function getDb() {
+  if (!_db) {
+    const { getFirestore } = await import('firebase/firestore');
+    _db = getFirestore(app);
+  }
+  return _db;
+}
+
+// Lazy Auth singleton
+let _auth: import('firebase/auth').Auth | null = null;
+export async function getFirebaseAuth() {
+  if (!_auth) {
+    const { getAuth } = await import('firebase/auth');
+    _auth = getAuth(app);
+  }
+  return _auth;
+}
 
 export default app;
