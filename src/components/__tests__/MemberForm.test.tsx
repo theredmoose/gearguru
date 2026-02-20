@@ -72,6 +72,41 @@ describe('MemberForm', () => {
       fireEvent.click(screen.getByRole('button', { name: /add member/i }));
       expect(await screen.findByText('Height must be greater than 0')).toBeInTheDocument();
     });
+
+    it('shows error when weight is zero', async () => {
+      render(<MemberForm {...defaultProps} />);
+      fireEvent.change(screen.getByLabelText(/name/i), { target: { value: 'John' } });
+      fireEvent.change(screen.getByLabelText(/date of birth/i), {
+        target: { value: '1990-05-15' },
+      });
+      fireEvent.change(screen.getByLabelText(/height \(cm\)/i), { target: { value: '180' } });
+      fireEvent.click(screen.getByRole('button', { name: /add member/i }));
+      expect(await screen.findByText('Weight must be greater than 0')).toBeInTheDocument();
+    });
+
+    it('shows error when date of birth is in the future', async () => {
+      render(<MemberForm {...defaultProps} />);
+      fireEvent.change(screen.getByLabelText(/name/i), { target: { value: 'John' } });
+      fireEvent.change(screen.getByLabelText(/date of birth/i), {
+        target: { value: '2099-01-01' },
+      });
+      fireEvent.change(screen.getByLabelText(/height \(cm\)/i), { target: { value: '180' } });
+      fireEvent.change(screen.getByLabelText(/weight \(kg\)/i), { target: { value: '75' } });
+      fireEvent.click(screen.getByRole('button', { name: /add member/i }));
+      expect(await screen.findByText('Date of birth cannot be in the future')).toBeInTheDocument();
+    });
+
+    it('shows error when date of birth is too far in the past', async () => {
+      render(<MemberForm {...defaultProps} />);
+      fireEvent.change(screen.getByLabelText(/name/i), { target: { value: 'John' } });
+      fireEvent.change(screen.getByLabelText(/date of birth/i), {
+        target: { value: '1800-01-01' },
+      });
+      fireEvent.change(screen.getByLabelText(/height \(cm\)/i), { target: { value: '180' } });
+      fireEvent.change(screen.getByLabelText(/weight \(kg\)/i), { target: { value: '75' } });
+      fireEvent.click(screen.getByRole('button', { name: /add member/i }));
+      expect(await screen.findByText('Date of birth is too far in the past')).toBeInTheDocument();
+    });
   });
 
   // ============================================

@@ -50,6 +50,24 @@ export function MemberForm({ member, onSubmit, onCancel }: MemberFormProps) {
       return;
     }
 
+    if (measurements.weight <= 0) {
+      setError('Weight must be greater than 0');
+      return;
+    }
+
+    const dobDate = new Date(dateOfBirth);
+    const today = new Date();
+    const minDate = new Date();
+    minDate.setFullYear(today.getFullYear() - 120);
+    if (dobDate > today) {
+      setError('Date of birth cannot be in the future');
+      return;
+    }
+    if (dobDate < minDate) {
+      setError('Date of birth is too far in the past');
+      return;
+    }
+
     setSubmitting(true);
     try {
       await onSubmit({
@@ -208,7 +226,7 @@ export function MemberForm({ member, onSubmit, onCancel }: MemberFormProps) {
               onChange={(e) =>
                 updateMeasurement(
                   'footWidthLeft',
-                  parseFloat(e.target.value) || undefined
+                  e.target.value === '' ? undefined : parseFloat(e.target.value)
                 )
               }
               placeholder="10.0"
@@ -226,7 +244,7 @@ export function MemberForm({ member, onSubmit, onCancel }: MemberFormProps) {
               onChange={(e) =>
                 updateMeasurement(
                   'footWidthRight',
-                  parseFloat(e.target.value) || undefined
+                  e.target.value === '' ? undefined : parseFloat(e.target.value)
                 )
               }
               placeholder="10.0"
@@ -250,7 +268,7 @@ export function MemberForm({ member, onSubmit, onCancel }: MemberFormProps) {
               onChange={(e) =>
                 updateMeasurement(
                   'usShoeSize',
-                  parseFloat(e.target.value) || undefined
+                  e.target.value === '' ? undefined : parseFloat(e.target.value)
                 )
               }
               placeholder="10"
@@ -268,7 +286,7 @@ export function MemberForm({ member, onSubmit, onCancel }: MemberFormProps) {
               onChange={(e) =>
                 updateMeasurement(
                   'euShoeSize',
-                  parseFloat(e.target.value) || undefined
+                  e.target.value === '' ? undefined : parseFloat(e.target.value)
                 )
               }
               placeholder="43"
@@ -292,7 +310,7 @@ export function MemberForm({ member, onSubmit, onCancel }: MemberFormProps) {
               onChange={(e) =>
                 updateMeasurement(
                   'headCircumference',
-                  parseFloat(e.target.value) || undefined
+                  e.target.value === '' ? undefined : parseFloat(e.target.value)
                 )
               }
               placeholder="57"
@@ -311,7 +329,7 @@ export function MemberForm({ member, onSubmit, onCancel }: MemberFormProps) {
               onChange={(e) =>
                 updateMeasurement(
                   'handSize',
-                  parseFloat(e.target.value) || undefined
+                  e.target.value === '' ? undefined : parseFloat(e.target.value)
                 )
               }
               placeholder="19"

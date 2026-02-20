@@ -22,7 +22,7 @@ export function MemberDetail({
     measurements.footLengthLeft,
     measurements.footLengthRight
   );
-  const shoeSizes = getShoeSizesFromFootLength(footLength);
+  const shoeSizes = footLength > 0 ? getShoeSizesFromFootLength(footLength) : null;
 
   return (
     <div className="member-detail">
@@ -83,36 +83,42 @@ export function MemberDetail({
       <section className="detail-section">
         <div className="section-header">
           <h2>Shoe Sizes</h2>
-          <button className="btn-link" onClick={onOpenConverter}>
-            Convert
-          </button>
+          {shoeSizes && (
+            <button className="btn-link" onClick={onOpenConverter}>
+              Convert
+            </button>
+          )}
         </div>
-        <div className="shoe-size-grid">
-          <div className="shoe-size-item">
-            <span className="shoe-size-value">{shoeSizes.eu}</span>
-            <span className="shoe-size-label">EU</span>
+        {shoeSizes ? (
+          <div className="shoe-size-grid">
+            <div className="shoe-size-item">
+              <span className="shoe-size-value">{shoeSizes.eu}</span>
+              <span className="shoe-size-label">EU</span>
+            </div>
+            <div className="shoe-size-item">
+              <span className="shoe-size-value">{shoeSizes.usMen}</span>
+              <span className="shoe-size-label">US M</span>
+            </div>
+            <div className="shoe-size-item">
+              <span className="shoe-size-value">{shoeSizes.usWomen}</span>
+              <span className="shoe-size-label">US W</span>
+            </div>
+            <div className="shoe-size-item">
+              <span className="shoe-size-value">{shoeSizes.uk}</span>
+              <span className="shoe-size-label">UK</span>
+            </div>
+            <div className="shoe-size-item">
+              <span className="shoe-size-value">{shoeSizes.mondopoint}</span>
+              <span className="shoe-size-label">Mondo</span>
+            </div>
+            <div className="shoe-size-item">
+              <span className="shoe-size-value">{shoeSizes.cm}</span>
+              <span className="shoe-size-label">CM</span>
+            </div>
           </div>
-          <div className="shoe-size-item">
-            <span className="shoe-size-value">{shoeSizes.usMen}</span>
-            <span className="shoe-size-label">US M</span>
-          </div>
-          <div className="shoe-size-item">
-            <span className="shoe-size-value">{shoeSizes.usWomen}</span>
-            <span className="shoe-size-label">US W</span>
-          </div>
-          <div className="shoe-size-item">
-            <span className="shoe-size-value">{shoeSizes.uk}</span>
-            <span className="shoe-size-label">UK</span>
-          </div>
-          <div className="shoe-size-item">
-            <span className="shoe-size-value">{shoeSizes.mondopoint}</span>
-            <span className="shoe-size-label">Mondo</span>
-          </div>
-          <div className="shoe-size-item">
-            <span className="shoe-size-value">{shoeSizes.cm}</span>
-            <span className="shoe-size-label">CM</span>
-          </div>
-        </div>
+        ) : (
+          <p className="empty-state">Enter foot measurements to see shoe sizes.</p>
+        )}
       </section>
 
       <section className="detail-section">

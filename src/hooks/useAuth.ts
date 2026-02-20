@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { User } from 'firebase/auth';
 import {
   signInWithEmail,
@@ -31,12 +31,22 @@ export function useAuth(): AuthState & AuthActions {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const mountedRef = useRef(true);
+
+  useEffect(() => {
+    mountedRef.current = true;
+    return () => {
+      mountedRef.current = false;
+    };
+  }, []);
 
   // Listen for auth state changes
   useEffect(() => {
     const unsubscribe = onAuthChange((user) => {
-      setUser(user);
-      setLoading(false);
+      if (mountedRef.current) {
+        setUser(user);
+        setLoading(false);
+      }
     });
 
     return () => unsubscribe();
@@ -55,10 +65,10 @@ export function useAuth(): AuthState & AuthActions {
       await signInWithEmail(email, password);
     } catch (err: unknown) {
       const errorCode = (err as { code?: string })?.code || 'unknown';
-      setError(getAuthErrorMessage(errorCode));
+      if (mountedRef.current) setError(getAuthErrorMessage(errorCode));
       throw err;
     } finally {
-      setLoading(false);
+      if (mountedRef.current) setLoading(false);
     }
   }, []);
 
@@ -70,10 +80,10 @@ export function useAuth(): AuthState & AuthActions {
       await signUpWithEmail(email, password, displayName);
     } catch (err: unknown) {
       const errorCode = (err as { code?: string })?.code || 'unknown';
-      setError(getAuthErrorMessage(errorCode));
+      if (mountedRef.current) setError(getAuthErrorMessage(errorCode));
       throw err;
     } finally {
-      setLoading(false);
+      if (mountedRef.current) setLoading(false);
     }
   }, []);
 
@@ -85,10 +95,10 @@ export function useAuth(): AuthState & AuthActions {
       await signInWithGoogle();
     } catch (err: unknown) {
       const errorCode = (err as { code?: string })?.code || 'unknown';
-      setError(getAuthErrorMessage(errorCode));
+      if (mountedRef.current) setError(getAuthErrorMessage(errorCode));
       throw err;
     } finally {
-      setLoading(false);
+      if (mountedRef.current) setLoading(false);
     }
   }, []);
 
@@ -100,10 +110,10 @@ export function useAuth(): AuthState & AuthActions {
       await signInWithFacebook();
     } catch (err: unknown) {
       const errorCode = (err as { code?: string })?.code || 'unknown';
-      setError(getAuthErrorMessage(errorCode));
+      if (mountedRef.current) setError(getAuthErrorMessage(errorCode));
       throw err;
     } finally {
-      setLoading(false);
+      if (mountedRef.current) setLoading(false);
     }
   }, []);
 

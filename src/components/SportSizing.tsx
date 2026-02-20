@@ -73,7 +73,9 @@ export function SportSizing({
   const setSkillLevel = (level: SkillLevel) => {
     const newSkillLevels = { ...skillLevels, [currentSport.id]: level };
     setSkillLevels(newSkillLevels);
-    onSkillLevelChange?.(newSkillLevels);
+    // Omit nordic-combi — it's not a selectable sport and shouldn't be persisted
+    const { 'nordic-combi': _unused, ...persistable } = newSkillLevels;
+    onSkillLevelChange?.(persistable);
   };
 
   const handleTouchStart = (e: React.TouchEvent) => {
