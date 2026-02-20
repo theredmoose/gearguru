@@ -13,7 +13,7 @@
 - [x] Skill level per sport
 - [x] List layout for gear types
 - [x] Separate settings section (DIN, Stance)
-- [x] 131 tests passing
+- [x] 223 tests passing
 - [x] CI/CD with GitHub Actions
 - [x] Deployed to Firebase Hosting
 
@@ -39,26 +39,26 @@
 ## Known Issues
 
 ### Critical
-- [ ] skillLevels field lost on Firestore read — `docToFamilyMember()` in `src/services/firebase.ts` doesn't include `skillLevels` in the returned object, losing skill level data on every fetch
-- [ ] photos/extendedDetails fields lost on Firestore read — `docToGearItem()` in `src/services/firebase.ts` doesn't include `photos` or `extendedDetails` in the returned object, losing photo and extended detail data on every fetch
-- [ ] No user-scoped Firebase queries — `getAllFamilyMembers()` and `getAllGearItems()` don't filter by user ID, potential data leakage if Firestore rules are misconfigured
+- [x] skillLevels field lost on Firestore read — was already fixed in `docToFamilyMember()`
+- [x] photos/extendedDetails fields lost on Firestore read — was already fixed in `docToGearItem()`
+- [x] No user-scoped Firebase queries — was already fixed in `getAllFamilyMembers()` and `getAllGearItems()`
 
 ### Medium
-- [ ] Negative/zero size values after conversion — shoe size and equipment size calculations can produce negative or zero values with edge-case inputs
-- [ ] Zero foot measurements cause invalid shoe sizes — `getShoeSizesFromFootLength(0)` returns bad data instead of "N/A" in `src/components/MemberDetail.tsx`
-- [ ] No validation for negative/zero measurements — weight and foot measurements in MemberForm accept 0 or negative values
-- [ ] Missing Firebase env var validation — `src/config/firebase.ts` silently accepts undefined env vars, causing cryptic runtime crash
+- [x] Negative/zero size values after conversion — MemberDetail now guards against footLength <= 0
+- [x] Zero foot measurements cause invalid shoe sizes — `MemberDetail.tsx` shows "N/A" message when footLength is 0
+- [x] No validation for negative/zero measurements — MemberForm now validates weight > 0
+- [x] Missing Firebase env var validation — `src/config/firebase.ts` now throws with clear error listing missing vars
 - [ ] No account linking flow — users get stuck signing in with Google after creating email account with same address
 - [ ] No offline error handling — Firebase operations show raw errors when offline
 
 ### Low
-- [ ] `parseFloat(value) || undefined` treats 0 as undefined — optional numeric fields in MemberForm save 0 values as undefined
-- [ ] No date-of-birth bounds validation — future dates and unrealistic ages accepted in MemberForm
-- [ ] nordic-combi in skillLevels but not in SPORTS array — skill levels initialized for a sport that isn't selectable
-- [ ] US shoe size conversion inconsistency — different functions use different EU-to-US formulas
+- [x] `parseFloat(value) || undefined` treats 0 as undefined — optional numeric fields now use `e.target.value === '' ? undefined : parseFloat()`
+- [x] No date-of-birth bounds validation — MemberForm now rejects future dates and dates > 120 years ago
+- [x] nordic-combi in skillLevels but not in SPORTS array — `SportSizing.tsx` now omits nordic-combi when persisting skill levels
+- [x] US shoe size conversion inconsistency — `sizing.ts` now uses `getShoeSizesFromFootLength()` from shoeSize service
 - [ ] Potential undefined skillLevel access — `skillLevels[currentSport.id]` in SportSizing has no fallback
 - [ ] No loading state for gear operations — gear delete/submit in App.tsx show no loading indicators
-- [ ] Race condition in useAuth — `setLoading(false)` can fire after component unmounts
+- [x] Race condition in useAuth — `setLoading(false)` and `setError()` now guarded by mounted ref
 - [ ] No email verification on signup — email accounts created without verifying address
 
 ## Notes

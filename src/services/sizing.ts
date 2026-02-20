@@ -9,6 +9,7 @@ import type {
   SnowboardBootSizing,
   HockeySkateSize,
 } from '../types';
+import { getShoeSizesFromFootLength } from './shoeSize';
 
 // ============================================
 // NORDIC SKIING
@@ -438,8 +439,9 @@ export function calculateHockeySkateSize(
     measurements.footWidthRight ?? 0
   );
 
-  // US shoe size from foot length (approximate)
-  const usShoeSize = measurements.usShoeSize ?? footLength * 1.5 + 2 - 32;
+  // US shoe size from foot length — use shared shoeSize service for consistency
+  const shoeSizes = footLength > 0 ? getShoeSizesFromFootLength(footLength) : null;
+  const usShoeSize = measurements.usShoeSize ?? shoeSizes?.usMen ?? 0;
 
   // Skate size is typically 1-1.5 smaller
   const skateSizeUS = Math.round((usShoeSize - 1.5) * 2) / 2; // Round to nearest 0.5

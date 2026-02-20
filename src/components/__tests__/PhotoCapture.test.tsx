@@ -43,8 +43,8 @@ describe('PhotoCapture', () => {
     it('shows upload and take photo buttons when slot is clicked', () => {
       render(<PhotoCapture {...defaultProps} />);
       fireEvent.click(screen.getByText('Full View'));
-      expect(screen.getByText('Upload Photo')).toBeInTheDocument();
-      expect(screen.getByText('Take Photo')).toBeInTheDocument();
+      expect(screen.getByText('Upload')).toBeInTheDocument();
+      expect(screen.getByText('Take')).toBeInTheDocument();
     });
 
     it('shows placeholder descriptions', () => {
