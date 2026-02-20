@@ -65,7 +65,8 @@ Always create a new branch for changes. Use standard naming conventions:
 
 Types: `Add`, `Fix`, `Update`, `Refactor`, `Remove`, `Move`
 
-### Bug Tracking
+### TODO.md Maintenance
+- **Update `TODO.md` at the end of every feature branch or bug fix** — check off completed items, add any new issues discovered, and update the test count if it changed
 - Maintain bugs in both GitHub Issues (with `bug` label) and the `TODO.md` Known Issues section
 - When creating a bug, add it to both locations with matching description and priority
 - When resolving a bug, close the GitHub Issue and check off the item in `TODO.md`
