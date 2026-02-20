@@ -1,17 +1,5 @@
-import {
-  collection,
-  doc,
-  getDocs,
-  getDoc,
-  addDoc,
-  updateDoc,
-  deleteDoc,
-  query,
-  where,
-  Timestamp,
-  type DocumentData,
-} from 'firebase/firestore';
-import { db } from '../config/firebase';
+import { getDb } from '../config/firebase';
+import type { DocumentData } from 'firebase/firestore';
 import type {
   FamilyMember,
   GearItem,
@@ -35,7 +23,8 @@ const COLLECTIONS = {
 // TIMESTAMP HELPERS
 // ============================================
 
-function toFirestoreTimestamp(isoString: string): Timestamp {
+async function toFirestoreTimestamp(isoString: string) {
+  const { Timestamp } = await import('firebase/firestore');
   return Timestamp.fromDate(new Date(isoString));
 }
 
@@ -89,6 +78,8 @@ function cleanPhotos(photos: GearPhoto[] | undefined): Array<{id: string; type: 
 // ============================================
 
 export async function getAllFamilyMembers(userId: string): Promise<FamilyMember[]> {
+  const { collection, query, where, getDocs } = await import('firebase/firestore');
+  const db = await getDb();
   const q = query(
     collection(db, COLLECTIONS.FAMILY_MEMBERS),
     where('userId', '==', userId)
@@ -104,6 +95,8 @@ export async function getAllFamilyMembers(userId: string): Promise<FamilyMember[
 export async function getFamilyMember(
   id: string
 ): Promise<FamilyMember | null> {
+  const { doc, getDoc } = await import('firebase/firestore');
+  const db = await getDb();
   const docRef = doc(db, COLLECTIONS.FAMILY_MEMBERS, id);
   const snapshot = await getDoc(docRef);
 
@@ -117,11 +110,13 @@ export async function getFamilyMember(
 export async function createFamilyMember(
   data: Omit<FamilyMember, 'id' | 'createdAt' | 'updatedAt'>
 ): Promise<FamilyMember> {
+  const { collection, addDoc } = await import('firebase/firestore');
+  const db = await getDb();
   const timestamp = now();
   const docData = {
     ...removeUndefined(data),
-    createdAt: toFirestoreTimestamp(timestamp),
-    updatedAt: toFirestoreTimestamp(timestamp),
+    createdAt: await toFirestoreTimestamp(timestamp),
+    updatedAt: await toFirestoreTimestamp(timestamp),
   };
 
   const docRef = await addDoc(
@@ -141,10 +136,12 @@ export async function updateFamilyMember(
   id: string,
   data: Partial<Omit<FamilyMember, 'id' | 'createdAt' | 'updatedAt'>>
 ): Promise<void> {
+  const { doc, updateDoc } = await import('firebase/firestore');
+  const db = await getDb();
   const docRef = doc(db, COLLECTIONS.FAMILY_MEMBERS, id);
   await updateDoc(docRef, {
     ...removeUndefined(data),
-    updatedAt: toFirestoreTimestamp(now()),
+    updatedAt: await toFirestoreTimestamp(now()),
   });
 }
 
@@ -152,13 +149,15 @@ export async function updateMeasurements(
   memberId: string,
   measurements: Measurements
 ): Promise<void> {
+  const { doc, updateDoc } = await import('firebase/firestore');
+  const db = await getDb();
   const docRef = doc(db, COLLECTIONS.FAMILY_MEMBERS, memberId);
   await updateDoc(docRef, {
     measurements: {
       ...measurements,
       measuredAt: now(),
     },
-    updatedAt: toFirestoreTimestamp(now()),
+    updatedAt: await toFirestoreTimestamp(now()),
   });
 }
 
@@ -166,14 +165,19 @@ export async function updateSkillLevels(
   memberId: string,
   skillLevels: Partial<Record<Sport, SkillLevel>>
 ): Promise<void> {
+  const { doc, updateDoc } = await import('firebase/firestore');
+  const db = await getDb();
   const docRef = doc(db, COLLECTIONS.FAMILY_MEMBERS, memberId);
   await updateDoc(docRef, {
     skillLevels,
-    updatedAt: toFirestoreTimestamp(now()),
+    updatedAt: await toFirestoreTimestamp(now()),
   });
 }
 
 export async function deleteFamilyMember(id: string): Promise<void> {
+  const { collection, doc, deleteDoc, query, where, getDocs } = await import('firebase/firestore');
+  const db = await getDb();
+
   // Delete member
   const docRef = doc(db, COLLECTIONS.FAMILY_MEMBERS, id);
   await deleteDoc(docRef);
@@ -194,6 +198,8 @@ export async function deleteFamilyMember(id: string): Promise<void> {
 // ============================================
 
 export async function getAllGearItems(userId: string): Promise<GearItem[]> {
+  const { collection, query, where, getDocs } = await import('firebase/firestore');
+  const db = await getDb();
   const q = query(
     collection(db, COLLECTIONS.GEAR_ITEMS),
     where('userId', '==', userId)
@@ -207,6 +213,8 @@ export async function getAllGearItems(userId: string): Promise<GearItem[]> {
 }
 
 export async function getGearItemsByOwner(ownerId: string): Promise<GearItem[]> {
+  const { collection, query, where, getDocs } = await import('firebase/firestore');
+  const db = await getDb();
   const q = query(
     collection(db, COLLECTIONS.GEAR_ITEMS),
     where('ownerId', '==', ownerId)
@@ -220,6 +228,8 @@ export async function getGearItemsByOwner(ownerId: string): Promise<GearItem[]> 
 }
 
 export async function getGearItem(id: string): Promise<GearItem | null> {
+  const { doc, getDoc } = await import('firebase/firestore');
+  const db = await getDb();
   const docRef = doc(db, COLLECTIONS.GEAR_ITEMS, id);
   const snapshot = await getDoc(docRef);
 
@@ -233,6 +243,8 @@ export async function getGearItem(id: string): Promise<GearItem | null> {
 export async function createGearItem(
   data: Omit<GearItem, 'id' | 'createdAt' | 'updatedAt'>
 ): Promise<GearItem> {
+  const { collection, addDoc } = await import('firebase/firestore');
+  const db = await getDb();
   const timestamp = now();
   // Build document explicitly to avoid any prototype chain issues
   const docData: DocumentData = {
@@ -244,8 +256,8 @@ export async function createGearItem(
     model: data.model,
     size: data.size,
     condition: data.condition,
-    createdAt: toFirestoreTimestamp(timestamp),
-    updatedAt: toFirestoreTimestamp(timestamp),
+    createdAt: await toFirestoreTimestamp(timestamp),
+    updatedAt: await toFirestoreTimestamp(timestamp),
   };
   // Add optional fields only if defined
   if (data.year !== undefined) docData.year = data.year;
@@ -271,10 +283,12 @@ export async function updateGearItem(
   id: string,
   data: Partial<Omit<GearItem, 'id' | 'createdAt' | 'updatedAt'>>
 ): Promise<void> {
+  const { doc, updateDoc } = await import('firebase/firestore');
+  const db = await getDb();
   const docRef = doc(db, COLLECTIONS.GEAR_ITEMS, id);
   // Build update object explicitly to avoid any prototype chain issues
   const updateData: DocumentData = {
-    updatedAt: toFirestoreTimestamp(now()),
+    updatedAt: await toFirestoreTimestamp(now()),
   };
   // Add only the fields that are being updated
   if (data.userId !== undefined) updateData.userId = data.userId;
@@ -298,6 +312,8 @@ export async function updateGearItem(
 }
 
 export async function deleteGearItem(id: string): Promise<void> {
+  const { doc, deleteDoc } = await import('firebase/firestore');
+  const db = await getDb();
   const docRef = doc(db, COLLECTIONS.GEAR_ITEMS, id);
   await deleteDoc(docRef);
 }

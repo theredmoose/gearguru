@@ -32,7 +32,7 @@
 - [ ] Multiple families / sharing
 
 ## Technical Debt
-- [ ] Code-split Firebase to reduce bundle size — chunks exceed 500KB after minification (currently 680KB), use dynamic imports
+- [x] Code-split Firebase to reduce bundle size — chunks exceed 500KB after minification (currently 680KB), use dynamic imports
 - [ ] Add E2E tests with Playwright
 - [ ] Increase test coverage to 80%+ for branches/functions
 
