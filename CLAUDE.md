@@ -54,6 +54,7 @@ Always create a new branch for changes. Use standard naming conventions:
 4. **Write descriptive commit messages** explaining the "why" not just the "what"
 5. **Create a PR** for review before merging to `main`
 6. **All tests must pass** before merging a branch
+7. **Do not delete branches** after merging unless explicitly asked to
 
 ### Commit Message Format
 ```
