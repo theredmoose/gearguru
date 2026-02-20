@@ -20,7 +20,7 @@
 ## Next Up
 - [x] Persist skill levels per member in database
 - [x] Add gear inventory tracking (owned equipment)
-- [ ] Add authentication (Google sign-in)
+- [x] Add authentication (Google sign-in)
 - [ ] Add data export (PDF/CSV)
 
 ## Future Enhancements
