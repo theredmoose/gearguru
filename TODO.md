@@ -13,13 +13,13 @@
 - [x] Skill level per sport
 - [x] List layout for gear types
 - [x] Separate settings section (DIN, Stance)
-- [x] 223 tests passing
+- [x] 278 tests passing
 - [x] CI/CD with GitHub Actions
 - [x] Deployed to Firebase Hosting
 
 ## Next Up
 - [x] Persist skill levels per member in database
-- [ ] Add gear inventory tracking (owned equipment)
+- [x] Add gear inventory tracking (owned equipment)
 - [ ] Add authentication (Google sign-in)
 - [ ] Add data export (PDF/CSV)
 
