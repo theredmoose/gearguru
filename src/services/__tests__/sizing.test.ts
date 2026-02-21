@@ -7,6 +7,7 @@ import {
   calculateSnowboardSizing,
   calculateSnowboardBootSizing,
   calculateHockeySkateSize,
+  calculateHelmetSizing,
   calculateAge,
   formatSizeRange,
 } from '../sizing';
@@ -316,6 +317,102 @@ describe('sizing service', () => {
 
     it('uses cm as default unit', () => {
       expect(formatSizeRange(160, 170)).toBe('160-170 cm');
+    });
+  });
+
+  // ============================================
+  // HELMET SIZING
+  // ============================================
+  describe('calculateHelmetSizing', () => {
+    it('returns XS for head circumference < 55cm', () => {
+      const result = calculateHelmetSizing(53);
+      expect(result.size).toBe('XS');
+      expect(result.rangeMin).toBe(51);
+      expect(result.rangeMax).toBe(54);
+    });
+
+    it('returns S for head circumference 55–56cm', () => {
+      const result = calculateHelmetSizing(55);
+      expect(result.size).toBe('S');
+      expect(result.rangeMin).toBe(55);
+      expect(result.rangeMax).toBe(56);
+    });
+
+    it('returns M for head circumference 57–58cm', () => {
+      const result = calculateHelmetSizing(57);
+      expect(result.size).toBe('M');
+      expect(result.rangeMin).toBe(57);
+      expect(result.rangeMax).toBe(58);
+    });
+
+    it('returns L for head circumference 59–60cm', () => {
+      const result = calculateHelmetSizing(59);
+      expect(result.size).toBe('L');
+      expect(result.rangeMin).toBe(59);
+      expect(result.rangeMax).toBe(60);
+    });
+
+    it('returns XL for head circumference 61–62cm', () => {
+      const result = calculateHelmetSizing(61);
+      expect(result.size).toBe('XL');
+      expect(result.rangeMin).toBe(61);
+      expect(result.rangeMax).toBe(62);
+    });
+
+    it('returns XXL for head circumference 63cm or above', () => {
+      const result = calculateHelmetSizing(63);
+      expect(result.size).toBe('XXL');
+      expect(result.rangeMin).toBe(63);
+      expect(result.rangeMax).toBe(65);
+    });
+
+    it('returns XXL for very large head circumference', () => {
+      const result = calculateHelmetSizing(70);
+      expect(result.size).toBe('XXL');
+    });
+  });
+
+  // ============================================
+  // NORDIC COMBI SIZING
+  // ============================================
+  describe('calculateNordicSkiSizing (combi style)', () => {
+    it('calculates combi ski length as height + 5 to +10cm range', () => {
+      const result = calculateNordicSkiSizing(MEASUREMENTS.adultMale, 'nordic-combi', 'intermediate');
+      expect(result.skiLengthMin).toBe(185); // height + 5
+      expect(result.skiLengthMax).toBe(190); // height + 10
+      expect(result.sport).toBe('nordic-combi');
+    });
+
+    it('uses combi pole multipliers (0.86–0.88)', () => {
+      const result = calculateNordicSkiSizing(MEASUREMENTS.adultMale, 'nordic-combi', 'beginner');
+      expect(result.poleLengthMin).toBe(Math.round(180 * 0.86));
+      expect(result.poleLengthMax).toBe(Math.round(180 * 0.88));
+    });
+  });
+
+  // ============================================
+  // HOCKEY WIDE FEET
+  // ============================================
+  describe('calculateHockeySkateSize (wide feet)', () => {
+    it('returns EE width for Bauer with wide feet', () => {
+      const result = calculateHockeySkateSize(MEASUREMENTS.wideFeet, 'bauer');
+      expect(result.width).toBe('EE');
+    });
+
+    it('returns W width for CCM with wide feet', () => {
+      const result = calculateHockeySkateSize(MEASUREMENTS.wideFeet, 'ccm');
+      expect(result.width).toBe('W');
+    });
+  });
+
+  // ============================================
+  // ALPINE BOOT — EXTRA-WIDE LAST
+  // ============================================
+  describe('calculateAlpineBootSizing (extra-wide last)', () => {
+    it('returns extra-wide last for very wide feet', () => {
+      // footWidth 11.5cm → estimatedLast 115mm > 104 → extra-wide
+      const result = calculateAlpineBootSizing(MEASUREMENTS.wideFeet, 'intermediate', 'male');
+      expect(result.lastWidth).toBe('extra-wide');
     });
   });
 });

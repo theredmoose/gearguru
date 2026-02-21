@@ -13,7 +13,7 @@
 - [x] Skill level per sport
 - [x] List layout for gear types
 - [x] Separate settings section (DIN, Stance)
-- [x] 278 tests passing
+- [x] 473 tests passing
 - [x] CI/CD with GitHub Actions
 - [x] Deployed to Firebase Hosting
 
@@ -34,7 +34,7 @@
 ## Technical Debt
 - [x] Code-split Firebase to reduce bundle size — chunks exceed 500KB after minification (currently 680KB), use dynamic imports
 - [ ] Add E2E tests with Playwright
-- [ ] Increase test coverage to 80%+ for branches/functions
+- [x] Increase test coverage to 80%+ for branches/functions — 87% stmts, 82% branches, 85% functions, 89% lines
 
 ## Known Issues
 

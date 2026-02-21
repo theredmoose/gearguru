@@ -1,10 +1,25 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import {
   docToFamilyMember,
   docToGearItem,
   fromFirestoreTimestamp,
+  getAllFamilyMembers,
+  getFamilyMember,
+  createFamilyMember,
+  updateFamilyMember,
+  updateMeasurements,
+  updateSkillLevels,
+  deleteFamilyMember,
+  getAllGearItems,
+  getGearItemsByOwner,
+  getGearItem,
+  createGearItem,
+  updateGearItem,
+  deleteGearItem,
 } from '../firebase';
 import type { FirestoreTimestamp } from '../../types';
+import { FAMILY_MEMBERS } from '@tests/fixtures/familyMembers';
+import { MEASUREMENTS } from '@tests/fixtures/measurements';
 
 // Helper to create mock Firestore timestamps
 const createTimestamp = (date: Date): FirestoreTimestamp => ({
@@ -197,6 +212,267 @@ describe('firebase service', () => {
         const result = docToGearItem('gear-1', data);
         expect(result.condition).toBe(condition);
       });
+    });
+  });
+
+  // ============================================
+  // FAMILY MEMBER SERVICE FUNCTIONS
+  // ============================================
+  describe('getAllFamilyMembers', () => {
+    it('returns empty array when no members exist', async () => {
+      const result = await getAllFamilyMembers('user-1');
+      expect(result).toEqual([]);
+    });
+
+    it('maps Firestore docs to FamilyMember objects and sorts by name', async () => {
+      const mockTimestamp = { seconds: 1705320000, nanoseconds: 0 };
+      const mockDocs = [
+        {
+          id: 'member-2',
+          data: () => ({
+            userId: 'user-1', name: 'Zara',
+            dateOfBirth: '1995-01-01', gender: 'female',
+            measurements: MEASUREMENTS.adultFemale,
+            createdAt: mockTimestamp, updatedAt: mockTimestamp,
+          }),
+        },
+        {
+          id: 'member-1',
+          data: () => ({
+            userId: 'user-1', name: 'Alice',
+            dateOfBirth: '1990-01-01', gender: 'female',
+            measurements: MEASUREMENTS.adultFemale,
+            createdAt: mockTimestamp, updatedAt: mockTimestamp,
+          }),
+        },
+      ];
+      const { getDocs } = await import('firebase/firestore');
+      vi.mocked(getDocs).mockResolvedValueOnce({ docs: mockDocs } as any);
+
+      const result = await getAllFamilyMembers('user-1');
+      expect(result).toHaveLength(2);
+      expect(result[0].name).toBe('Alice');
+      expect(result[1].name).toBe('Zara');
+    });
+  });
+
+  describe('getFamilyMember', () => {
+    it('returns null when member does not exist', async () => {
+      const result = await getFamilyMember('nonexistent');
+      expect(result).toBeNull();
+    });
+
+    it('returns FamilyMember when doc exists', async () => {
+      const mockTimestamp = { seconds: 1705320000, nanoseconds: 0 };
+      const { getDoc } = await import('firebase/firestore');
+      vi.mocked(getDoc).mockResolvedValueOnce({
+        exists: () => true,
+        id: 'member-1',
+        data: () => ({
+          userId: 'user-1', name: 'John',
+          dateOfBirth: '1990-01-01', gender: 'male',
+          measurements: MEASUREMENTS.adultMale,
+          createdAt: mockTimestamp, updatedAt: mockTimestamp,
+        }),
+      } as any);
+
+      const result = await getFamilyMember('member-1');
+      expect(result).not.toBeNull();
+      expect(result!.name).toBe('John');
+    });
+  });
+
+  describe('createFamilyMember', () => {
+    it('creates a member and returns it with the new id', async () => {
+      const { name: _, id: _id, createdAt: _c, updatedAt: _u, ...memberData } = FAMILY_MEMBERS.john;
+      const result = await createFamilyMember({ ...memberData, name: 'New Person' });
+      expect(result.id).toBe('mock-id');
+      expect(result.name).toBe('New Person');
+    });
+
+    it('strips undefined fields before saving', async () => {
+      const { name: _, id: _id, createdAt: _c, updatedAt: _u, ...memberData } = FAMILY_MEMBERS.john;
+      const dataWithUndefined = { ...memberData, name: 'Test', skillLevels: undefined };
+      const result = await createFamilyMember(dataWithUndefined);
+      expect(result.id).toBe('mock-id');
+    });
+  });
+
+  describe('updateFamilyMember', () => {
+    it('calls updateDoc with updated data', async () => {
+      const { updateDoc } = await import('firebase/firestore');
+      await updateFamilyMember('member-1', { name: 'Updated Name' });
+      expect(vi.mocked(updateDoc)).toHaveBeenCalled();
+    });
+  });
+
+  describe('updateMeasurements', () => {
+    it('calls updateDoc with measurements', async () => {
+      const { updateDoc } = await import('firebase/firestore');
+      await updateMeasurements('member-1', MEASUREMENTS.adultMale);
+      expect(vi.mocked(updateDoc)).toHaveBeenCalled();
+    });
+  });
+
+  describe('updateSkillLevels', () => {
+    it('calls updateDoc with skill levels', async () => {
+      const { updateDoc } = await import('firebase/firestore');
+      await updateSkillLevels('member-1', { alpine: 'advanced' });
+      expect(vi.mocked(updateDoc)).toHaveBeenCalled();
+    });
+  });
+
+  describe('deleteFamilyMember', () => {
+    it('deletes the member document', async () => {
+      const { deleteDoc } = await import('firebase/firestore');
+      await deleteFamilyMember('member-1');
+      expect(vi.mocked(deleteDoc)).toHaveBeenCalled();
+    });
+
+    it('also deletes gear items owned by the member', async () => {
+      const mockGearDocs = [
+        { ref: 'gear-ref-1' },
+        { ref: 'gear-ref-2' },
+      ];
+      const { getDocs, deleteDoc } = await import('firebase/firestore');
+      vi.mocked(getDocs).mockResolvedValueOnce({ docs: mockGearDocs } as any);
+      await deleteFamilyMember('member-1');
+      // deleteDoc is called once for the member + twice for gear
+      expect(vi.mocked(deleteDoc).mock.calls.length).toBeGreaterThanOrEqual(1);
+    });
+  });
+
+  // ============================================
+  // GEAR ITEM SERVICE FUNCTIONS
+  // ============================================
+  describe('getAllGearItems', () => {
+    it('returns empty array when no gear exists', async () => {
+      const result = await getAllGearItems('user-1');
+      expect(result).toEqual([]);
+    });
+
+    it('maps Firestore docs to GearItem objects sorted by createdAt desc', async () => {
+      const ts1 = { seconds: 1000, nanoseconds: 0 };
+      const ts2 = { seconds: 2000, nanoseconds: 0 };
+      const mockDocs = [
+        {
+          id: 'gear-1',
+          data: () => ({
+            userId: 'user-1', ownerId: 'member-1',
+            sport: 'alpine', type: 'ski', brand: 'Atomic', model: 'Redster',
+            size: '170', condition: 'good',
+            createdAt: ts1, updatedAt: ts1,
+          }),
+        },
+        {
+          id: 'gear-2',
+          data: () => ({
+            userId: 'user-1', ownerId: 'member-1',
+            sport: 'alpine', type: 'boot', brand: 'Salomon', model: 'X Pro',
+            size: '270', condition: 'new',
+            createdAt: ts2, updatedAt: ts2,
+          }),
+        },
+      ];
+      const { getDocs } = await import('firebase/firestore');
+      vi.mocked(getDocs).mockResolvedValueOnce({ docs: mockDocs } as any);
+
+      const result = await getAllGearItems('user-1');
+      expect(result).toHaveLength(2);
+      // gear-2 has later timestamp so it should come first
+      expect(result[0].id).toBe('gear-2');
+    });
+  });
+
+  describe('getGearItemsByOwner', () => {
+    it('returns empty array when no gear for owner', async () => {
+      const result = await getGearItemsByOwner('member-1');
+      expect(result).toEqual([]);
+    });
+  });
+
+  describe('getGearItem', () => {
+    it('returns null when gear does not exist', async () => {
+      const result = await getGearItem('nonexistent');
+      expect(result).toBeNull();
+    });
+
+    it('returns GearItem when doc exists', async () => {
+      const mockTimestamp = { seconds: 1705320000, nanoseconds: 0 };
+      const { getDoc } = await import('firebase/firestore');
+      vi.mocked(getDoc).mockResolvedValueOnce({
+        exists: () => true,
+        id: 'gear-1',
+        data: () => ({
+          userId: 'user-1', ownerId: 'member-1',
+          sport: 'alpine', type: 'ski', brand: 'Atomic', model: 'Redster',
+          size: '170', condition: 'good',
+          createdAt: mockTimestamp, updatedAt: mockTimestamp,
+        }),
+      } as any);
+
+      const result = await getGearItem('gear-1');
+      expect(result).not.toBeNull();
+      expect(result!.brand).toBe('Atomic');
+    });
+  });
+
+  describe('createGearItem', () => {
+    it('creates gear item and returns it with new id', async () => {
+      const result = await createGearItem({
+        userId: 'user-1', ownerId: 'member-1',
+        sport: 'alpine', type: 'ski', brand: 'Atomic', model: 'Redster',
+        size: '170', condition: 'good',
+      });
+      expect(result.id).toBe('mock-id');
+      expect(result.brand).toBe('Atomic');
+    });
+
+    it('includes optional fields when provided', async () => {
+      const result = await createGearItem({
+        userId: 'user-1', ownerId: 'member-1',
+        sport: 'alpine', type: 'ski', brand: 'Atomic', model: 'Redster',
+        size: '170', condition: 'good',
+        year: 2023, status: 'available', location: 'Garage',
+        checkedOutTo: undefined, notes: 'Demo ski',
+        photos: [
+          { id: 'p1', type: 'fullView', url: 'http://example.com/a.jpg', createdAt: new Date().toISOString() },
+        ],
+      });
+      expect(result.id).toBe('mock-id');
+      expect(result.notes).toBe('Demo ski');
+    });
+  });
+
+  describe('updateGearItem', () => {
+    it('calls updateDoc', async () => {
+      const { updateDoc } = await import('firebase/firestore');
+      await updateGearItem('gear-1', { brand: 'Salomon', condition: 'fair' });
+      expect(vi.mocked(updateDoc)).toHaveBeenCalled();
+    });
+
+    it('handles photos update', async () => {
+      const { updateDoc } = await import('firebase/firestore');
+      await updateGearItem('gear-1', {
+        photos: [
+          { id: 'p1', type: 'fullView', url: 'http://example.com/a.jpg', createdAt: new Date().toISOString() },
+        ],
+      });
+      expect(vi.mocked(updateDoc)).toHaveBeenCalled();
+    });
+
+    it('clears photos when empty array passed', async () => {
+      const { updateDoc } = await import('firebase/firestore');
+      await updateGearItem('gear-1', { photos: [] });
+      expect(vi.mocked(updateDoc)).toHaveBeenCalled();
+    });
+  });
+
+  describe('deleteGearItem', () => {
+    it('calls deleteDoc', async () => {
+      const { deleteDoc } = await import('firebase/firestore');
+      await deleteGearItem('gear-1');
+      expect(vi.mocked(deleteDoc)).toHaveBeenCalled();
     });
   });
 });

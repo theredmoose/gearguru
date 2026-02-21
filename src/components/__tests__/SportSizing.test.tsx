@@ -135,4 +135,125 @@ describe('SportSizing', () => {
       expect(dots[2]).toHaveClass('active'); // Alpine is third (index 2)
     });
   });
+
+  // ============================================
+  // GEAR SECTION
+  // ============================================
+  describe('gear section with handlers', () => {
+    const mockOnAddGear = vi.fn();
+    const mockOnEditGear = vi.fn();
+    const mockOnDeleteGear = vi.fn();
+
+    const nordicGear = {
+      id: 'gear-1',
+      userId: 'user-1',
+      ownerId: 'member-1',
+      sport: 'nordic-classic' as const,
+      type: 'ski' as const,
+      brand: 'Fischer',
+      model: 'Crown',
+      size: '192cm',
+      condition: 'good' as const,
+      createdAt: '',
+      updatedAt: '',
+    };
+
+    it('shows My Gear section when gear handlers provided', () => {
+      render(
+        <SportSizing
+          {...defaultProps}
+          onAddGear={mockOnAddGear}
+          onEditGear={mockOnEditGear}
+          onDeleteGear={mockOnDeleteGear}
+        />
+      );
+      expect(screen.getByText('My Gear')).toBeInTheDocument();
+    });
+
+    it('shows + Add button when onAddGear provided', () => {
+      render(
+        <SportSizing
+          {...defaultProps}
+          onAddGear={mockOnAddGear}
+          onEditGear={mockOnEditGear}
+          onDeleteGear={mockOnDeleteGear}
+        />
+      );
+      expect(screen.getByText('+ Add')).toBeInTheDocument();
+    });
+
+    it('calls onAddGear when + Add clicked', () => {
+      render(
+        <SportSizing
+          {...defaultProps}
+          onAddGear={mockOnAddGear}
+          onEditGear={mockOnEditGear}
+          onDeleteGear={mockOnDeleteGear}
+        />
+      );
+      fireEvent.click(screen.getByText('+ Add'));
+      expect(mockOnAddGear).toHaveBeenCalledWith('nordic-classic');
+    });
+
+    it('shows empty gear hint when no gear for sport', () => {
+      render(
+        <SportSizing
+          {...defaultProps}
+          gearItems={[]}
+          onAddGear={mockOnAddGear}
+          onEditGear={mockOnEditGear}
+          onDeleteGear={mockOnDeleteGear}
+        />
+      );
+      expect(screen.getByText(/no gear yet for nordic classic/i)).toBeInTheDocument();
+    });
+
+    it('shows gear item card when gear exists for sport', () => {
+      render(
+        <SportSizing
+          {...defaultProps}
+          gearItems={[nordicGear]}
+          onAddGear={mockOnAddGear}
+          onEditGear={mockOnEditGear}
+          onDeleteGear={mockOnDeleteGear}
+        />
+      );
+      expect(screen.getByText('Fischer Crown')).toBeInTheDocument();
+    });
+  });
+
+  // ============================================
+  // SKILL LEVEL CALLBACK
+  // ============================================
+  describe('skill level change callback', () => {
+    it('calls onSkillLevelChange when skill level changes', () => {
+      const mockOnSkillLevelChange = vi.fn();
+      render(
+        <SportSizing
+          {...defaultProps}
+          onSkillLevelChange={mockOnSkillLevelChange}
+        />
+      );
+      fireEvent.click(screen.getByRole('button', { name: /exp/i }));
+      expect(mockOnSkillLevelChange).toHaveBeenCalled();
+    });
+  });
+
+  // ============================================
+  // TOUCH / SWIPE
+  // ============================================
+  describe('touch swipe navigation', () => {
+    it('swipes to previous tab when swiping right', () => {
+      render(<SportSizing {...defaultProps} />);
+      // Start on Nordic Classic (index 0), click Alpine to go to index 2
+      fireEvent.click(screen.getByRole('button', { name: /alpine/i }));
+      // Now swipe right (diff < -threshold) to go back one
+      const content = document.querySelector('.sport-content')!;
+      fireEvent.touchStart(content, { touches: [{ clientX: 100 }] });
+      fireEvent.touchMove(content, { touches: [{ clientX: 200 }] });
+      fireEvent.touchEnd(content);
+      // Should go from index 2 to index 1 (Nordic Skate)
+      expect(screen.getAllByText('Nordic Skate').length).toBeGreaterThanOrEqual(1);
+    });
+  });
 });

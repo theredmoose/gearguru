@@ -299,5 +299,207 @@ describe('GearForm', () => {
       fireEvent.click(screen.getByRole('button', { name: 'Cancel' }));
       expect(mockOnCancel).toHaveBeenCalledTimes(1);
     });
+
+    it('shows submit error when onSubmit rejects', async () => {
+      mockOnSubmit.mockRejectedValueOnce(new Error('Network failure'));
+      render(<GearForm {...defaultProps} />);
+      fireEvent.change(screen.getByLabelText('Brand'), { target: { value: 'Atomic' } });
+      fireEvent.change(screen.getByLabelText('Model'), { target: { value: 'Redster' } });
+      fireEvent.change(screen.getByLabelText('Size'), { target: { value: '170' } });
+      fireEvent.click(screen.getByRole('button', { name: 'Add Gear' }));
+      expect(await screen.findByText('Network failure')).toBeInTheDocument();
+    });
+  });
+
+  // ============================================
+  // CHECKED OUT TO FIELD
+  // ============================================
+  describe('checked out to field', () => {
+    it('shows "Checked Out To" field when status is checked-out', () => {
+      render(<GearForm {...defaultProps} />);
+      fireEvent.change(screen.getByLabelText('Status'), { target: { value: 'checked-out' } });
+      expect(screen.getByLabelText('Checked Out To')).toBeInTheDocument();
+    });
+
+    it('hides "Checked Out To" when status changes back to available', () => {
+      render(<GearForm {...defaultProps} />);
+      fireEvent.change(screen.getByLabelText('Status'), { target: { value: 'checked-out' } });
+      fireEvent.change(screen.getByLabelText('Status'), { target: { value: 'available' } });
+      expect(screen.queryByLabelText('Checked Out To')).not.toBeInTheDocument();
+    });
+
+    it('includes checkedOutTo in submission when status is checked-out', async () => {
+      render(<GearForm {...defaultProps} />);
+      fireEvent.change(screen.getByLabelText('Brand'), { target: { value: 'Atomic' } });
+      fireEvent.change(screen.getByLabelText('Model'), { target: { value: 'Redster' } });
+      fireEvent.change(screen.getByLabelText('Size'), { target: { value: '170' } });
+      fireEvent.change(screen.getByLabelText('Status'), { target: { value: 'checked-out' } });
+      fireEvent.change(screen.getByLabelText('Checked Out To'), { target: { value: 'Bob' } });
+      fireEvent.click(screen.getByRole('button', { name: 'Add Gear' }));
+      await waitFor(() =>
+        expect(mockOnSubmit).toHaveBeenCalledWith(
+          expect.objectContaining({ status: 'checked-out', checkedOutTo: 'Bob' })
+        )
+      );
+    });
+  });
+
+  // ============================================
+  // NOTES
+  // ============================================
+  describe('notes field', () => {
+    it('includes notes in submission when entered', async () => {
+      render(<GearForm {...defaultProps} />);
+      fireEvent.change(screen.getByLabelText('Brand'), { target: { value: 'Atomic' } });
+      fireEvent.change(screen.getByLabelText('Model'), { target: { value: 'Redster' } });
+      fireEvent.change(screen.getByLabelText('Size'), { target: { value: '170' } });
+      fireEvent.change(screen.getByLabelText('Notes (optional)'), { target: { value: 'Needs wax' } });
+      fireEvent.click(screen.getByRole('button', { name: 'Add Gear' }));
+      await waitFor(() =>
+        expect(mockOnSubmit).toHaveBeenCalledWith(
+          expect.objectContaining({ notes: 'Needs wax' })
+        )
+      );
+    });
+
+    it('omits notes from submission when empty', async () => {
+      render(<GearForm {...defaultProps} />);
+      fireEvent.change(screen.getByLabelText('Brand'), { target: { value: 'Atomic' } });
+      fireEvent.change(screen.getByLabelText('Model'), { target: { value: 'Redster' } });
+      fireEvent.change(screen.getByLabelText('Size'), { target: { value: '170' } });
+      fireEvent.click(screen.getByRole('button', { name: 'Add Gear' }));
+      await waitFor(() =>
+        expect(mockOnSubmit).toHaveBeenCalledWith(
+          expect.objectContaining({ notes: undefined })
+        )
+      );
+    });
+  });
+
+  // ============================================
+  // SKI SPECIFICATIONS SUBMISSION
+  // ============================================
+  describe('alpine ski specs submission', () => {
+    it('includes extendedDetails with profile/radius/bindings on submit', async () => {
+      render(<GearForm {...defaultProps} />);
+      // Default is alpine/ski, so ski specs section is shown
+      fireEvent.change(screen.getByLabelText('Brand'), { target: { value: 'Fischer' } });
+      fireEvent.change(screen.getByLabelText('Model'), { target: { value: 'Ranger' } });
+      fireEvent.change(screen.getByLabelText('Size'), { target: { value: '178' } });
+      // Fill profile fields (by placeholder)
+      fireEvent.change(screen.getByPlaceholderText('Tip'), { target: { value: '123' } });
+      fireEvent.change(screen.getByPlaceholderText('Waist'), { target: { value: '75' } });
+      fireEvent.change(screen.getByPlaceholderText('Tail'), { target: { value: '108' } });
+      fireEvent.change(screen.getByLabelText('Turn Radius (R value in meters)'), { target: { value: '16.5' } });
+      fireEvent.change(screen.getByLabelText('Binding Brand'), { target: { value: 'Marker' } });
+      fireEvent.change(screen.getByLabelText('Binding Model'), { target: { value: 'Griffon' } });
+      fireEvent.change(screen.getByLabelText('DIN Range'), { target: { value: '4-13' } });
+      fireEvent.click(screen.getByRole('button', { name: 'Add Gear' }));
+      await waitFor(() =>
+        expect(mockOnSubmit).toHaveBeenCalledWith(
+          expect.objectContaining({
+            extendedDetails: expect.objectContaining({
+              type: 'alpineSki',
+              details: expect.objectContaining({
+                profile: { tip: 123, waist: 75, tail: 108 },
+                radiusM: 16.5,
+                bindings: expect.objectContaining({ brand: 'Marker', model: 'Griffon' }),
+              }),
+            }),
+          })
+        )
+      );
+    });
+  });
+
+  // ============================================
+  // PHOTO ANALYSIS
+  // ============================================
+  describe('photo analysis', () => {
+    it('auto-fills brand and model after successful analysis', async () => {
+      const { analyzeGearPhotos } = await import('../../services/gearAnalysis');
+      vi.mocked(analyzeGearPhotos).mockResolvedValue({
+        brand: 'Fischer',
+        model: 'Crown Eboard',
+        size: '186cm',
+        year: 2023,
+        condition: 'good',
+        notes: ['Detected from label photo'],
+        confidence: 0.9,
+      } as any);
+
+      render(<GearForm {...defaultProps} />);
+      fireEvent.click(screen.getByText('Add Photo'));
+      fireEvent.click(screen.getByText('Analyze Photos & Auto-Fill'));
+
+      await waitFor(() => expect(screen.getByDisplayValue('Fischer')).toBeInTheDocument());
+      expect(screen.getByDisplayValue('Crown Eboard')).toBeInTheDocument();
+    });
+
+    it('shows analysis notes and confidence after analysis', async () => {
+      const { analyzeGearPhotos } = await import('../../services/gearAnalysis');
+      vi.mocked(analyzeGearPhotos).mockResolvedValue({
+        brand: 'Atomic',
+        model: 'Redster',
+        size: '170',
+        year: 2022,
+        condition: 'good',
+        notes: ['Detected brand from label'],
+        confidence: 0.85,
+      } as any);
+
+      render(<GearForm {...defaultProps} />);
+      fireEvent.click(screen.getByText('Add Photo'));
+      fireEvent.click(screen.getByText('Analyze Photos & Auto-Fill'));
+
+      await waitFor(() =>
+        expect(screen.getByText(/85% confidence/i)).toBeInTheDocument()
+      );
+      expect(screen.getByText('Detected brand from label')).toBeInTheDocument();
+    });
+
+    it('shows error message when analysis fails', async () => {
+      const { analyzeGearPhotos } = await import('../../services/gearAnalysis');
+      vi.mocked(analyzeGearPhotos).mockRejectedValue(new Error('Analysis failed'));
+
+      render(<GearForm {...defaultProps} />);
+      fireEvent.click(screen.getByText('Add Photo'));
+      fireEvent.click(screen.getByText('Analyze Photos & Auto-Fill'));
+
+      await waitFor(() =>
+        expect(screen.getByText('Analysis failed')).toBeInTheDocument()
+      );
+    });
+
+    it('populates ski spec fields when analysis returns alpineSki extendedDetails', async () => {
+      const { analyzeGearPhotos } = await import('../../services/gearAnalysis');
+      vi.mocked(analyzeGearPhotos).mockResolvedValue({
+        brand: 'Fischer',
+        model: 'Ranger 98',
+        size: '178',
+        year: 2023,
+        condition: 'good',
+        notes: [],
+        confidence: 0.9,
+        extendedDetails: {
+          type: 'alpineSki',
+          details: {
+            lengthCm: 178,
+            profile: { tip: 123, waist: 75, tail: 108 },
+            radiusM: 16.5,
+            bindings: { brand: 'Marker', model: 'Griffon 13', dinRange: '4-13' },
+          },
+        },
+      } as any);
+
+      render(<GearForm {...defaultProps} />);
+      fireEvent.click(screen.getByText('Add Photo'));
+      fireEvent.click(screen.getByText('Analyze Photos & Auto-Fill'));
+
+      await waitFor(() => expect(screen.getByDisplayValue('Fischer')).toBeInTheDocument());
+      expect((screen.getByPlaceholderText('Tip') as HTMLInputElement).value).toBe('123');
+      expect((screen.getByPlaceholderText('Waist') as HTMLInputElement).value).toBe('75');
+      expect(screen.getByDisplayValue('Marker')).toBeInTheDocument();
+    });
   });
 });

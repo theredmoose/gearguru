@@ -181,5 +181,72 @@ describe('PhotoCapture', () => {
       fireEvent.click(slots[1]); // Click Label slot
       expect(slots[1]).toHaveClass('active');
     });
+
+    it('shows Replace button when active slot has an existing photo', () => {
+      const photos = [{
+        id: 'photo-1',
+        type: 'fullView' as const,
+        url: 'data:image/jpeg;base64,test',
+        createdAt: new Date().toISOString(),
+      }];
+      render(<PhotoCapture {...defaultProps} photos={photos} />);
+      // Click the slot that has a photo to make it active
+      const slots = document.querySelectorAll('.photo-slot');
+      fireEvent.click(slots[0]); // Click the fullView slot
+      expect(screen.getByText('Replace')).toBeInTheDocument();
+    });
+  });
+
+  // ============================================
+  // ADDITIONAL PHOTOS
+  // ============================================
+  describe('additional photos section', () => {
+    it('shows additional photos section when other type photos exist', () => {
+      const photos = [{
+        id: 'photo-extra',
+        type: 'other' as const,
+        url: 'data:image/jpeg;base64,other',
+        createdAt: new Date().toISOString(),
+      }];
+      render(<PhotoCapture {...defaultProps} photos={photos} />);
+      expect(screen.getByText('Additional Photos')).toBeInTheDocument();
+    });
+
+    it('renders additional photo image', () => {
+      const photos = [{
+        id: 'photo-extra',
+        type: 'other' as const,
+        url: 'data:image/jpeg;base64,other',
+        createdAt: new Date().toISOString(),
+      }];
+      render(<PhotoCapture {...defaultProps} photos={photos} />);
+      const img = document.querySelector('.additional-photo img');
+      expect(img).toBeInTheDocument();
+    });
+
+    it('shows remove button for additional photo when not disabled', () => {
+      const photos = [{
+        id: 'photo-extra',
+        type: 'other' as const,
+        url: 'data:image/jpeg;base64,other',
+        createdAt: new Date().toISOString(),
+      }];
+      render(<PhotoCapture {...defaultProps} photos={photos} />);
+      const removeButtons = document.querySelectorAll('.additional-photo .photo-remove');
+      expect(removeButtons.length).toBeGreaterThan(0);
+    });
+
+    it('removes additional photo when remove button clicked', () => {
+      const photos = [{
+        id: 'photo-extra',
+        type: 'other' as const,
+        url: 'data:image/jpeg;base64,other',
+        createdAt: new Date().toISOString(),
+      }];
+      render(<PhotoCapture {...defaultProps} photos={photos} />);
+      const removeBtn = document.querySelector('.additional-photo .photo-remove')!;
+      fireEvent.click(removeBtn);
+      expect(mockOnPhotosChange).toHaveBeenCalledWith([]);
+    });
   });
 });
