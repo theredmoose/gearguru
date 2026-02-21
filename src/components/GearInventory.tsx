@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { ChevronLeft } from 'lucide-react';
 import type { FamilyMember, GearItem } from '../types';
 import { GearCard } from './GearCard';
 
@@ -42,63 +43,76 @@ export function GearInventory({
   );
 
   return (
-    <div className="gear-inventory">
-      <header className="detail-header">
-        <button className="btn-back" onClick={onBack}>
-          ← Home
+    <div className="flex flex-col min-h-0 flex-1">
+      {/* Blue app header */}
+      <div className="px-6 py-4 bg-blue-700 border-b border-blue-800 shadow-sm flex items-center gap-3">
+        <button
+          className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-blue-600 transition-colors text-white flex-shrink-0"
+          onClick={onBack}
+          aria-label="Back"
+        >
+          <ChevronLeft className="w-5 h-5" />
+          <span className="sr-only">← Home</span>
         </button>
-        <h1>Family Gear</h1>
-        <div style={{ width: 60 }} /> {/* Spacer for centering */}
-      </header>
+        <h1 className="text-lg font-black text-white tracking-tight flex-1">Family Gear</h1>
+      </div>
 
-      <div className="inventory-content">
-        <div className="inventory-filter">
-          <label htmlFor="owner-filter">Filter by owner:</label>
-          <select
-            id="owner-filter"
-            value={filterOwnerId}
-            onChange={(e) => setFilterOwnerId(e.target.value)}
-          >
-            <option value="all">All Members</option>
-            {members.map((member) => (
-              <option key={member.id} value={member.id}>
-                {member.name}
-              </option>
-            ))}
-          </select>
-        </div>
+      {/* Filter bar */}
+      <div className="px-6 py-3 bg-white border-b border-slate-100 flex items-center gap-3">
+        <label htmlFor="owner-filter" className="text-xs font-bold text-slate-500 uppercase tracking-wide flex-shrink-0">
+          Filter by owner:
+        </label>
+        <select
+          id="owner-filter"
+          value={filterOwnerId}
+          onChange={(e) => setFilterOwnerId(e.target.value)}
+          className="flex-1 text-sm font-bold text-slate-700 bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
+        >
+          <option value="all">All Members</option>
+          {members.map((member) => (
+            <option key={member.id} value={member.id}>
+              {member.name}
+            </option>
+          ))}
+        </select>
+      </div>
 
+      {/* Content */}
+      <div className="flex-1 overflow-y-auto bg-white px-6 py-4">
         {filteredItems.length === 0 ? (
-          <div className="empty-state">
-            <p>No gear found.</p>
+          <div className="flex flex-col items-center justify-center py-16 gap-4">
+            <p className="text-slate-400 font-bold text-sm">No gear found.</p>
             {filterOwnerId !== 'all' && (
               <button
                 className="btn btn-primary"
                 onClick={() => onAddGear(filterOwnerId)}
-                style={{ marginTop: '1rem' }}
               >
                 + Add Gear
               </button>
             )}
           </div>
         ) : filterOwnerId === 'all' ? (
-          // Show grouped by owner when viewing all
-          <div className="inventory-groups">
+          // Grouped by owner
+          <div className="flex flex-col gap-6">
             {Object.values(groupedByOwner).map(({ member, items }) => (
-              <div key={member.id} className="inventory-group">
-                <div className="inventory-group-header">
-                  <h2>{member.name}</h2>
+              <div key={member.id}>
+                {/* Group header */}
+                <div className="flex items-center justify-between mb-3">
+                  <h2 className="text-xs font-black text-slate-500 uppercase tracking-widest">
+                    {member.name}
+                  </h2>
                   <button
-                    className="btn-link"
+                    className="text-xs font-bold text-blue-600 hover:text-blue-800 transition-colors"
                     onClick={() => onAddGear(member.id)}
                   >
                     + Add
                   </button>
                 </div>
+
                 {items.length === 0 ? (
-                  <p className="inventory-group-empty">No gear yet</p>
+                  <p className="text-xs text-slate-400 font-bold py-2">No gear yet</p>
                 ) : (
-                  <div className="gear-list">
+                  <div>
                     {items.map((item) => (
                       <GearCard
                         key={item.id}
@@ -113,8 +127,8 @@ export function GearInventory({
             ))}
           </div>
         ) : (
-          // Flat list when filtering by specific owner
-          <div className="gear-list">
+          // Flat list for a specific owner
+          <div>
             {filteredItems.map((item) => (
               <GearCard
                 key={item.id}
@@ -124,19 +138,11 @@ export function GearInventory({
               />
             ))}
             <button
-              className="btn btn-primary"
+              className="btn btn-primary w-full mt-2"
               onClick={() => onAddGear(filterOwnerId)}
             >
               + Add Gear
             </button>
-          </div>
-        )}
-
-        {filterOwnerId === 'all' && members.length > 0 && (
-          <div className="inventory-add-section">
-            <p className="inventory-add-hint">
-              Select a member from the filter above to add gear for them.
-            </p>
           </div>
         )}
       </div>

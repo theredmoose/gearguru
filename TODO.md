@@ -8,7 +8,7 @@
 - [x] Snowboard sizing with stance width
 - [x] Hockey skate sizing (Bauer/CCM)
 - [x] Shoe size converter (EU/US/UK/Mondo)
-- [x] Mobile-first CSS
+- [x] Mobile-first CSS with Tailwind v4
 - [x] Firebase integration
 - [x] Skill level per sport
 - [x] List layout for gear types

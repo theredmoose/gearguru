@@ -2,6 +2,7 @@ import { useState } from 'react';
 import type { GearItem, GearType, Sport, GearPhoto, ExtendedGearDetails, AlpineSkiDetails, SkiProfile, GearStatus } from '../types';
 import { PhotoCapture } from './PhotoCapture';
 import { analyzeGearPhotos } from '../services/gearAnalysis';
+import { ScreenHeader } from './ScreenHeader';
 
 interface GearFormProps {
   item?: GearItem;
@@ -38,6 +39,12 @@ const STATUSES: { id: GearStatus; label: string }[] = [
   { id: 'checked-out', label: 'Checked Out' },
   { id: 'maintenance', label: 'In Maintenance' },
 ];
+
+// Shared input/label classes
+const inputCls =
+  'w-full border border-slate-200 rounded-xl px-3 py-2.5 text-sm text-slate-800 bg-white focus:outline-none focus:ring-2 focus:ring-blue-400 placeholder:text-slate-300';
+const labelCls = 'block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1';
+const sectionTitleCls = 'text-[10px] font-black text-slate-500 uppercase tracking-widest mb-3';
 
 export function GearForm({
   item,
@@ -105,18 +112,15 @@ export function GearForm({
     try {
       const result = await analyzeGearPhotos(photos, { sport, type });
 
-      // Populate fields from analysis
       if (result.brand) setBrand(result.brand);
       if (result.model) setModel(result.model);
       if (result.size) setSize(result.size);
       if (result.year) setYear(result.year.toString());
       if (result.condition) setCondition(result.condition);
 
-      // Handle extended details
       if (result.extendedDetails) {
         setExtendedDetails(result.extendedDetails);
 
-        // Populate extended fields for alpine skis
         if (result.extendedDetails.type === 'alpineSki') {
           const details = result.extendedDetails.details;
           if (details.profile) {
@@ -160,7 +164,6 @@ export function GearForm({
     setSubmitting(true);
 
     try {
-      // Build extended details for alpine skis
       let finalExtendedDetails: ExtendedGearDetails | undefined = extendedDetails;
 
       if (type === 'ski' && sport === 'alpine') {
@@ -216,300 +219,336 @@ export function GearForm({
   const showAlpineSkiDetails = type === 'ski' && sport === 'alpine';
 
   return (
-    <form className="gear-form" onSubmit={handleSubmit}>
-      <h2>{item ? 'Edit Gear' : 'Add Gear'}</h2>
+    <div className="flex flex-col min-h-0 flex-1">
+      <ScreenHeader
+        title={item ? 'Edit Gear' : 'Add Gear'}
+        onBack={onCancel}
+      />
 
-      {error && <div className="form-error">{error}</div>}
+      <form
+        onSubmit={handleSubmit}
+        className="flex flex-col flex-1 min-h-0"
+      >
+        {/* Scrollable content */}
+        <div className="flex-1 overflow-y-auto bg-white px-6 py-5 flex flex-col gap-6">
+          {error && (
+            <div className="bg-red-50 border border-red-200 text-red-600 text-sm font-bold rounded-xl px-4 py-3">
+              {error}
+            </div>
+          )}
 
-      {analysisNotes.length > 0 && (
-        <div className="form-info">
-          {analysisNotes.map((note, i) => (
-            <p key={i}>{note}</p>
-          ))}
+          {analysisNotes.length > 0 && (
+            <div className="bg-blue-50 border border-blue-200 text-blue-700 text-sm rounded-xl px-4 py-3 flex flex-col gap-1">
+              {analysisNotes.map((note, i) => (
+                <p key={i}>{note}</p>
+              ))}
+            </div>
+          )}
+
+          {/* Photos */}
+          <section>
+            <h3 className={sectionTitleCls}>Photos</h3>
+            <p className="text-xs text-slate-400 font-bold mb-3">
+              Add photos of your gear. The <strong>Label</strong> photo helps auto-fill specifications.
+            </p>
+            <PhotoCapture
+              photos={photos}
+              onPhotosChange={setPhotos}
+              disabled={submitting}
+            />
+            {photos.length > 0 && (
+              <button
+                type="button"
+                className="mt-3 w-full py-2.5 rounded-xl text-sm font-bold text-blue-600 border border-blue-200 hover:bg-blue-50 transition-colors"
+                onClick={handleAnalyzePhotos}
+                disabled={analyzing || submitting}
+              >
+                {analyzing ? 'Analyzing...' : 'Analyze Photos & Auto-Fill'}
+              </button>
+            )}
+          </section>
+
+          {/* Gear Info */}
+          <section>
+            <h3 className={sectionTitleCls}>Gear Info</h3>
+            <div className="flex flex-col gap-3">
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label htmlFor="sport" className={labelCls}>Sport</label>
+                  <select
+                    id="sport"
+                    className={inputCls}
+                    value={sport}
+                    onChange={(e) => setSport(e.target.value as Sport)}
+                  >
+                    {SPORTS.map((s) => (
+                      <option key={s.id} value={s.id}>{s.label}</option>
+                    ))}
+                  </select>
+                </div>
+
+                <div>
+                  <label htmlFor="type" className={labelCls}>Type</label>
+                  <select
+                    id="type"
+                    className={inputCls}
+                    value={type}
+                    onChange={(e) => setType(e.target.value as GearType)}
+                  >
+                    {GEAR_TYPES.map((t) => (
+                      <option key={t.id} value={t.id}>{t.label}</option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label htmlFor="brand" className={labelCls}>Brand</label>
+                  <input
+                    id="brand"
+                    type="text"
+                    className={inputCls}
+                    value={brand}
+                    onChange={(e) => setBrand(e.target.value)}
+                    placeholder="e.g., Fischer"
+                    required
+                  />
+                </div>
+
+                <div>
+                  <label htmlFor="model" className={labelCls}>Model</label>
+                  <input
+                    id="model"
+                    type="text"
+                    className={inputCls}
+                    value={model}
+                    onChange={(e) => setModel(e.target.value)}
+                    placeholder="e.g., RCS Skate"
+                    required
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label htmlFor="size" className={labelCls}>Size</label>
+                  <input
+                    id="size"
+                    type="text"
+                    className={inputCls}
+                    value={size}
+                    onChange={(e) => setSize(e.target.value)}
+                    placeholder={showAlpineSkiDetails ? 'e.g., 170' : 'e.g., 186cm'}
+                    required
+                  />
+                </div>
+
+                <div>
+                  <label htmlFor="year" className={labelCls}>Year (optional)</label>
+                  <input
+                    id="year"
+                    type="number"
+                    className={inputCls}
+                    value={year}
+                    onChange={(e) => setYear(e.target.value)}
+                    placeholder="e.g., 2023"
+                    min="1990"
+                    max="2030"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label htmlFor="condition" className={labelCls}>Condition</label>
+                  <select
+                    id="condition"
+                    className={inputCls}
+                    value={condition}
+                    onChange={(e) => setCondition(e.target.value as typeof condition)}
+                  >
+                    {CONDITIONS.map((c) => (
+                      <option key={c} value={c}>
+                        {c.charAt(0).toUpperCase() + c.slice(1)}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div>
+                  <label htmlFor="status" className={labelCls}>Status</label>
+                  <select
+                    id="status"
+                    className={inputCls}
+                    value={status}
+                    onChange={(e) => setStatus(e.target.value as GearStatus)}
+                  >
+                    {STATUSES.map((s) => (
+                      <option key={s.id} value={s.id}>{s.label}</option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
+              <div>
+                <label htmlFor="location" className={labelCls}>Location (optional)</label>
+                <input
+                  id="location"
+                  type="text"
+                  className={inputCls}
+                  value={location}
+                  onChange={(e) => setLocation(e.target.value)}
+                  placeholder="e.g., Garage, Ski locker, Car"
+                />
+              </div>
+
+              {status === 'checked-out' && (
+                <div>
+                  <label htmlFor="checkedOutTo" className={labelCls}>Checked Out To</label>
+                  <input
+                    id="checkedOutTo"
+                    type="text"
+                    className={inputCls}
+                    value={checkedOutTo}
+                    onChange={(e) => setCheckedOutTo(e.target.value)}
+                    placeholder="e.g., Friend's name, Rental shop"
+                  />
+                </div>
+              )}
+            </div>
+          </section>
+
+          {/* Ski Specifications (alpine skis only) */}
+          {showAlpineSkiDetails && (
+            <section>
+              <h3 className={sectionTitleCls}>Ski Specifications</h3>
+              <div className="flex flex-col gap-3">
+                <div>
+                  <label className={labelCls}>Profile (Tip / Waist / Tail mm)</label>
+                  <div className="grid grid-cols-3 gap-2">
+                    <input
+                      type="number"
+                      className={inputCls}
+                      value={profileTip}
+                      onChange={(e) => setProfileTip(e.target.value)}
+                      placeholder="Tip"
+                      min="80"
+                      max="150"
+                    />
+                    <input
+                      type="number"
+                      className={inputCls}
+                      value={profileWaist}
+                      onChange={(e) => setProfileWaist(e.target.value)}
+                      placeholder="Waist"
+                      min="60"
+                      max="120"
+                    />
+                    <input
+                      type="number"
+                      className={inputCls}
+                      value={profileTail}
+                      onChange={(e) => setProfileTail(e.target.value)}
+                      placeholder="Tail"
+                      min="80"
+                      max="150"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label htmlFor="radius" className={labelCls}>Turn Radius (R value in meters)</label>
+                  <input
+                    id="radius"
+                    type="number"
+                    className={inputCls}
+                    value={radius}
+                    onChange={(e) => setRadius(e.target.value)}
+                    placeholder="e.g., 15.5"
+                    step="0.1"
+                    min="5"
+                    max="40"
+                  />
+                </div>
+
+                <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Bindings</p>
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label htmlFor="bindingBrand" className={labelCls}>Binding Brand</label>
+                    <input
+                      id="bindingBrand"
+                      type="text"
+                      className={inputCls}
+                      value={bindingBrand}
+                      onChange={(e) => setBindingBrand(e.target.value)}
+                      placeholder="e.g., Marker"
+                    />
+                  </div>
+                  <div>
+                    <label htmlFor="bindingModel" className={labelCls}>Binding Model</label>
+                    <input
+                      id="bindingModel"
+                      type="text"
+                      className={inputCls}
+                      value={bindingModel}
+                      onChange={(e) => setBindingModel(e.target.value)}
+                      placeholder="e.g., Griffon 13"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label htmlFor="bindingDin" className={labelCls}>DIN Range</label>
+                  <input
+                    id="bindingDin"
+                    type="text"
+                    className={inputCls}
+                    value={bindingDin}
+                    onChange={(e) => setBindingDin(e.target.value)}
+                    placeholder="e.g., 4-13"
+                  />
+                </div>
+              </div>
+            </section>
+          )}
+
+          {/* Notes */}
+          <section>
+            <h3 className={sectionTitleCls}>Notes</h3>
+            <div>
+              <label htmlFor="notes" className={labelCls}>Notes (optional)</label>
+              <textarea
+                id="notes"
+                className={`${inputCls} resize-none`}
+                value={notes}
+                onChange={(e) => setNotes(e.target.value)}
+                placeholder="e.g., Needs waxing, base repair needed"
+                rows={3}
+              />
+            </div>
+          </section>
         </div>
-      )}
 
-      {/* Photo Section */}
-      <div className="form-section">
-        <h3>Photos</h3>
-        <p className="form-hint">
-          Add photos of your gear. The <strong>Label</strong> photo helps auto-fill specifications.
-        </p>
-        <PhotoCapture
-          photos={photos}
-          onPhotosChange={setPhotos}
-          disabled={submitting}
-        />
-        {photos.length > 0 && (
+        {/* Actions */}
+        <div className="px-6 py-4 bg-white border-t border-slate-100 flex gap-3">
           <button
             type="button"
-            className="btn btn-analyze"
-            onClick={handleAnalyzePhotos}
-            disabled={analyzing || submitting}
+            className="flex-1 btn btn-secondary"
+            onClick={onCancel}
+            disabled={submitting}
           >
-            {analyzing ? 'Analyzing...' : 'Analyze Photos & Auto-Fill'}
+            Cancel
           </button>
-        )}
-      </div>
-
-      <div className="form-section">
-        <h3>Gear Info</h3>
-
-        <div className="form-row">
-          <div className="form-group">
-            <label htmlFor="sport">Sport</label>
-            <select
-              id="sport"
-              value={sport}
-              onChange={(e) => setSport(e.target.value as Sport)}
-            >
-              {SPORTS.map((s) => (
-                <option key={s.id} value={s.id}>
-                  {s.label}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          <div className="form-group">
-            <label htmlFor="type">Type</label>
-            <select
-              id="type"
-              value={type}
-              onChange={(e) => setType(e.target.value as GearType)}
-            >
-              {GEAR_TYPES.map((t) => (
-                <option key={t.id} value={t.id}>
-                  {t.label}
-                </option>
-              ))}
-            </select>
-          </div>
+          <button
+            type="submit"
+            className="flex-1 btn btn-primary"
+            disabled={submitting || analyzing}
+          >
+            {submitting ? 'Saving...' : item ? 'Update' : 'Add Gear'}
+          </button>
         </div>
-
-        <div className="form-row">
-          <div className="form-group">
-            <label htmlFor="brand">Brand</label>
-            <input
-              id="brand"
-              type="text"
-              value={brand}
-              onChange={(e) => setBrand(e.target.value)}
-              placeholder="e.g., Fischer"
-              required
-            />
-          </div>
-
-          <div className="form-group">
-            <label htmlFor="model">Model</label>
-            <input
-              id="model"
-              type="text"
-              value={model}
-              onChange={(e) => setModel(e.target.value)}
-              placeholder="e.g., RCS Skate"
-              required
-            />
-          </div>
-        </div>
-
-        <div className="form-row">
-          <div className="form-group">
-            <label htmlFor="size">Size</label>
-            <input
-              id="size"
-              type="text"
-              value={size}
-              onChange={(e) => setSize(e.target.value)}
-              placeholder={showAlpineSkiDetails ? 'e.g., 170' : 'e.g., 186cm or 27.5'}
-              required
-            />
-          </div>
-
-          <div className="form-group">
-            <label htmlFor="year">Year (optional)</label>
-            <input
-              id="year"
-              type="number"
-              value={year}
-              onChange={(e) => setYear(e.target.value)}
-              placeholder="e.g., 2023"
-              min="1990"
-              max="2030"
-            />
-          </div>
-        </div>
-
-        <div className="form-row">
-          <div className="form-group">
-            <label htmlFor="condition">Condition</label>
-            <select
-              id="condition"
-              value={condition}
-              onChange={(e) => setCondition(e.target.value as typeof condition)}
-            >
-              {CONDITIONS.map((c) => (
-                <option key={c} value={c}>
-                  {c.charAt(0).toUpperCase() + c.slice(1)}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          <div className="form-group">
-            <label htmlFor="status">Status</label>
-            <select
-              id="status"
-              value={status}
-              onChange={(e) => setStatus(e.target.value as GearStatus)}
-            >
-              {STATUSES.map((s) => (
-                <option key={s.id} value={s.id}>
-                  {s.label}
-                </option>
-              ))}
-            </select>
-          </div>
-        </div>
-
-        <div className="form-group">
-          <label htmlFor="location">Location (optional)</label>
-          <input
-            id="location"
-            type="text"
-            value={location}
-            onChange={(e) => setLocation(e.target.value)}
-            placeholder="e.g., Garage, Ski locker, Car"
-          />
-        </div>
-
-        {status === 'checked-out' && (
-          <div className="form-group">
-            <label htmlFor="checkedOutTo">Checked Out To</label>
-            <input
-              id="checkedOutTo"
-              type="text"
-              value={checkedOutTo}
-              onChange={(e) => setCheckedOutTo(e.target.value)}
-              placeholder="e.g., Friend's name, Rental shop"
-            />
-          </div>
-        )}
-      </div>
-
-      {/* Extended Details for Alpine Skis */}
-      {showAlpineSkiDetails && (
-        <div className="form-section">
-          <h3>Ski Specifications</h3>
-
-          <div className="form-group">
-            <label>Profile (Tip / Waist / Tail mm)</label>
-            <div className="form-row form-row-3">
-              <input
-                type="number"
-                value={profileTip}
-                onChange={(e) => setProfileTip(e.target.value)}
-                placeholder="Tip"
-                min="80"
-                max="150"
-              />
-              <input
-                type="number"
-                value={profileWaist}
-                onChange={(e) => setProfileWaist(e.target.value)}
-                placeholder="Waist"
-                min="60"
-                max="120"
-              />
-              <input
-                type="number"
-                value={profileTail}
-                onChange={(e) => setProfileTail(e.target.value)}
-                placeholder="Tail"
-                min="80"
-                max="150"
-              />
-            </div>
-          </div>
-
-          <div className="form-group">
-            <label htmlFor="radius">Turn Radius (R value in meters)</label>
-            <input
-              id="radius"
-              type="number"
-              value={radius}
-              onChange={(e) => setRadius(e.target.value)}
-              placeholder="e.g., 15.5"
-              step="0.1"
-              min="5"
-              max="40"
-            />
-          </div>
-
-          <h4 className="form-subsection-title">Bindings</h4>
-          <div className="form-row">
-            <div className="form-group">
-              <label htmlFor="bindingBrand">Binding Brand</label>
-              <input
-                id="bindingBrand"
-                type="text"
-                value={bindingBrand}
-                onChange={(e) => setBindingBrand(e.target.value)}
-                placeholder="e.g., Marker"
-              />
-            </div>
-            <div className="form-group">
-              <label htmlFor="bindingModel">Binding Model</label>
-              <input
-                id="bindingModel"
-                type="text"
-                value={bindingModel}
-                onChange={(e) => setBindingModel(e.target.value)}
-                placeholder="e.g., Griffon 13"
-              />
-            </div>
-          </div>
-
-          <div className="form-group">
-            <label htmlFor="bindingDin">DIN Range</label>
-            <input
-              id="bindingDin"
-              type="text"
-              value={bindingDin}
-              onChange={(e) => setBindingDin(e.target.value)}
-              placeholder="e.g., 4-13"
-            />
-          </div>
-        </div>
-      )}
-
-      <div className="form-section">
-        <h3>Notes</h3>
-        <div className="form-group">
-          <label htmlFor="notes">Notes (optional)</label>
-          <textarea
-            id="notes"
-            value={notes}
-            onChange={(e) => setNotes(e.target.value)}
-            placeholder="e.g., Needs waxing, base repair needed"
-            rows={3}
-          />
-        </div>
-      </div>
-
-      <div className="form-actions">
-        <button
-          type="button"
-          className="btn btn-secondary"
-          onClick={onCancel}
-          disabled={submitting}
-        >
-          Cancel
-        </button>
-        <button type="submit" className="btn btn-primary" disabled={submitting || analyzing}>
-          {submitting ? 'Saving...' : item ? 'Update' : 'Add Gear'}
-        </button>
-      </div>
-    </form>
+      </form>
+    </div>
   );
 }
