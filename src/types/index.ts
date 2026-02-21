@@ -277,3 +277,35 @@ export type FirestoreGearItem = Omit<GearItem, 'createdAt' | 'updatedAt'> & {
   createdAt: FirestoreTimestamp;
   updatedAt: FirestoreTimestamp;
 };
+
+// ============================================
+// SETTINGS TYPES
+// ============================================
+
+export type HeightUnit = 'cm' | 'ft-in';
+export type WeightUnit = 'kg' | 'lbs';
+export type SkiLengthUnit = 'cm' | 'in';
+
+export interface DisplaySettings {
+  showFoot: boolean;
+  showHand: boolean;
+}
+
+export interface AppSettings {
+  heightUnit: HeightUnit;
+  weightUnit: WeightUnit;
+  skiLengthUnit: SkiLengthUnit;
+  defaultSport: Sport;
+  display: DisplaySettings;
+}
+
+export const DEFAULT_SETTINGS: AppSettings = {
+  heightUnit: 'cm',
+  weightUnit: 'kg',
+  skiLengthUnit: 'cm',
+  defaultSport: 'alpine',
+  display: {
+    showFoot: true,
+    showHand: true,
+  },
+};

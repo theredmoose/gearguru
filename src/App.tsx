@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Settings } from 'lucide-react';
 import {
   MemberForm,
   MemberCard,
@@ -11,9 +12,10 @@ import {
   BottomNav,
   MeasureScreen,
   ResourcesScreen,
+  SettingsScreen,
 } from './components';
 import type { TopLevelTab } from './components';
-import { useFamilyMembers, useAuth, useGearItems } from './hooks';
+import { useFamilyMembers, useAuth, useGearItems, useSettings } from './hooks';
 import type { FamilyMember, GearItem, Sport } from './types';
 
 type View =
@@ -25,7 +27,8 @@ type View =
   | 'converter'
   | 'inventory'
   | 'add-gear'
-  | 'edit-gear';
+  | 'edit-gear'
+  | 'settings';
 
 function App() {
   const {
@@ -44,6 +47,7 @@ function App() {
     useFamilyMembers(user?.uid ?? null);
   const { items: gearItems, addItem: addGearItem, updateItem: updateGearItem, deleteItem: deleteGearItem } =
     useGearItems(user?.uid ?? null);
+  const { settings, updateSettings, resetSettings } = useSettings();
 
   const [view, setView] = useState<View>('home');
   const [activeTab, setActiveTab] = useState<TopLevelTab>('family');
@@ -178,6 +182,22 @@ function App() {
   }
 
   // ── Full-screen overlay views (no bottom nav) ────────────────────
+  if (view === 'settings') {
+    return (
+      <div className="app">
+        <SettingsScreen
+          settings={settings}
+          user={user}
+          onUpdateSettings={updateSettings}
+          onResetSettings={resetSettings}
+          onSignOut={signOut}
+          onSendPasswordReset={sendPasswordReset}
+          onBack={() => setView('home')}
+        />
+      </div>
+    );
+  }
+
   if (view === 'add' || view === 'edit') {
     return (
       <div className="app">
@@ -197,6 +217,7 @@ function App() {
         <MemberDetail
           member={selectedMember}
           gearItems={memberGear}
+          settings={settings}
           onBack={() => { setSelectedMember(null); setView('home'); }}
           onEdit={() => setView('edit')}
           onGetSizing={() => setView('sizing')}
@@ -294,10 +315,11 @@ function App() {
                   {user.displayName || user.email}
                 </span>
                 <button
-                  onClick={signOut}
-                  className="text-[10px] font-bold text-white bg-blue-600 hover:bg-blue-500 px-2.5 py-1.5 rounded-lg transition-colors"
+                  onClick={() => setView('settings')}
+                  className="p-1.5 hover:bg-blue-600 rounded-full transition-colors"
+                  aria-label="Open settings"
                 >
-                  Sign Out
+                  <Settings className="w-5 h-5 text-white" />
                 </button>
               </div>
             </div>

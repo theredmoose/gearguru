@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Settings, PlusCircle, ChevronDown, CheckCircle2, AlertCircle, ArrowLeftRight } from 'lucide-react';
-import type { FamilyMember, GearItem, Sport, SkillLevel } from '../types';
+import type { FamilyMember, GearItem, Sport, SkillLevel, AppSettings } from '../types';
 import { ScreenHeader } from './ScreenHeader';
 import { GearTypeIcon } from './GearIcons';
 import { getShoeSizesFromFootLength } from '../services/shoeSize';
@@ -18,6 +18,7 @@ import {
 interface MemberDetailProps {
   member: FamilyMember;
   gearItems: GearItem[];
+  settings?: AppSettings;
   onBack: () => void;
   onEdit: () => void;
   onGetSizing: () => void;
@@ -152,6 +153,7 @@ function getSizingCards(
 export function MemberDetail({
   member,
   gearItems,
+  settings,
   onBack,
   onEdit,
   onGetSizing,
@@ -164,16 +166,20 @@ export function MemberDetail({
   const footLength = Math.max(m.footLengthLeft, m.footLengthRight);
 
   const defaultSport: Sport =
-    (Object.keys(member.skillLevels ?? {})[0] as Sport | undefined) ?? 'alpine';
+    settings?.defaultSport ??
+    (Object.keys(member.skillLevels ?? {})[0] as Sport | undefined) ??
+    'alpine';
   const [selectedSport, setSelectedSport] = useState<Sport>(defaultSport);
   const [skillLevel, setSkillLevel] = useState<SkillLevel>(
     member.skillLevels?.[defaultSport] ?? 'intermediate'
   );
 
-  const [lengthUnit, setLengthUnit] = useState<LengthUnit>('cm');
+  const [lengthUnit, setLengthUnit] = useState<LengthUnit>(settings?.skiLengthUnit ?? 'cm');
   const [bootUnit, setBootUnit] = useState<BootUnit>('mp');
-  const [heightUnit, setHeightUnit] = useState<'cm' | 'ft'>('cm');
-  const [weightUnit, setWeightUnit] = useState<'kg' | 'lbs'>('kg');
+  const [heightUnit, setHeightUnit] = useState<'cm' | 'ft'>(
+    settings?.heightUnit === 'ft-in' ? 'ft' : 'cm'
+  );
+  const [weightUnit, setWeightUnit] = useState<'kg' | 'lbs'>(settings?.weightUnit ?? 'kg');
 
   function cycleBootUnit() {
     setBootUnit(u => {
@@ -205,12 +211,15 @@ export function MemberDetail({
     ? `${Math.round(m.weight * 2.2046)} lbs`
     : `${m.weight} kg`;
 
+  const showFoot = settings?.display.showFoot ?? true;
+  const showHand = settings?.display.showHand ?? true;
+
   const statRows = [
     { label: 'Age',    value: `${age} yrs` },
     { label: 'Height', value: heightDisplay, onToggle: () => setHeightUnit(u => u === 'cm' ? 'ft' : 'cm') },
     { label: 'Weight', value: weightDisplay, onToggle: () => setWeightUnit(u => u === 'kg' ? 'lbs' : 'kg') },
-    { label: 'Foot',   value: shoeDisplay, action: footLength > 0 ? onOpenConverter : undefined },
-    { label: 'Hand',   value: handDisplay },
+    ...(showFoot ? [{ label: 'Foot', value: shoeDisplay, action: footLength > 0 ? onOpenConverter : undefined }] : []),
+    ...(showHand ? [{ label: 'Hand', value: handDisplay }] : []),
   ];
 
   return (

@@ -2,7 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent, within } from '@testing-library/react';
 import { MemberDetail } from '../MemberDetail';
 import { FAMILY_MEMBERS, createFamilyMember } from '@tests/fixtures/familyMembers';
-import type { GearItem, FamilyMember } from '../../types';
+import type { GearItem, FamilyMember, AppSettings } from '../../types';
 
 // Minimal valid GearItem factory
 function makeGearItem(overrides: Partial<GearItem> = {}): GearItem {
@@ -361,6 +361,64 @@ describe('MemberDetail', () => {
       render(<MemberDetail {...defaultProps} member={memberWithSkills} />);
       const levelSelect = screen.getAllByRole('combobox')[1] as HTMLSelectElement;
       expect(levelSelect.value).toBe('expert');
+    });
+  });
+
+  // ============================================
+  // SETTINGS PROP
+  // ============================================
+  describe('with settings prop', () => {
+    const baseSettings: AppSettings = {
+      heightUnit: 'cm',
+      weightUnit: 'kg',
+      skiLengthUnit: 'cm',
+      defaultSport: 'alpine',
+      display: { showFoot: true, showHand: true },
+    };
+
+    it('hides Foot row when display.showFoot is false', () => {
+      const settings = { ...baseSettings, display: { showFoot: false, showHand: true } };
+      render(<MemberDetail {...defaultProps} settings={settings} />);
+      expect(screen.queryByText('Foot')).toBeNull();
+    });
+
+    it('shows Foot row when display.showFoot is true', () => {
+      render(<MemberDetail {...defaultProps} settings={{ ...baseSettings, display: { showFoot: true, showHand: true } }} />);
+      expect(screen.getByText('Foot')).toBeInTheDocument();
+    });
+
+    it('hides Hand row when display.showHand is false', () => {
+      const settings = { ...baseSettings, display: { showFoot: true, showHand: false } };
+      render(<MemberDetail {...defaultProps} settings={settings} />);
+      expect(screen.queryByText('Hand')).toBeNull();
+    });
+
+    it('uses settings.defaultSport as the initial sport selector value', () => {
+      const settings = { ...baseSettings, defaultSport: 'snowboard' as const };
+      render(<MemberDetail {...defaultProps} settings={settings} />);
+      const sportSelect = screen.getAllByRole('combobox')[0] as HTMLSelectElement;
+      expect(sportSelect.value).toBe('snowboard');
+    });
+
+    it('initialises lengthUnit from skiLengthUnit setting', () => {
+      const settings = { ...baseSettings, skiLengthUnit: 'in' as const };
+      render(<MemberDetail {...defaultProps} settings={settings} />);
+      // The ski card should show inches rather than cm
+      expect(screen.getAllByRole('button', { name: /toggle skis units/i })[0]).toBeInTheDocument();
+    });
+
+    it('initialises weightUnit from settings', () => {
+      const settings = { ...baseSettings, weightUnit: 'lbs' as const };
+      render(<MemberDetail {...defaultProps} settings={settings} />);
+      // Weight stat row value should be in lbs
+      expect(screen.getByText(/lbs/)).toBeInTheDocument();
+    });
+
+    it('initialises heightUnit from ft-in setting', () => {
+      const settings = { ...baseSettings, heightUnit: 'ft-in' as const };
+      render(<MemberDetail {...defaultProps} settings={settings} />);
+      // Height stat row should show feet format
+      expect(screen.getByText(/'\d+"/)).toBeInTheDocument();
     });
   });
 });

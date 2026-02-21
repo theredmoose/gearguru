@@ -16,4 +16,5 @@ export { BottomNav } from './BottomNav';
 export type { TopLevelTab } from './BottomNav';
 export { MeasureScreen } from './MeasureScreen';
 export { ResourcesScreen } from './ResourcesScreen';
+export { SettingsScreen } from './SettingsScreen';
 export { GearTypeIcon, SkiIcon, BootIcon, PoleIcon, HelmetIcon, SnowboardIcon, SkateIcon } from './GearIcons';
