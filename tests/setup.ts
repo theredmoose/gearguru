@@ -19,6 +19,9 @@ vi.mock('firebase/firestore', () => ({
   where: vi.fn(),
   orderBy: vi.fn(),
   onSnapshot: vi.fn(),
+  Timestamp: {
+    fromDate: vi.fn(() => ({ seconds: 1705320000, nanoseconds: 0 })),
+  },
 }));
 
 vi.mock('firebase/auth', () => ({
