@@ -1,8 +1,9 @@
 import { useState } from 'react';
-import { Settings, PlusCircle, ChevronDown, CheckCircle2, AlertCircle } from 'lucide-react';
+import { Settings, PlusCircle, ChevronDown, CheckCircle2, AlertCircle, ArrowLeftRight } from 'lucide-react';
 import type { FamilyMember, GearItem, Sport, SkillLevel } from '../types';
 import { ScreenHeader } from './ScreenHeader';
 import { GearTypeIcon } from './GearIcons';
+import { getShoeSizesFromFootLength } from '../services/shoeSize';
 import {
   calculateAlpineSkiSizing,
   calculateAlpineBootSizing,
@@ -45,6 +46,29 @@ const GEAR_TYPE_LABELS: Record<string, string> = {
   snowboard: 'Snowboard', skate: 'Skates', helmet: 'Helmet', other: 'Other',
 };
 
+type BootUnit = 'mp' | 'eu' | 'us-men' | 'us-women';
+type LengthUnit = 'cm' | 'in';
+const BOOT_UNIT_CYCLE: BootUnit[] = ['mp', 'eu', 'us-men', 'us-women'];
+
+function fmtLength(cm: number, unit: LengthUnit): string {
+  return unit === 'in' ? `${Math.round(cm / 2.54)}"` : `${cm} cm`;
+}
+
+function fmtRange(min: number, max: number, unit: LengthUnit): string {
+  if (unit === 'in') return `${Math.round(min / 2.54)}–${Math.round(max / 2.54)}"`;
+  return `${min}–${max} cm`;
+}
+
+function fmtBoot(mondopoint: number, unit: BootUnit): { label: string; value: string } {
+  const sizes = getShoeSizesFromFootLength(mondopoint / 10);
+  switch (unit) {
+    case 'mp':       return { label: 'Mondo',  value: `${mondopoint} MP` };
+    case 'eu':       return { label: 'EU',     value: String(sizes.eu) };
+    case 'us-men':   return { label: 'US M',   value: String(sizes.usMen) };
+    case 'us-women': return { label: 'US W',   value: String(sizes.usWomen) };
+  }
+}
+
 function calculateAge(dateOfBirth: string): number {
   const today = new Date();
   const birth = new Date(dateOfBirth);
@@ -62,13 +86,16 @@ function gearFitStatus(item: GearItem): 'Ready' | 'Update' {
 interface SizingCard {
   label: string;
   type: 'ski' | 'boot' | 'pole' | 'helmet' | 'snowboard' | 'skate';
+  toggleKind?: 'length' | 'boot';
   items: { label: string; value: string }[];
 }
 
 function getSizingCards(
   member: FamilyMember,
   sport: Sport,
-  skillLevel: SkillLevel
+  skillLevel: SkillLevel,
+  lengthUnit: LengthUnit,
+  bootUnit: BootUnit,
 ): SizingCard[] {
   const m = member.measurements;
   const helmetSizing = m.headCircumference ? calculateHelmetSizing(m.headCircumference) : null;
@@ -78,14 +105,14 @@ function getSizingCards(
       const ski  = calculateAlpineSkiSizing(m, skillLevel, member.gender);
       const boot = calculateAlpineBootSizing(m, skillLevel, member.gender);
       return [
-        { label: 'Skis',   type: 'ski',  items: [{ label: 'Length', value: `${ski.skiLengthRecommended} cm` }] },
-        { label: 'Boots',  type: 'boot', items: [
-            { label: 'Mondo', value: String(boot.mondopoint) },
-            { label: 'Flex',  value: `${boot.flexRating.min}–${boot.flexRating.max}` },
-            { label: 'Last',  value: `${boot.lastWidthMm} mm` },
+        { label: 'Skis',   type: 'ski',    toggleKind: 'length', items: [{ label: 'Length', value: fmtLength(ski.skiLengthRecommended, lengthUnit) }] },
+        { label: 'Boots',  type: 'boot',   toggleKind: 'boot',   items: [
+            fmtBoot(boot.mondopoint, bootUnit),
+            { label: 'Flex', value: `${boot.flexRating.min}–${boot.flexRating.max}` },
+            { label: 'Last', value: `${boot.lastWidthMm} mm` },
           ]},
-        { label: 'Poles',  type: 'pole',   items: [{ label: 'Length', value: `${Math.round(m.height * 0.7)} cm` }] },
-        { label: 'Helmet', type: 'helmet', items: [{ label: 'Size',   value: helmetSizing?.size ?? '—' }] },
+        { label: 'Poles',  type: 'pole',   toggleKind: 'length', items: [{ label: 'Length', value: fmtLength(Math.round(m.height * 0.7), lengthUnit) }] },
+        { label: 'Helmet', type: 'helmet',                        items: [{ label: 'Size',   value: helmetSizing?.size ?? '—' }] },
       ];
     }
     case 'nordic-classic':
@@ -93,20 +120,20 @@ function getSizingCards(
       const ski  = calculateNordicSkiSizing(m, sport, skillLevel);
       const boot = calculateNordicBootSizing(m);
       return [
-        { label: 'Skis',   type: 'ski',    items: [{ label: 'Length', value: `${ski.skiLengthRecommended} cm` }] },
-        { label: 'Poles',  type: 'pole',   items: [{ label: 'Length', value: `${ski.poleLengthRecommended} cm` }] },
-        { label: 'Boots',  type: 'boot',   items: [{ label: 'Mondo',  value: `${boot.mondopoint} MP` }] },
-        { label: 'Helmet', type: 'helmet', items: [{ label: 'Size',   value: helmetSizing?.size ?? '—' }] },
+        { label: 'Skis',   type: 'ski',    toggleKind: 'length', items: [{ label: 'Length', value: fmtLength(ski.skiLengthRecommended, lengthUnit) }] },
+        { label: 'Poles',  type: 'pole',   toggleKind: 'length', items: [{ label: 'Length', value: fmtLength(ski.poleLengthRecommended, lengthUnit) }] },
+        { label: 'Boots',  type: 'boot',   toggleKind: 'boot',   items: [fmtBoot(boot.mondopoint, bootUnit)] },
+        { label: 'Helmet', type: 'helmet',                        items: [{ label: 'Size',   value: helmetSizing?.size ?? '—' }] },
       ];
     }
     case 'snowboard': {
       const board = calculateSnowboardSizing(m, skillLevel);
       const boot  = calculateSnowboardBootSizing(m);
       return [
-        { label: 'Board',  type: 'snowboard', items: [{ label: 'Length', value: `${board.boardLengthRecommended} cm` }] },
-        { label: 'Boots',  type: 'boot',      items: [{ label: 'Mondo',  value: `${boot.mondopoint} MP` }] },
-        { label: 'Stance', type: 'ski',       items: [{ label: 'Width',  value: `${board.stanceWidth.min}–${board.stanceWidth.max} cm` }] },
-        { label: 'Helmet', type: 'helmet',    items: [{ label: 'Size',   value: helmetSizing?.size ?? '—' }] },
+        { label: 'Board',  type: 'snowboard', toggleKind: 'length', items: [{ label: 'Length', value: fmtLength(board.boardLengthRecommended, lengthUnit) }] },
+        { label: 'Boots',  type: 'boot',      toggleKind: 'boot',   items: [fmtBoot(boot.mondopoint, bootUnit)] },
+        { label: 'Stance', type: 'ski',        toggleKind: 'length', items: [{ label: 'Width',  value: fmtRange(board.stanceWidth.min, board.stanceWidth.max, lengthUnit) }] },
+        { label: 'Helmet', type: 'helmet',                            items: [{ label: 'Size',   value: helmetSizing?.size ?? '—' }] },
       ];
     }
     case 'hockey': {
@@ -143,17 +170,45 @@ export function MemberDetail({
     member.skillLevels?.[defaultSport] ?? 'intermediate'
   );
 
-  const sizingCards = getSizingCards(member, selectedSport, skillLevel);
+  const [lengthUnit, setLengthUnit] = useState<LengthUnit>('cm');
+  const [bootUnit, setBootUnit] = useState<BootUnit>('mp');
+  const [heightUnit, setHeightUnit] = useState<'cm' | 'ft'>('cm');
+  const [weightUnit, setWeightUnit] = useState<'kg' | 'lbs'>('kg');
+
+  function cycleBootUnit() {
+    setBootUnit(u => {
+      const idx = BOOT_UNIT_CYCLE.indexOf(u);
+      return BOOT_UNIT_CYCLE[(idx + 1) % BOOT_UNIT_CYCLE.length];
+    });
+  }
+
+  const sizingCards = getSizingCards(member, selectedSport, skillLevel, lengthUnit, bootUnit);
 
   // Format shoe size for display
   const shoeDisplay = footLength > 0 ? `${footLength} cm` : '—';
   // Hand size display
   const handDisplay = m.handSize ? `${m.handSize} cm` : '—';
 
+  // Height display
+  const heightDisplay = (() => {
+    if (heightUnit === 'ft') {
+      const totalInches = m.height / 2.54;
+      const feet = Math.floor(totalInches / 12);
+      const inches = Math.round(totalInches % 12);
+      return `${feet}'${inches}"`;
+    }
+    return `${m.height} cm`;
+  })();
+
+  // Weight display
+  const weightDisplay = weightUnit === 'lbs'
+    ? `${Math.round(m.weight * 2.2046)} lbs`
+    : `${m.weight} kg`;
+
   const statRows = [
     { label: 'Age',    value: `${age} yrs` },
-    { label: 'Height', value: `${m.height} cm` },
-    { label: 'Weight', value: `${m.weight} kg` },
+    { label: 'Height', value: heightDisplay, onToggle: () => setHeightUnit(u => u === 'cm' ? 'ft' : 'cm') },
+    { label: 'Weight', value: weightDisplay, onToggle: () => setWeightUnit(u => u === 'kg' ? 'lbs' : 'kg') },
     { label: 'Foot',   value: shoeDisplay, action: footLength > 0 ? onOpenConverter : undefined },
     { label: 'Hand',   value: handDisplay },
   ];
@@ -251,6 +306,15 @@ export function MemberDetail({
                     >
                       {row.value}
                     </button>
+                  ) : row.onToggle ? (
+                    <button
+                      onClick={row.onToggle}
+                      className="flex items-center gap-1 group"
+                      aria-label={`Toggle ${row.label} units`}
+                    >
+                      <span className="text-sm font-extrabold text-slate-800 group-hover:text-blue-600 transition-colors">{row.value}</span>
+                      <ArrowLeftRight className="w-3 h-3 text-slate-300 group-hover:text-blue-400 transition-colors" />
+                    </button>
                   ) : (
                     <span className="text-sm font-extrabold text-slate-800">{row.value}</span>
                   )}
@@ -284,9 +348,23 @@ export function MemberDetail({
                   <GearTypeIcon type={card.type} className="w-9 h-9" />
                 </div>
                 <div className="flex flex-col flex-1 min-w-0">
-                  <span className="text-[11px] text-blue-700 font-bold uppercase tracking-wide block mb-1">
-                    {card.label}
-                  </span>
+                  <div className="flex items-center justify-between mb-1">
+                    <span className="text-[11px] text-blue-700 font-bold uppercase tracking-wide">
+                      {card.label}
+                    </span>
+                    {card.toggleKind && (
+                      <button
+                        onClick={() => card.toggleKind === 'length'
+                          ? setLengthUnit(u => u === 'cm' ? 'in' : 'cm')
+                          : cycleBootUnit()
+                        }
+                        className="text-slate-300 hover:text-blue-400 transition-colors ml-1 flex-shrink-0"
+                        aria-label={`Toggle ${card.label} units`}
+                      >
+                        <ArrowLeftRight className="w-3 h-3" />
+                      </button>
+                    )}
+                  </div>
                   {card.items.map((item, i) => (
                     <div key={i} className="flex justify-between items-center w-full">
                       <span className="text-[11px] font-bold text-slate-600 truncate">{item.label}</span>
