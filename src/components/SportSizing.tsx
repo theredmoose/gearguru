@@ -1,4 +1,5 @@
 import { useState, useRef } from 'react';
+import { ChevronLeft } from 'lucide-react';
 import type { FamilyMember, GearItem, SkillLevel, Sport, GearType } from '../types';
 import {
   calculateNordicSkiSizing,
@@ -26,10 +27,10 @@ interface SportSizingProps {
 
 const SPORTS: { id: Sport; label: string; icon: string; color: string }[] = [
   { id: 'nordic-classic', label: 'Nordic Classic', icon: '⛷️', color: '#0891b2' },
-  { id: 'nordic-skate', label: 'Nordic Skate', icon: '⛷️', color: '#0d9488' },
-  { id: 'alpine', label: 'Alpine', icon: '🎿', color: '#2563eb' },
-  { id: 'snowboard', label: 'Snowboard', icon: '🏂', color: '#7c3aed' },
-  { id: 'hockey', label: 'Hockey', icon: '🏒', color: '#dc2626' },
+  { id: 'nordic-skate',   label: 'Nordic Skate',   icon: '⛷️', color: '#0d9488' },
+  { id: 'alpine',         label: 'Alpine',          icon: '🎿', color: '#2563eb' },
+  { id: 'snowboard',      label: 'Snowboard',       icon: '🏂', color: '#7c3aed' },
+  { id: 'hockey',         label: 'Hockey',          icon: '🏒', color: '#dc2626' },
 ];
 
 export function SportSizing({
@@ -44,24 +45,22 @@ export function SportSizing({
   const [currentIndex, setCurrentIndex] = useState(0);
   const [skillLevels, setSkillLevels] = useState<Record<Sport, SkillLevel>>(() => ({
     'nordic-classic': member.skillLevels?.['nordic-classic'] ?? 'intermediate',
-    'nordic-skate': member.skillLevels?.['nordic-skate'] ?? 'intermediate',
-    'nordic-combi': member.skillLevels?.['nordic-combi'] ?? 'intermediate',
-    'alpine': member.skillLevels?.['alpine'] ?? 'intermediate',
-    'snowboard': member.skillLevels?.['snowboard'] ?? 'intermediate',
-    'hockey': member.skillLevels?.['hockey'] ?? 'intermediate',
+    'nordic-skate':   member.skillLevels?.['nordic-skate']   ?? 'intermediate',
+    'nordic-combi':   member.skillLevels?.['nordic-combi']   ?? 'intermediate',
+    'alpine':         member.skillLevels?.['alpine']         ?? 'intermediate',
+    'snowboard':      member.skillLevels?.['snowboard']      ?? 'intermediate',
+    'hockey':         member.skillLevels?.['hockey']         ?? 'intermediate',
   }));
   const containerRef = useRef<HTMLDivElement>(null);
   const touchStartX = useRef(0);
   const touchEndX = useRef(0);
 
   const currentSport = SPORTS[currentIndex];
-  const skillLevel = skillLevels[currentSport.id];
+  const skillLevel = skillLevels[currentSport.id] ?? 'intermediate';
 
-  // Filter gear items for current sport
   const sportGearItems = gearItems.filter((item) => item.sport === currentSport.id);
 
   const handleSlotTap = (slotType: GearType) => {
-    // Check if there's already gear of this type
     const existingGear = sportGearItems.find((item) => item.type === slotType);
     if (existingGear && onEditGear) {
       onEditGear(existingGear);
@@ -73,7 +72,6 @@ export function SportSizing({
   const setSkillLevel = (level: SkillLevel) => {
     const newSkillLevels = { ...skillLevels, [currentSport.id]: level };
     setSkillLevels(newSkillLevels);
-    // Omit nordic-combi — it's not a selectable sport and shouldn't be persisted
     const { 'nordic-combi': _unused, ...persistable } = newSkillLevels;
     onSkillLevelChange?.(persistable);
   };
@@ -89,7 +87,6 @@ export function SportSizing({
   const handleTouchEnd = () => {
     const diff = touchStartX.current - touchEndX.current;
     const threshold = 50;
-
     if (diff > threshold && currentIndex < SPORTS.length - 1) {
       setCurrentIndex(currentIndex + 1);
     } else if (diff < -threshold && currentIndex > 0) {
@@ -97,33 +94,10 @@ export function SportSizing({
     }
   };
 
-  const renderSportContent = () => {
-    const sport = currentSport.id;
+  // ── Sizing content renderers ──────────────────────────────────────
 
-    switch (sport) {
-      case 'nordic-classic':
-      case 'nordic-skate':
-      case 'nordic-combi':
-        return renderNordicContent(sport);
-      case 'alpine':
-        return renderAlpineContent();
-      case 'snowboard':
-        return renderSnowboardContent();
-      case 'hockey':
-        return renderHockeyContent();
-      default:
-        return null;
-    }
-  };
-
-  const renderNordicContent = (
-    style: 'nordic-classic' | 'nordic-skate' | 'nordic-combi'
-  ) => {
-    const skiSizing = calculateNordicSkiSizing(
-      member.measurements,
-      style,
-      skillLevel
-    );
+  const renderNordicContent = (style: 'nordic-classic' | 'nordic-skate' | 'nordic-combi') => {
+    const skiSizing  = calculateNordicSkiSizing(member.measurements, style, skillLevel);
     const bootSizing = calculateNordicBootSizing(member.measurements);
 
     return (
@@ -162,16 +136,8 @@ export function SportSizing({
   };
 
   const renderAlpineContent = () => {
-    const skiSizing = calculateAlpineSkiSizing(
-      member.measurements,
-      skillLevel,
-      member.gender
-    );
-    const bootSizing = calculateAlpineBootSizing(
-      member.measurements,
-      skillLevel,
-      member.gender
-    );
+    const skiSizing  = calculateAlpineSkiSizing(member.measurements, skillLevel, member.gender);
+    const bootSizing = calculateAlpineBootSizing(member.measurements, skillLevel, member.gender);
 
     return (
       <div className="sizing-sections">
@@ -221,7 +187,7 @@ export function SportSizing({
 
   const renderSnowboardContent = () => {
     const boardSizing = calculateSnowboardSizing(member.measurements, skillLevel);
-    const bootSizing = calculateSnowboardBootSizing(member.measurements);
+    const bootSizing  = calculateSnowboardBootSizing(member.measurements);
 
     return (
       <div className="sizing-sections">
@@ -273,7 +239,7 @@ export function SportSizing({
 
   const renderHockeyContent = () => {
     const bauerSizing = calculateHockeySkateSize(member.measurements, 'bauer');
-    const ccmSizing = calculateHockeySkateSize(member.measurements, 'ccm');
+    const ccmSizing   = calculateHockeySkateSize(member.measurements, 'ccm');
 
     return (
       <div className="sizing-sections">
@@ -305,75 +271,98 @@ export function SportSizing({
     );
   };
 
+  const renderSportContent = () => {
+    switch (currentSport.id) {
+      case 'nordic-classic':
+      case 'nordic-skate':
+      case 'nordic-combi':
+        return renderNordicContent(currentSport.id);
+      case 'alpine':    return renderAlpineContent();
+      case 'snowboard': return renderSnowboardContent();
+      case 'hockey':    return renderHockeyContent();
+      default:          return null;
+    }
+  };
+
   return (
-    <div className="sport-sizing">
-      <header className="detail-header">
-        <button className="btn-back" onClick={onBack}>
-          ← {member.name}
+    <div className="sport-sizing flex flex-col min-h-0 flex-1">
+      {/* Header */}
+      <div className="px-4 py-3 bg-blue-700 border-b border-blue-800 shadow-sm flex items-center gap-2">
+        <button
+          className="flex items-center gap-1 text-white font-bold text-sm hover:text-blue-200 transition-colors"
+          onClick={onBack}
+        >
+          <ChevronLeft className="w-5 h-5" />
+          {member.name}
         </button>
-      </header>
+      </div>
 
       {/* Sport tabs */}
-      <div className="sport-tabs">
+      <div className="sport-tabs flex overflow-x-auto border-b border-slate-100 bg-white">
         {SPORTS.map((sport, index) => (
           <button
             key={sport.id}
-            className={`sport-tab ${index === currentIndex ? 'active' : ''}`}
-            onClick={() => setCurrentIndex(index)}
-            style={
+            className={`sport-tab flex-shrink-0 flex flex-col items-center gap-0.5 px-4 py-2.5 text-[10px] font-black uppercase tracking-wide border-b-2 transition-colors ${
               index === currentIndex
-                ? { borderColor: sport.color, color: sport.color }
-                : undefined
-            }
+                ? 'border-current'
+                : 'border-transparent text-slate-400 hover:text-slate-600'
+            }`}
+            onClick={() => setCurrentIndex(index)}
+            style={index === currentIndex ? { color: sport.color, borderColor: sport.color } : undefined}
           >
-            <span className="sport-tab-icon">{sport.icon}</span>
+            <span className="text-base leading-none">{sport.icon}</span>
             <span className="sport-tab-label">{sport.label}</span>
           </button>
         ))}
       </div>
 
-      {/* Swipeable content area */}
+      {/* Swipeable content */}
       <div
         ref={containerRef}
-        className="sport-content"
+        className="sport-content flex-1 overflow-y-auto"
         onTouchStart={handleTouchStart}
         onTouchMove={handleTouchMove}
         onTouchEnd={handleTouchEnd}
         style={{ backgroundColor: currentSport.color + '10' }}
       >
+        {/* Sport header banner */}
         <div
-          className="sport-header"
+          className="sport-header flex items-center gap-3 px-6 py-4"
           style={{ backgroundColor: currentSport.color }}
         >
-          <span className="sport-icon">{currentSport.icon}</span>
-          <h1>{currentSport.label}</h1>
+          <span className="text-2xl">{currentSport.icon}</span>
+          <h1 className="text-base font-black text-white uppercase tracking-wide">
+            {currentSport.label}
+          </h1>
         </div>
 
-        {/* Skill level selector (not for hockey) */}
+        {/* Skill level selector */}
         {currentSport.id !== 'hockey' && (
-          <div className="skill-selector">
-            <div className="skill-buttons">
-              {(['beginner', 'intermediate', 'advanced', 'expert'] as SkillLevel[]).map(
-                (level) => (
-                  <button
-                    key={level}
-                    className={`skill-btn ${skillLevel === level ? 'active' : ''}`}
-                    onClick={() => setSkillLevel(level)}
-                    style={
-                      skillLevel === level
-                        ? { backgroundColor: currentSport.color, borderColor: currentSport.color }
-                        : undefined
-                    }
-                  >
-                    {level.charAt(0).toUpperCase() + level.slice(1, 3)}
-                  </button>
-                )
-              )}
+          <div className="skill-selector px-6 py-3 bg-white border-b border-slate-100">
+            <div className="skill-buttons flex gap-2">
+              {(['beginner', 'intermediate', 'advanced', 'expert'] as SkillLevel[]).map((level) => (
+                <button
+                  key={level}
+                  className={`skill-btn flex-1 py-2 rounded-xl text-[10px] font-black uppercase tracking-wide border-2 transition-colors ${
+                    skillLevel === level
+                      ? 'active text-white border-transparent'
+                      : 'text-slate-400 border-slate-200 hover:border-slate-300'
+                  }`}
+                  onClick={() => setSkillLevel(level)}
+                  style={
+                    skillLevel === level
+                      ? { backgroundColor: currentSport.color, borderColor: currentSport.color }
+                      : undefined
+                  }
+                >
+                  {level.charAt(0).toUpperCase() + level.slice(1, 3)}
+                </button>
+              ))}
             </div>
           </div>
         )}
 
-        {/* Gear Loadout Panel */}
+        {/* Loadout + member info */}
         <div className="sizing-sections">
           <GearLoadoutPanel
             member={member}
@@ -391,7 +380,7 @@ export function SportSizing({
 
         {renderSportContent()}
 
-        {/* My Gear Section */}
+        {/* My Gear section */}
         {(onAddGear || onEditGear || onDeleteGear) && (
           <div className="sizing-sections">
             <section className="sizing-section gear-section">
@@ -407,9 +396,7 @@ export function SportSizing({
                 )}
               </div>
               {sportGearItems.length === 0 ? (
-                <p className="gear-empty-hint">
-                  No gear yet for {currentSport.label}.
-                </p>
+                <p className="gear-empty-hint">No gear yet for {currentSport.label}.</p>
               ) : (
                 <div className="gear-list">
                   {sportGearItems.map((item) => (
@@ -426,22 +413,22 @@ export function SportSizing({
           </div>
         )}
 
-        {/* Swipe indicator */}
-        <div className="swipe-indicator">
+        {/* Swipe indicator dots */}
+        <div className="swipe-indicator flex justify-center gap-2 py-4">
           {SPORTS.map((_, index) => (
             <span
               key={index}
-              className={`swipe-dot ${index === currentIndex ? 'active' : ''}`}
-              style={
-                index === currentIndex
-                  ? { backgroundColor: currentSport.color }
-                  : undefined
-              }
+              className={`swipe-dot w-2 h-2 rounded-full transition-all ${
+                index === currentIndex ? 'active scale-125' : 'bg-slate-300'
+              }`}
+              style={index === currentIndex ? { backgroundColor: currentSport.color } : undefined}
             />
           ))}
         </div>
 
-        <p className="swipe-hint">Swipe for more sports</p>
+        <p className="swipe-hint text-center text-[10px] text-slate-400 font-bold uppercase tracking-widest pb-4">
+          Swipe for more sports
+        </p>
       </div>
     </div>
   );
