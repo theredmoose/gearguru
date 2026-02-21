@@ -57,7 +57,7 @@
 - [x] nordic-combi in skillLevels but not in SPORTS array — `SportSizing.tsx` now omits nordic-combi when persisting skill levels
 - [x] US shoe size conversion inconsistency — `sizing.ts` now uses `getShoeSizesFromFootLength()` from shoeSize service
 - [ ] Potential undefined skillLevel access — `skillLevels[currentSport.id]` in SportSizing has no fallback
-- [ ] No loading state for gear operations — gear delete/submit in App.tsx show no loading indicators
+- [x] No loading state for gear operations — gear delete/submit in App.tsx show no loading indicators; mutations now catch errors and surface a dismissible toast
 - [x] Race condition in useAuth — `setLoading(false)` and `setError()` now guarded by mounted ref
 - [ ] No email verification on signup — email accounts created without verifying address
 

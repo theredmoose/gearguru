@@ -1,4 +1,16 @@
 import { useState } from 'react';
+
+function getOperationErrorMessage(err: unknown): string {
+  const code = (err as { code?: string })?.code ?? '';
+  if (code === 'unavailable' || code === 'network-request-failed') {
+    return 'Unable to save — check your connection and try again.';
+  }
+  if (code === 'permission-denied') {
+    return 'Permission denied. Please sign out and sign back in.';
+  }
+  if (err instanceof Error && err.message) return err.message;
+  return 'Something went wrong. Please try again.';
+}
 import { Settings } from 'lucide-react';
 import {
   MemberForm,
@@ -51,6 +63,7 @@ function App() {
 
   const [view, setView] = useState<View>('home');
   const [activeTab, setActiveTab] = useState<TopLevelTab>('family');
+  const [operationError, setOperationError] = useState<string | null>(null);
   const [selectedMember, setSelectedMember] = useState<FamilyMember | null>(null);
   const [selectedGearItem, setSelectedGearItem] = useState<GearItem | null>(null);
   const [gearOwnerId, setGearOwnerId] = useState<string | null>(null);
@@ -70,25 +83,37 @@ function App() {
     data: Omit<FamilyMember, 'id' | 'userId' | 'createdAt' | 'updatedAt'>
   ) => {
     if (!user) return;
-    await addMember({ ...data, userId: user.uid });
-    setView('home');
+    try {
+      await addMember({ ...data, userId: user.uid });
+      setView('home');
+    } catch (err) {
+      setOperationError(getOperationErrorMessage(err));
+    }
   };
 
   const handleUpdateMember = async (
     data: Omit<FamilyMember, 'id' | 'userId' | 'createdAt' | 'updatedAt'>
   ) => {
     if (selectedMember) {
-      await updateMember(selectedMember.id, data);
-      setSelectedMember({ ...selectedMember, ...data });
-      setView('detail');
+      try {
+        await updateMember(selectedMember.id, data);
+        setSelectedMember({ ...selectedMember, ...data });
+        setView('detail');
+      } catch (err) {
+        setOperationError(getOperationErrorMessage(err));
+      }
     }
   };
 
   const handleDeleteMember = async (member: FamilyMember) => {
-    await deleteMember(member.id);
-    if (selectedMember?.id === member.id) {
-      setSelectedMember(null);
-      setView('home');
+    try {
+      await deleteMember(member.id);
+      if (selectedMember?.id === member.id) {
+        setSelectedMember(null);
+        setView('home');
+      }
+    } catch (err) {
+      setOperationError(getOperationErrorMessage(err));
     }
   };
 
@@ -134,15 +159,19 @@ function App() {
     data: Omit<GearItem, 'id' | 'userId' | 'createdAt' | 'updatedAt'>
   ) => {
     if (!user) return;
-    if (selectedGearItem) {
-      await updateGearItem(selectedGearItem.id, data);
-    } else {
-      await addGearItem({ ...data, userId: user.uid });
-    }
-    if (gearDefaultSport && selectedMember) {
-      setView('sizing');
-    } else {
-      setView('home');
+    try {
+      if (selectedGearItem) {
+        await updateGearItem(selectedGearItem.id, data);
+      } else {
+        await addGearItem({ ...data, userId: user.uid });
+      }
+      if (gearDefaultSport && selectedMember) {
+        setView('sizing');
+      } else {
+        setView('home');
+      }
+    } catch (err) {
+      setOperationError(getOperationErrorMessage(err));
     }
   };
 
@@ -178,100 +207,6 @@ function App() {
         loading={authLoading}
         onClearError={clearAuthError}
       />
-    );
-  }
-
-  // ── Full-screen overlay views (no bottom nav) ────────────────────
-  if (view === 'settings') {
-    return (
-      <div className="app">
-        <SettingsScreen
-          settings={settings}
-          user={user}
-          onUpdateSettings={updateSettings}
-          onResetSettings={resetSettings}
-          onSignOut={signOut}
-          onSendPasswordReset={sendPasswordReset}
-          onBack={() => setView('home')}
-        />
-      </div>
-    );
-  }
-
-  if (view === 'add' || view === 'edit') {
-    return (
-      <div className="app">
-        <MemberForm
-          member={view === 'edit' ? selectedMember ?? undefined : undefined}
-          onSubmit={view === 'edit' ? handleUpdateMember : handleAddMember}
-          onCancel={() => setView(selectedMember ? 'detail' : 'home')}
-        />
-      </div>
-    );
-  }
-
-  if (view === 'detail' && selectedMember) {
-    const memberGear = gearItems.filter((item) => item.ownerId === selectedMember.id);
-    return (
-      <div className="app">
-        <MemberDetail
-          member={selectedMember}
-          gearItems={memberGear}
-          settings={settings}
-          onBack={() => { setSelectedMember(null); setView('home'); }}
-          onEdit={() => setView('edit')}
-          onGetSizing={() => setView('sizing')}
-          onOpenConverter={() => setView('converter')}
-          onAddGear={() => handleAddGearFromSizing('alpine')}
-          onEditGear={handleEditGear}
-        />
-      </div>
-    );
-  }
-
-  if (view === 'sizing' && selectedMember) {
-    const memberGear = gearItems.filter((item) => item.ownerId === selectedMember.id);
-    return (
-      <div className="app">
-        <SportSizing
-          member={selectedMember}
-          gearItems={memberGear}
-          onBack={() => setView('detail')}
-          onSkillLevelChange={(levels) => updateSkillLevels(selectedMember.id, levels)}
-          onAddGear={handleAddGearFromSizing}
-          onEditGear={handleEditGear}
-          onDeleteGear={handleDeleteGear}
-        />
-      </div>
-    );
-  }
-
-  if (view === 'converter' && selectedMember) {
-    const footLength = Math.max(
-      selectedMember.measurements.footLengthLeft,
-      selectedMember.measurements.footLengthRight
-    );
-    return (
-      <div className="app">
-        <ShoeSizeConverter
-          footLengthCm={footLength}
-          onClose={() => setView('detail')}
-        />
-      </div>
-    );
-  }
-
-  if ((view === 'add-gear' || view === 'edit-gear') && gearOwnerId) {
-    return (
-      <div className="app">
-        <GearForm
-          item={view === 'edit-gear' ? selectedGearItem ?? undefined : undefined}
-          ownerId={gearOwnerId}
-          defaultSport={gearDefaultSport}
-          onSubmit={handleGearSubmit}
-          onCancel={handleGearCancel}
-        />
-      </div>
     );
   }
 
@@ -360,12 +295,115 @@ function App() {
     }
   };
 
+  const renderView = () => {
+    if (view === 'settings') {
+      return (
+        <SettingsScreen
+          settings={settings}
+          user={user}
+          onUpdateSettings={updateSettings}
+          onResetSettings={resetSettings}
+          onSignOut={signOut}
+          onSendPasswordReset={sendPasswordReset}
+          onBack={() => setView('home')}
+        />
+      );
+    }
+
+    if (view === 'add' || view === 'edit') {
+      return (
+        <MemberForm
+          member={view === 'edit' ? selectedMember ?? undefined : undefined}
+          onSubmit={view === 'edit' ? handleUpdateMember : handleAddMember}
+          onCancel={() => setView(selectedMember ? 'detail' : 'home')}
+        />
+      );
+    }
+
+    if (view === 'detail' && selectedMember) {
+      const memberGear = gearItems.filter((item) => item.ownerId === selectedMember.id);
+      return (
+        <MemberDetail
+          member={selectedMember}
+          gearItems={memberGear}
+          settings={settings}
+          onBack={() => { setSelectedMember(null); setView('home'); }}
+          onEdit={() => setView('edit')}
+          onGetSizing={() => setView('sizing')}
+          onOpenConverter={() => setView('converter')}
+          onAddGear={() => handleAddGearFromSizing('alpine')}
+          onEditGear={handleEditGear}
+        />
+      );
+    }
+
+    if (view === 'sizing' && selectedMember) {
+      const memberGear = gearItems.filter((item) => item.ownerId === selectedMember.id);
+      return (
+        <SportSizing
+          member={selectedMember}
+          gearItems={memberGear}
+          onBack={() => setView('detail')}
+          onSkillLevelChange={(levels) => updateSkillLevels(selectedMember.id, levels)}
+          onAddGear={handleAddGearFromSizing}
+          onEditGear={handleEditGear}
+          onDeleteGear={handleDeleteGear}
+        />
+      );
+    }
+
+    if (view === 'converter' && selectedMember) {
+      const footLength = Math.max(
+        selectedMember.measurements.footLengthLeft,
+        selectedMember.measurements.footLengthRight
+      );
+      return (
+        <ShoeSizeConverter
+          footLengthCm={footLength}
+          onClose={() => setView('detail')}
+        />
+      );
+    }
+
+    if ((view === 'add-gear' || view === 'edit-gear') && gearOwnerId) {
+      return (
+        <GearForm
+          item={view === 'edit-gear' ? selectedGearItem ?? undefined : undefined}
+          ownerId={gearOwnerId}
+          defaultSport={gearDefaultSport}
+          onSubmit={handleGearSubmit}
+          onCancel={handleGearCancel}
+        />
+      );
+    }
+
+    // Default: main tabbed shell
+    return (
+      <>
+        <div className="flex-1 flex flex-col min-h-0 overflow-hidden">
+          {renderTabContent()}
+        </div>
+        <BottomNav activeTab={activeTab} onChange={handleTabChange} />
+      </>
+    );
+  };
+
   return (
     <div className="app flex flex-col" style={{ minHeight: '100dvh' }}>
-      <div className="flex-1 flex flex-col min-h-0 overflow-hidden">
-        {renderTabContent()}
-      </div>
-      <BottomNav activeTab={activeTab} onChange={handleTabChange} />
+      {renderView()}
+      {operationError && (
+        <div
+          role="alert"
+          className="fixed bottom-20 left-4 right-4 z-50 bg-red-600 text-white px-4 py-3 rounded-xl shadow-lg flex items-center justify-between"
+        >
+          <span className="text-sm font-semibold">{operationError}</span>
+          <button
+            onClick={() => setOperationError(null)}
+            aria-label="Dismiss error"
+            className="ml-3 text-white hover:text-red-200 font-bold text-lg leading-none"
+          >✕</button>
+        </div>
+      )}
     </div>
   );
 }

@@ -64,12 +64,17 @@ export function useFamilyMembers(userId: string | null): UseFamilyMembersReturn 
 
   const addMember = useCallback(
     async (data: Omit<FamilyMember, 'id' | 'createdAt' | 'updatedAt'>) => {
-      const member = await firebaseService.createFamilyMember(data);
-      setState((prev) => ({
-        ...prev,
-        data: prev.data ? [...prev.data, member] : [member],
-      }));
-      return member;
+      try {
+        const member = await firebaseService.createFamilyMember(data);
+        setState((prev) => ({
+          ...prev,
+          data: prev.data ? [...prev.data, member] : [member],
+        }));
+        return member;
+      } catch (err) {
+        console.error('[GearGuru] addMember failed', err);
+        throw err;
+      }
     },
     []
   );
@@ -79,49 +84,69 @@ export function useFamilyMembers(userId: string | null): UseFamilyMembersReturn 
       id: string,
       data: Partial<Omit<FamilyMember, 'id' | 'createdAt' | 'updatedAt'>>
     ) => {
-      await firebaseService.updateFamilyMember(id, data);
-      setState((prev) => ({
-        ...prev,
-        data: prev.data
-          ? prev.data.map((m) => (m.id === id ? { ...m, ...data } : m))
-          : null,
-      }));
+      try {
+        await firebaseService.updateFamilyMember(id, data);
+        setState((prev) => ({
+          ...prev,
+          data: prev.data
+            ? prev.data.map((m) => (m.id === id ? { ...m, ...data } : m))
+            : null,
+        }));
+      } catch (err) {
+        console.error('[GearGuru] updateMember failed', err);
+        throw err;
+      }
     },
     []
   );
 
   const updateMeasurements = useCallback(
     async (id: string, measurements: Measurements) => {
-      await firebaseService.updateMeasurements(id, measurements);
-      setState((prev) => ({
-        ...prev,
-        data: prev.data
-          ? prev.data.map((m) => (m.id === id ? { ...m, measurements } : m))
-          : null,
-      }));
+      try {
+        await firebaseService.updateMeasurements(id, measurements);
+        setState((prev) => ({
+          ...prev,
+          data: prev.data
+            ? prev.data.map((m) => (m.id === id ? { ...m, measurements } : m))
+            : null,
+        }));
+      } catch (err) {
+        console.error('[GearGuru] updateMeasurements failed', err);
+        throw err;
+      }
     },
     []
   );
 
   const updateSkillLevels = useCallback(
     async (id: string, skillLevels: Partial<Record<Sport, SkillLevel>>) => {
-      await firebaseService.updateSkillLevels(id, skillLevels);
-      setState((prev) => ({
-        ...prev,
-        data: prev.data
-          ? prev.data.map((m) => (m.id === id ? { ...m, skillLevels } : m))
-          : null,
-      }));
+      try {
+        await firebaseService.updateSkillLevels(id, skillLevels);
+        setState((prev) => ({
+          ...prev,
+          data: prev.data
+            ? prev.data.map((m) => (m.id === id ? { ...m, skillLevels } : m))
+            : null,
+        }));
+      } catch (err) {
+        console.error('[GearGuru] updateSkillLevels failed', err);
+        throw err;
+      }
     },
     []
   );
 
   const deleteMember = useCallback(async (id: string) => {
-    await firebaseService.deleteFamilyMember(id);
-    setState((prev) => ({
-      ...prev,
-      data: prev.data ? prev.data.filter((m) => m.id !== id) : null,
-    }));
+    try {
+      await firebaseService.deleteFamilyMember(id);
+      setState((prev) => ({
+        ...prev,
+        data: prev.data ? prev.data.filter((m) => m.id !== id) : null,
+      }));
+    } catch (err) {
+      console.error('[GearGuru] deleteMember failed', err);
+      throw err;
+    }
   }, []);
 
   return {
@@ -238,12 +263,17 @@ export function useGearItems(userId: string | null, ownerId?: string): UseGearIt
 
   const addItem = useCallback(
     async (data: Omit<GearItem, 'id' | 'createdAt' | 'updatedAt'>) => {
-      const item = await firebaseService.createGearItem(data);
-      setState((prev) => ({
-        ...prev,
-        data: prev.data ? [item, ...prev.data] : [item],
-      }));
-      return item;
+      try {
+        const item = await firebaseService.createGearItem(data);
+        setState((prev) => ({
+          ...prev,
+          data: prev.data ? [item, ...prev.data] : [item],
+        }));
+        return item;
+      } catch (err) {
+        console.error('[GearGuru] addItem failed', err);
+        throw err;
+      }
     },
     []
   );
@@ -253,23 +283,33 @@ export function useGearItems(userId: string | null, ownerId?: string): UseGearIt
       id: string,
       data: Partial<Omit<GearItem, 'id' | 'createdAt' | 'updatedAt'>>
     ) => {
-      await firebaseService.updateGearItem(id, data);
-      setState((prev) => ({
-        ...prev,
-        data: prev.data
-          ? prev.data.map((i) => (i.id === id ? { ...i, ...data } : i))
-          : null,
-      }));
+      try {
+        await firebaseService.updateGearItem(id, data);
+        setState((prev) => ({
+          ...prev,
+          data: prev.data
+            ? prev.data.map((i) => (i.id === id ? { ...i, ...data } : i))
+            : null,
+        }));
+      } catch (err) {
+        console.error('[GearGuru] updateItem failed', err);
+        throw err;
+      }
     },
     []
   );
 
   const deleteItem = useCallback(async (id: string) => {
-    await firebaseService.deleteGearItem(id);
-    setState((prev) => ({
-      ...prev,
-      data: prev.data ? prev.data.filter((i) => i.id !== id) : null,
-    }));
+    try {
+      await firebaseService.deleteGearItem(id);
+      setState((prev) => ({
+        ...prev,
+        data: prev.data ? prev.data.filter((i) => i.id !== id) : null,
+      }));
+    } catch (err) {
+      console.error('[GearGuru] deleteItem failed', err);
+      throw err;
+    }
   }, []);
 
   return {
