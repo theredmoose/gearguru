@@ -1,0 +1,254 @@
+import { useState } from 'react';
+import type { User } from 'firebase/auth';
+import type { AppSettings, Sport } from '../types';
+import { ScreenHeader } from './ScreenHeader';
+
+interface SettingsScreenProps {
+  settings: AppSettings;
+  user: User;
+  onUpdateSettings: (patch: Partial<AppSettings>) => void;
+  onResetSettings: () => void;
+  onSignOut: () => void;
+  onSendPasswordReset: (email: string) => Promise<void>;
+  onBack: () => void;
+}
+
+const SPORT_LABELS: Record<Sport, string> = {
+  alpine:           'Alpine / Downhill',
+  'nordic-classic': 'XC Classic',
+  'nordic-skate':   'XC Skate',
+  'nordic-combi':   'XC Combi',
+  snowboard:        'Snowboard',
+  hockey:           'Hockey',
+};
+
+const DEFAULT_SPORTS: Sport[] = ['alpine', 'nordic-classic', 'nordic-skate', 'snowboard', 'hockey'];
+
+const sectionTitleCls = 'text-[10px] font-black text-slate-500 uppercase tracking-widest mb-2';
+const rowCls = 'flex items-center justify-between py-3 border-b border-slate-100 last:border-0';
+const labelCls = 'text-sm font-semibold text-slate-700';
+const subLabelCls = 'text-[11px] text-slate-400 mt-0.5';
+const toggleBtnCls = 'px-3 py-1.5 rounded-lg text-xs font-bold bg-blue-50 text-blue-700 border border-blue-200 hover:bg-blue-100 transition-colors';
+
+export function SettingsScreen({
+  settings,
+  user,
+  onUpdateSettings,
+  onResetSettings,
+  onSignOut,
+  onSendPasswordReset,
+  onBack,
+}: SettingsScreenProps) {
+  const [resetSent, setResetSent] = useState(false);
+  const [resetError, setResetError] = useState<string | null>(null);
+
+  const isEmailProvider = user.providerData?.some(p => p.providerId === 'password');
+
+  async function handlePasswordReset() {
+    if (!user.email) return;
+    setResetError(null);
+    try {
+      await onSendPasswordReset(user.email);
+      setResetSent(true);
+    } catch (err) {
+      setResetError(err instanceof Error ? err.message : 'Failed to send reset email.');
+    }
+  }
+
+  return (
+    <div className="flex flex-col min-h-0 flex-1">
+      <ScreenHeader title="Settings" onBack={onBack} />
+
+      <div className="flex-1 overflow-y-auto bg-white px-6 py-6 flex flex-col gap-8">
+
+        {/* ── Units ─────────────────────────────────── */}
+        <section>
+          <p className={sectionTitleCls}>Units</p>
+          <div className="bg-slate-50 rounded-2xl px-4">
+
+            <div className={rowCls}>
+              <div>
+                <p className={labelCls}>Height</p>
+                <p className={subLabelCls}>Used in member profile</p>
+              </div>
+              <button
+                className={toggleBtnCls}
+                onClick={() =>
+                  onUpdateSettings({ heightUnit: settings.heightUnit === 'cm' ? 'ft-in' : 'cm' })
+                }
+                aria-label="Toggle height unit"
+              >
+                {settings.heightUnit === 'cm' ? 'cm' : 'ft / in'}
+              </button>
+            </div>
+
+            <div className={rowCls}>
+              <div>
+                <p className={labelCls}>Weight</p>
+                <p className={subLabelCls}>Used in member profile</p>
+              </div>
+              <button
+                className={toggleBtnCls}
+                onClick={() =>
+                  onUpdateSettings({ weightUnit: settings.weightUnit === 'kg' ? 'lbs' : 'kg' })
+                }
+                aria-label="Toggle weight unit"
+              >
+                {settings.weightUnit === 'kg' ? 'kg' : 'lbs'}
+              </button>
+            </div>
+
+            <div className={rowCls}>
+              <div>
+                <p className={labelCls}>Ski / Board Length</p>
+                <p className={subLabelCls}>Used in sizing cards</p>
+              </div>
+              <button
+                className={toggleBtnCls}
+                onClick={() =>
+                  onUpdateSettings({ skiLengthUnit: settings.skiLengthUnit === 'cm' ? 'in' : 'cm' })
+                }
+                aria-label="Toggle ski length unit"
+              >
+                {settings.skiLengthUnit === 'cm' ? 'cm' : 'inches'}
+              </button>
+            </div>
+
+          </div>
+        </section>
+
+        {/* ── Default Sport ─────────────────────────── */}
+        <section>
+          <p className={sectionTitleCls}>Default Sport</p>
+          <p className="text-[11px] text-slate-400 mb-2">
+            The sport shown first when viewing member sizing details.
+          </p>
+          <div className="bg-slate-50 rounded-2xl px-4">
+            {DEFAULT_SPORTS.map(sport => (
+              <div key={sport} className={rowCls}>
+                <p className={labelCls}>{SPORT_LABELS[sport]}</p>
+                <button
+                  className={`px-3 py-1.5 rounded-lg text-xs font-bold border transition-colors ${
+                    settings.defaultSport === sport
+                      ? 'bg-blue-700 text-white border-blue-700'
+                      : 'bg-slate-100 text-slate-500 border-slate-200 hover:bg-slate-200'
+                  }`}
+                  onClick={() => onUpdateSettings({ defaultSport: sport })}
+                  aria-label={`Set ${SPORT_LABELS[sport]} as default`}
+                  aria-pressed={settings.defaultSport === sport}
+                >
+                  {settings.defaultSport === sport ? 'Default' : 'Set'}
+                </button>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* ── Display ───────────────────────────────── */}
+        <section>
+          <p className={sectionTitleCls}>Display</p>
+          <p className="text-[11px] text-slate-400 mb-2">
+            Choose which measurements appear in member profiles.
+          </p>
+          <div className="bg-slate-50 rounded-2xl px-4">
+
+            <div className={rowCls}>
+              <div>
+                <p className={labelCls}>Foot Length</p>
+                <p className={subLabelCls}>Shown in profile stats</p>
+              </div>
+              <label className="relative inline-flex items-center cursor-pointer" aria-label="Toggle foot display">
+                <input
+                  type="checkbox"
+                  className="sr-only peer"
+                  checked={settings.display.showFoot}
+                  onChange={e => onUpdateSettings({ display: { ...settings.display, showFoot: e.target.checked } })}
+                  aria-label="Show foot length"
+                />
+                <div className="w-10 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600" />
+              </label>
+            </div>
+
+            <div className={rowCls}>
+              <div>
+                <p className={labelCls}>Hand Size</p>
+                <p className={subLabelCls}>Shown in profile stats</p>
+              </div>
+              <label className="relative inline-flex items-center cursor-pointer" aria-label="Toggle hand display">
+                <input
+                  type="checkbox"
+                  className="sr-only peer"
+                  checked={settings.display.showHand}
+                  onChange={e => onUpdateSettings({ display: { ...settings.display, showHand: e.target.checked } })}
+                  aria-label="Show hand size"
+                />
+                <div className="w-10 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600" />
+              </label>
+            </div>
+
+          </div>
+        </section>
+
+        {/* ── Account ───────────────────────────────── */}
+        <section>
+          <p className={sectionTitleCls}>Account</p>
+          <div className="bg-slate-50 rounded-2xl px-4">
+
+            <div className={rowCls}>
+              <div>
+                <p className={labelCls}>Email</p>
+                <p className={subLabelCls}>{user.email ?? '—'}</p>
+              </div>
+            </div>
+
+            {isEmailProvider && (
+              <div className={rowCls}>
+                <div>
+                  <p className={labelCls}>Password</p>
+                  <p className={subLabelCls}>
+                    {resetSent ? 'Reset email sent — check your inbox.' : 'Send a password reset email'}
+                  </p>
+                  {resetError && (
+                    <p className="text-xs text-red-500 mt-1">{resetError}</p>
+                  )}
+                </div>
+                <button
+                  className={`${toggleBtnCls} ${resetSent ? 'opacity-50 cursor-not-allowed' : ''}`}
+                  onClick={handlePasswordReset}
+                  disabled={resetSent}
+                  aria-label="Send password reset email"
+                >
+                  {resetSent ? 'Sent' : 'Reset'}
+                </button>
+              </div>
+            )}
+
+            <div className={rowCls}>
+              <p className={labelCls}>Sign Out</p>
+              <button
+                className="px-3 py-1.5 rounded-lg text-xs font-bold text-red-600 border border-red-200 bg-red-50 hover:bg-red-100 transition-colors"
+                onClick={onSignOut}
+                aria-label="Sign out"
+              >
+                Sign Out
+              </button>
+            </div>
+
+          </div>
+        </section>
+
+        {/* ── Reset ────────────────────────────────── */}
+        <section>
+          <button
+            className="w-full py-3 rounded-xl text-sm font-bold text-slate-400 border border-slate-200 hover:bg-slate-50 transition-colors"
+            onClick={onResetSettings}
+            aria-label="Reset all settings to defaults"
+          >
+            Reset to Defaults
+          </button>
+        </section>
+
+      </div>
+    </div>
+  );
+}

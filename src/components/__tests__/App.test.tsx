@@ -36,6 +36,17 @@ vi.mock('../../hooks', () => ({
     sendPasswordReset: vi.fn(),
     clearError: vi.fn(),
   })),
+  useSettings: vi.fn(() => ({
+    settings: {
+      heightUnit: 'cm',
+      weightUnit: 'kg',
+      skiLengthUnit: 'cm',
+      defaultSport: 'alpine',
+      display: { showFoot: true, showHand: true },
+    },
+    updateSettings: vi.fn(),
+    resetSettings: vi.fn(),
+  })),
 }));
 
 describe('App Integration', () => {
@@ -320,9 +331,10 @@ describe('App member operations', () => {
     });
   });
 
-  it('calls signOut when Sign Out button clicked', () => {
+  it('calls signOut via settings screen', () => {
     render(<App />);
-    fireEvent.click(screen.getByText('Sign Out'));
+    fireEvent.click(screen.getByRole('button', { name: /open settings/i }));
+    fireEvent.click(screen.getByRole('button', { name: /sign out/i }));
     expect(mockSignOut).toHaveBeenCalled();
   });
 
