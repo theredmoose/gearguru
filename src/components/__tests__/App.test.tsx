@@ -131,8 +131,8 @@ describe('App Integration', () => {
     it('navigates to member detail on card click', () => {
       render(<App />);
       fireEvent.click(screen.getByText('John Doe'));
-      expect(screen.getByText('Body Measurements')).toBeInTheDocument();
-      expect(screen.getByText('Get Equipment Sizing')).toBeInTheDocument();
+      expect(screen.getByText('Member Details')).toBeInTheDocument();
+      expect(screen.getByText('Sizing')).toBeInTheDocument();
     });
   });
 });
