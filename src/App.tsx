@@ -191,14 +191,18 @@ function App() {
   }
 
   if (view === 'detail' && selectedMember) {
+    const memberGear = gearItems.filter((item) => item.ownerId === selectedMember.id);
     return (
       <div className="app">
         <MemberDetail
           member={selectedMember}
+          gearItems={memberGear}
           onBack={() => { setSelectedMember(null); setView('home'); }}
           onEdit={() => setView('edit')}
           onGetSizing={() => setView('sizing')}
           onOpenConverter={() => setView('converter')}
+          onAddGear={() => handleAddGearFromSizing('alpine')}
+          onEditGear={handleEditGear}
         />
       </div>
     );

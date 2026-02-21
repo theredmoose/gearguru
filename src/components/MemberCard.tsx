@@ -1,3 +1,4 @@
+import { Pencil, Trash2, ChevronRight } from 'lucide-react';
 import type { FamilyMember } from '../types';
 
 interface MemberCardProps {
@@ -7,12 +8,16 @@ interface MemberCardProps {
   onDelete: (member: FamilyMember) => void;
 }
 
-export function MemberCard({
-  member,
-  onSelect,
-  onEdit,
-  onDelete,
-}: MemberCardProps) {
+function calculateAge(dateOfBirth: string): number {
+  const today = new Date();
+  const birth = new Date(dateOfBirth);
+  let age = today.getFullYear() - birth.getFullYear();
+  const m = today.getMonth() - birth.getMonth();
+  if (m < 0 || (m === 0 && today.getDate() < birth.getDate())) age--;
+  return age;
+}
+
+export function MemberCard({ member, onSelect, onEdit, onDelete }: MemberCardProps) {
   const age = calculateAge(member.dateOfBirth);
   const { measurements } = member;
 
@@ -29,43 +34,45 @@ export function MemberCard({
   };
 
   return (
-    <div className="member-card" onClick={() => onSelect(member)}>
-      <div className="member-card-main">
-        <div className="member-avatar">{member.name.charAt(0).toUpperCase()}</div>
-        <div className="member-info">
-          <span className="member-name">{member.name}</span>
-          <span className="member-details">
-            {age} yrs • {measurements.height} cm • {measurements.weight} kg
+    <div
+      className="bg-white border border-slate-200 rounded-2xl p-4 flex items-center justify-between shadow-sm hover:shadow-md active:scale-[0.98] transition-all cursor-pointer mb-3"
+      onClick={() => onSelect(member)}
+    >
+      <div className="flex items-center gap-3">
+        {/* Avatar */}
+        <div className="w-11 h-11 rounded-full bg-blue-700 flex items-center justify-center flex-shrink-0">
+          <span className="text-lg font-black text-white">
+            {member.name.charAt(0).toUpperCase()}
           </span>
         </div>
+
+        {/* Info */}
+        <div>
+          <p className="text-sm font-black text-slate-900 leading-tight">{member.name}</p>
+          <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wide mt-0.5">
+            {age} yrs · {measurements.height} cm · {measurements.weight} kg
+          </p>
+        </div>
       </div>
-      <div className="member-card-actions">
+
+      {/* Actions */}
+      <div className="flex items-center gap-1">
         <button
-          className="btn-icon"
+          className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-slate-100 transition-colors text-slate-400 hover:text-blue-600"
           onClick={handleEdit}
           aria-label="Edit member"
         >
-          ✏️
+          <Pencil className="w-4 h-4" />
         </button>
         <button
-          className="btn-icon btn-icon-danger"
+          className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-red-50 transition-colors text-slate-400 hover:text-red-500"
           onClick={handleDelete}
           aria-label="Delete member"
         >
-          🗑️
+          <Trash2 className="w-4 h-4" />
         </button>
+        <ChevronRight className="w-4 h-4 text-slate-300 ml-1" />
       </div>
     </div>
   );
-}
-
-function calculateAge(dateOfBirth: string): number {
-  const today = new Date();
-  const birth = new Date(dateOfBirth);
-  let age = today.getFullYear() - birth.getFullYear();
-  const monthDiff = today.getMonth() - birth.getMonth();
-  if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birth.getDate())) {
-    age--;
-  }
-  return age;
 }
