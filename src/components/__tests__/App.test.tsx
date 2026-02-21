@@ -47,7 +47,7 @@ describe('App Integration', () => {
     it('renders the app header', () => {
       render(<App />);
       expect(screen.getByText('Gear Guru')).toBeInTheDocument();
-      expect(screen.getByText('Sports Equipment Sizing Calculator')).toBeInTheDocument();
+      expect(screen.getByText(/sports equipment sizing/i)).toBeInTheDocument();
     });
 
     it('shows empty state when no members', () => {
@@ -122,9 +122,10 @@ describe('App Integration', () => {
       expect(screen.getByText('John Doe')).toBeInTheDocument();
     });
 
-    it('shows quick tip section when members exist', () => {
+    it('shows bottom navigation when members exist', () => {
       render(<App />);
-      expect(screen.getByText('Quick Tip')).toBeInTheDocument();
+      expect(screen.getByText('FAMILY')).toBeInTheDocument();
+      expect(screen.getByText('GEAR')).toBeInTheDocument();
     });
 
     it('navigates to member detail on card click', () => {
