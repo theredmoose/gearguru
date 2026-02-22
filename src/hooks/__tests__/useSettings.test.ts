@@ -13,6 +13,7 @@ const DEFAULT: AppSettings = {
   display: { showFoot: true, showHand: true },
   sizingModel: 'generic',
   sizingDisplay: 'range',
+  bootUnit: 'mp',
 };
 
 // localStorage mock
