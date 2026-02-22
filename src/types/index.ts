@@ -300,6 +300,7 @@ export type HeightUnit = 'cm' | 'ft-in';
 export type WeightUnit = 'kg' | 'lbs';
 export type SkiLengthUnit = 'cm' | 'in';
 export type SizingDisplay = 'range' | 'single';
+export type BootUnit = 'mp' | 'eu' | 'us-men' | 'us-women';
 
 export interface DisplaySettings {
   showFoot: boolean;
@@ -314,6 +315,7 @@ export interface AppSettings {
   display: DisplaySettings;
   sizingModel: SizingModel;
   sizingDisplay: SizingDisplay;
+  bootUnit: BootUnit; // preferred unit shown in boot sizing cards
   defaultDIN?: number; // pre-fills the DIN setting field when adding alpine skis
 }
 
@@ -328,4 +330,5 @@ export const DEFAULT_SETTINGS: AppSettings = {
   },
   sizingModel: 'generic',
   sizingDisplay: 'range',
+  bootUnit: 'mp',
 };

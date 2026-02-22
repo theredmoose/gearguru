@@ -327,6 +327,7 @@ function App() {
           member={selectedMember}
           gearItems={memberGear}
           settings={settings}
+          onUpdateSettings={updateSettings}
           onBack={() => { setSelectedMember(null); setView('home'); }}
           onEdit={() => setView('edit')}
           onGetSizing={() => setView('sizing')}

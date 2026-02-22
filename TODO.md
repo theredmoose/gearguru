@@ -63,7 +63,7 @@
 - [x] `getGearItemsByOwner()` not filtered by userId — fixed: compound query now filters by both `userId` and `ownerId` (PR #45)
 
 ### High
-- [ ] Boot unit preference (MP/EU/US) resets on every visit — `bootUnit` state in MemberDetail is local and not persisted in AppSettings
+- [x] Boot unit preference (MP/EU/US) resets on every visit — fixed: `bootUnit` added to `AppSettings`, persisted via `onUpdateSettings` when cycled in MemberDetail
 - [x] Hockey skate fallback size formula wrong — fixed: `MemberInfoTable.tsx` now uses `calculateHockeySkateSize()` which delegates to `getShoeSizesFromFootLength()`
 
 ### Medium

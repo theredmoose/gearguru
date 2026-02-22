@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Settings, PlusCircle, ChevronDown, CheckCircle2, AlertCircle, ArrowLeftRight } from 'lucide-react';
-import type { FamilyMember, GearItem, Sport, SkillLevel, AppSettings } from '../types';
+import type { FamilyMember, GearItem, Sport, SkillLevel, AppSettings, BootUnit } from '../types';
 import { ScreenHeader } from './ScreenHeader';
 import { GearTypeIcon } from './GearIcons';
 import { getShoeSizesFromFootLength } from '../services/shoeSize';
@@ -19,6 +19,7 @@ interface MemberDetailProps {
   member: FamilyMember;
   gearItems: GearItem[];
   settings?: AppSettings;
+  onUpdateSettings?: (patch: Partial<AppSettings>) => void;
   onBack: () => void;
   onEdit: () => void;
   onGetSizing: () => void;
@@ -47,7 +48,6 @@ const GEAR_TYPE_LABELS: Record<string, string> = {
   snowboard: 'Snowboard', skate: 'Skates', helmet: 'Helmet', other: 'Other',
 };
 
-type BootUnit = 'mp' | 'eu' | 'us-men' | 'us-women';
 type LengthUnit = 'cm' | 'in';
 const BOOT_UNIT_CYCLE: BootUnit[] = ['mp', 'eu', 'us-men', 'us-women'];
 
@@ -154,6 +154,7 @@ export function MemberDetail({
   member,
   gearItems,
   settings,
+  onUpdateSettings,
   onBack,
   onEdit,
   onGetSizing,
@@ -175,7 +176,7 @@ export function MemberDetail({
   );
 
   const [lengthUnit, setLengthUnit] = useState<LengthUnit>(settings?.skiLengthUnit ?? 'cm');
-  const [bootUnit, setBootUnit] = useState<BootUnit>('mp');
+  const [bootUnit, setBootUnit] = useState<BootUnit>(settings?.bootUnit ?? 'mp');
   const [heightUnit, setHeightUnit] = useState<'cm' | 'ft'>(
     settings?.heightUnit === 'ft-in' ? 'ft' : 'cm'
   );
@@ -184,7 +185,9 @@ export function MemberDetail({
   function cycleBootUnit() {
     setBootUnit(u => {
       const idx = BOOT_UNIT_CYCLE.indexOf(u);
-      return BOOT_UNIT_CYCLE[(idx + 1) % BOOT_UNIT_CYCLE.length];
+      const next = BOOT_UNIT_CYCLE[(idx + 1) % BOOT_UNIT_CYCLE.length];
+      onUpdateSettings?.({ bootUnit: next });
+      return next;
     });
   }
 
