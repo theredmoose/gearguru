@@ -73,9 +73,9 @@
 - [x] Missing Firebase env var validation — `src/config/firebase.ts` now throws with clear error listing missing vars
 - [ ] No account linking flow — users get stuck signing in with Google after creating email account with same address
 - [ ] No offline error handling — Firebase operations show raw errors when offline
-- [ ] Year field in GearForm accepts invalid values (0, negative, far future) — needs validation to 1980–current year + 1
-- [ ] GearForm numeric fields (tip/waist/tail profile) use parseFloat/parseInt without isNaN guard — NaN silently stored on submit
-- [ ] Foot measurement bounds not validated — MemberForm accepts values outside reasonable range (12–30 cm)
+- [x] Year field in GearForm accepts invalid values — added submit-time validation (1980–currentYear+1); HTML min/max updated to match
+- [x] GearForm numeric fields (tip/waist/tail profile) use parseFloat/parseInt without isNaN guard — fixed: profile only built when all three fields parse to valid integers
+- [x] Foot measurement bounds not validated — MemberForm now validates 12–30 cm range with error message; HTML min/max updated
 
 ### Low
 - [x] `parseFloat(value) || undefined` treats 0 as undefined — optional numeric fields now use `e.target.value === '' ? undefined : parseFloat()`
