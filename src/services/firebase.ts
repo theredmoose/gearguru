@@ -212,11 +212,12 @@ export async function getAllGearItems(userId: string): Promise<GearItem[]> {
     .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
 }
 
-export async function getGearItemsByOwner(ownerId: string): Promise<GearItem[]> {
+export async function getGearItemsByOwner(userId: string, ownerId: string): Promise<GearItem[]> {
   const { collection, query, where, getDocs } = await import('firebase/firestore');
   const db = await getDb();
   const q = query(
     collection(db, COLLECTIONS.GEAR_ITEMS),
+    where('userId', '==', userId),
     where('ownerId', '==', ownerId)
   );
   const snapshot = await getDocs(q);
