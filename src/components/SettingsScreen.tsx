@@ -216,6 +216,27 @@ export function SettingsScreen({
             </div>
 
             <div className={rowCls}>
+              <div className="flex-1 mr-4">
+                <p className={labelCls}>Default DIN Setting</p>
+                <p className={subLabelCls}>Pre-fills the DIN setting when you add an alpine ski. Leave blank to not pre-fill.</p>
+              </div>
+              <input
+                type="number"
+                className="w-20 border border-slate-200 rounded-xl px-3 py-1.5 text-sm text-slate-800 bg-white focus:outline-none focus:ring-2 focus:ring-blue-400 text-center"
+                value={settings.defaultDIN ?? ''}
+                onChange={(e) => {
+                  const val = e.target.value;
+                  onUpdateSettings({ defaultDIN: val === '' ? undefined : parseFloat(val) });
+                }}
+                placeholder="e.g. 5.5"
+                step="0.5"
+                min="1"
+                max="14"
+                aria-label="Default DIN setting"
+              />
+            </div>
+
+            <div className={rowCls}>
               <div>
                 <p className={labelCls}>Default Nordic Model</p>
                 <p className={subLabelCls}>Sizing chart used for Nordic ski calculations</p>

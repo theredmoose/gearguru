@@ -161,7 +161,8 @@ export interface AlpineSkiDetails {
   bindings?: {
     brand: string;
     model: string;
-    dinRange?: string; // e.g., "3-10"
+    dinRange?: string;   // binding capacity, e.g. "4-13"
+    dinSetting?: number; // actual release setting, e.g. 5.5
   };
   rocker?: string; // e.g., "tip rocker", "full rocker", "camber"
 }
@@ -313,6 +314,7 @@ export interface AppSettings {
   display: DisplaySettings;
   sizingModel: SizingModel;
   sizingDisplay: SizingDisplay;
+  defaultDIN?: number; // pre-fills the DIN setting field when adding alpine skis
 }
 
 export const DEFAULT_SETTINGS: AppSettings = {

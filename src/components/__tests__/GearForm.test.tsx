@@ -393,7 +393,7 @@ describe('GearForm', () => {
       fireEvent.change(screen.getByLabelText('Turn Radius (R value in meters)'), { target: { value: '16.5' } });
       fireEvent.change(screen.getByLabelText('Binding Brand'), { target: { value: 'Marker' } });
       fireEvent.change(screen.getByLabelText('Binding Model'), { target: { value: 'Griffon' } });
-      fireEvent.change(screen.getByLabelText('DIN Range'), { target: { value: '4-13' } });
+      fireEvent.change(screen.getByLabelText('DIN Range (binding capacity)'), { target: { value: '4-13' } });
       fireEvent.click(screen.getByRole('button', { name: 'Add Gear' }));
       await waitFor(() =>
         expect(mockOnSubmit).toHaveBeenCalledWith(

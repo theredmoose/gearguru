@@ -373,6 +373,7 @@ function App() {
           item={view === 'edit-gear' ? selectedGearItem ?? undefined : undefined}
           ownerId={gearOwnerId}
           defaultSport={gearDefaultSport}
+          defaultDIN={settings.defaultDIN}
           onSubmit={handleGearSubmit}
           onCancel={handleGearCancel}
         />
