@@ -60,11 +60,11 @@
 - [x] photos/extendedDetails fields lost on Firestore read — was already fixed in `docToGearItem()`
 - [x] No user-scoped Firebase queries — was already fixed in `getAllFamilyMembers()` and `getAllGearItems()`
 - [x] status/location/checkedOutTo/checkedOutDate lost on Firestore read — fixed in `docToGearItem()` (PR #39)
-- [ ] `getGearItemsByOwner()` not filtered by userId — queries by ownerId only, not `userId + ownerId`; a user could fetch another user's gear if they know the ownerId (`src/services/firebase.ts`)
+- [x] `getGearItemsByOwner()` not filtered by userId — fixed: compound query now filters by both `userId` and `ownerId` (PR #45)
 
 ### High
 - [ ] Boot unit preference (MP/EU/US) resets on every visit — `bootUnit` state in MemberDetail is local and not persisted in AppSettings
-- [ ] Hockey skate fallback size formula wrong — `MemberInfoTable.tsx:55` uses `footLength * 1.5 + 2 - 32` fallback instead of `getShoeSizesFromFootLength()` from shoeSize service
+- [x] Hockey skate fallback size formula wrong — fixed: `MemberInfoTable.tsx` now uses `calculateHockeySkateSize()` which delegates to `getShoeSizesFromFootLength()`
 
 ### Medium
 - [x] Negative/zero size values after conversion — MemberDetail now guards against footLength <= 0
@@ -86,7 +86,7 @@
 - [x] No loading state for gear operations — gear delete/submit in App.tsx show no loading indicators; mutations now catch errors and surface a dismissible toast
 - [x] Race condition in useAuth — `setLoading(false)` and `setError()` now guarded by mounted ref
 - [ ] No email verification on signup — email accounts created without verifying address
-- [ ] Hockey skate width thresholds (0.36, 0.40) hardcoded without source documentation (`sizing.ts:653`)
+- [x] Hockey skate width thresholds (0.36, 0.40) hardcoded without source documentation — added Bauer/CCM fit guide comments to `determineSkateWidth()`
 - [ ] Firestore timestamp conversion drops nanoseconds (`firebase.ts:32`) — minor precision loss
 
 ## Notes
