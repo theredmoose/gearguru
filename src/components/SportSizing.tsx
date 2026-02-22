@@ -1,8 +1,9 @@
 import { useState, useRef } from 'react';
 import { ChevronLeft } from 'lucide-react';
-import type { FamilyMember, GearItem, SkillLevel, Sport, GearType } from '../types';
+import type { FamilyMember, GearItem, SkillLevel, Sport, GearType, SizingModel, SizingDisplay } from '../types';
+import { SIZING_MODEL_LABELS } from '../types';
 import {
-  calculateNordicSkiSizing,
+  calculateNordicSkiSizingByModel,
   calculateNordicBootSizing,
   calculateAlpineSkiSizing,
   calculateAlpineBootSizing,
@@ -23,6 +24,8 @@ interface SportSizingProps {
   onAddGear?: (sport: Sport, gearType?: GearType) => void;
   onEditGear?: (item: GearItem) => void;
   onDeleteGear?: (item: GearItem) => void;
+  defaultSizingModel?: SizingModel;
+  defaultSizingDisplay?: SizingDisplay;
 }
 
 const SPORTS: { id: Sport; label: string; icon: string; color: string }[] = [
@@ -33,6 +36,8 @@ const SPORTS: { id: Sport; label: string; icon: string; color: string }[] = [
   { id: 'hockey',         label: 'Hockey',          icon: '🏒', color: '#dc2626' },
 ];
 
+const NORDIC_MODELS: SizingModel[] = ['generic', 'fischer', 'evosports'];
+
 export function SportSizing({
   member,
   gearItems = [],
@@ -41,8 +46,12 @@ export function SportSizing({
   onAddGear,
   onEditGear,
   onDeleteGear,
+  defaultSizingModel = 'generic',
+  defaultSizingDisplay = 'range',
 }: SportSizingProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [sizingModel, setSizingModel] = useState<SizingModel>(defaultSizingModel);
+  const [sizingDisplay, setSizingDisplay] = useState<SizingDisplay>(defaultSizingDisplay);
   const [skillLevels, setSkillLevels] = useState<Record<Sport, SkillLevel>>(() => ({
     'nordic-classic': member.skillLevels?.['nordic-classic'] ?? 'intermediate',
     'nordic-skate':   member.skillLevels?.['nordic-skate']   ?? 'intermediate',
@@ -97,28 +106,56 @@ export function SportSizing({
   // ── Sizing content renderers ──────────────────────────────────────
 
   const renderNordicContent = (style: 'nordic-classic' | 'nordic-skate' | 'nordic-combi') => {
-    const skiSizing  = calculateNordicSkiSizing(member.measurements, style, skillLevel);
+    const skiSizing  = calculateNordicSkiSizingByModel(member.measurements, style, skillLevel, sizingModel);
     const bootSizing = calculateNordicBootSizing(member.measurements);
+    const showRange  = sizingDisplay === 'range';
 
     return (
       <div className="sizing-sections">
         <section className="sizing-section">
-          <h2>Equipment Sizing</h2>
+          <div className="section-header">
+            <h2>Equipment Sizing</h2>
+            <button
+              className="btn-link text-[10px] font-bold uppercase tracking-wide"
+              onClick={() => setSizingDisplay(d => d === 'range' ? 'single' : 'range')}
+              aria-label="Toggle range or single size display"
+            >
+              {showRange ? 'Single' : 'Range'}
+            </button>
+          </div>
           <div className="sizing-list">
             <div className="sizing-row">
               <span className="sizing-label">Skis</span>
               <div className="sizing-value-group">
-                <span className="sizing-value">{skiSizing.skiLengthRecommended}</span>
-                <span className="sizing-unit">cm</span>
-                <span className="sizing-range">({formatSizeRange(skiSizing.skiLengthMin, skiSizing.skiLengthMax)})</span>
+                {showRange ? (
+                  <>
+                    <span className="sizing-value">{skiSizing.skiLengthRecommended}</span>
+                    <span className="sizing-unit">cm</span>
+                    <span className="sizing-range">({formatSizeRange(skiSizing.skiLengthMin, skiSizing.skiLengthMax)})</span>
+                  </>
+                ) : (
+                  <>
+                    <span className="sizing-value">{skiSizing.skiLengthRecommended}</span>
+                    <span className="sizing-unit">cm</span>
+                  </>
+                )}
               </div>
             </div>
             <div className="sizing-row">
               <span className="sizing-label">Poles</span>
               <div className="sizing-value-group">
-                <span className="sizing-value">{skiSizing.poleLengthRecommended}</span>
-                <span className="sizing-unit">cm</span>
-                <span className="sizing-range">({formatSizeRange(skiSizing.poleLengthMin, skiSizing.poleLengthMax)})</span>
+                {showRange ? (
+                  <>
+                    <span className="sizing-value">{skiSizing.poleLengthRecommended}</span>
+                    <span className="sizing-unit">cm</span>
+                    <span className="sizing-range">({formatSizeRange(skiSizing.poleLengthMin, skiSizing.poleLengthMax)})</span>
+                  </>
+                ) : (
+                  <>
+                    <span className="sizing-value">{skiSizing.poleLengthRecommended}</span>
+                    <span className="sizing-unit">cm</span>
+                  </>
+                )}
               </div>
             </div>
             <div className="sizing-row">
@@ -129,7 +166,23 @@ export function SportSizing({
                 <span className="sizing-range">(EU {bootSizing.euSize} / US {bootSizing.usSize})</span>
               </div>
             </div>
+            {skiSizing.faValueRange && (
+              <div className="sizing-row">
+                <span className="sizing-label">FA Value</span>
+                <div className="sizing-value-group">
+                  <span className="sizing-value">{skiSizing.faValueRange.min}–{skiSizing.faValueRange.max}</span>
+                  <span className="sizing-unit">kg</span>
+                </div>
+              </div>
+            )}
           </div>
+          {skiSizing.modelNotes && skiSizing.modelNotes.length > 0 && (
+            <div className="mt-2 space-y-1">
+              {skiSizing.modelNotes.map((note, i) => (
+                <p key={i} className="sizing-tip">{note}</p>
+              ))}
+            </div>
+          )}
         </section>
       </div>
     );
@@ -138,18 +191,30 @@ export function SportSizing({
   const renderAlpineContent = () => {
     const skiSizing  = calculateAlpineSkiSizing(member.measurements, skillLevel, member.gender);
     const bootSizing = calculateAlpineBootSizing(member.measurements, skillLevel, member.gender);
+    const showRange  = sizingDisplay === 'range';
 
     return (
       <div className="sizing-sections">
         <section className="sizing-section">
-          <h2>Equipment Sizing</h2>
+          <div className="section-header">
+            <h2>Equipment Sizing</h2>
+            <button
+              className="btn-link text-[10px] font-bold uppercase tracking-wide"
+              onClick={() => setSizingDisplay(d => d === 'range' ? 'single' : 'range')}
+              aria-label="Toggle range or single size display"
+            >
+              {showRange ? 'Single' : 'Range'}
+            </button>
+          </div>
           <div className="sizing-list">
             <div className="sizing-row">
               <span className="sizing-label">Skis</span>
               <div className="sizing-value-group">
                 <span className="sizing-value">{skiSizing.skiLengthRecommended}</span>
                 <span className="sizing-unit">cm</span>
-                <span className="sizing-range">({formatSizeRange(skiSizing.skiLengthMin, skiSizing.skiLengthMax)})</span>
+                {showRange && (
+                  <span className="sizing-range">({formatSizeRange(skiSizing.skiLengthMin, skiSizing.skiLengthMax)})</span>
+                )}
               </div>
             </div>
             <div className="sizing-row">
@@ -163,7 +228,11 @@ export function SportSizing({
             <div className="sizing-row">
               <span className="sizing-label">Boot Flex</span>
               <div className="sizing-value-group">
-                <span className="sizing-value">{bootSizing.flexRating.min}-{bootSizing.flexRating.max}</span>
+                {showRange ? (
+                  <span className="sizing-value">{bootSizing.flexRating.min}–{bootSizing.flexRating.max}</span>
+                ) : (
+                  <span className="sizing-value">{Math.round((bootSizing.flexRating.min + bootSizing.flexRating.max) / 2)}</span>
+                )}
               </div>
             </div>
           </div>
@@ -188,18 +257,30 @@ export function SportSizing({
   const renderSnowboardContent = () => {
     const boardSizing = calculateSnowboardSizing(member.measurements, skillLevel);
     const bootSizing  = calculateSnowboardBootSizing(member.measurements);
+    const showRange   = sizingDisplay === 'range';
 
     return (
       <div className="sizing-sections">
         <section className="sizing-section">
-          <h2>Equipment Sizing</h2>
+          <div className="section-header">
+            <h2>Equipment Sizing</h2>
+            <button
+              className="btn-link text-[10px] font-bold uppercase tracking-wide"
+              onClick={() => setSizingDisplay(d => d === 'range' ? 'single' : 'range')}
+              aria-label="Toggle range or single size display"
+            >
+              {showRange ? 'Single' : 'Range'}
+            </button>
+          </div>
           <div className="sizing-list">
             <div className="sizing-row">
               <span className="sizing-label">Board</span>
               <div className="sizing-value-group">
                 <span className="sizing-value">{boardSizing.boardLengthRecommended}</span>
                 <span className="sizing-unit">cm</span>
-                <span className="sizing-range">({formatSizeRange(boardSizing.boardLengthMin, boardSizing.boardLengthMax)})</span>
+                {showRange && (
+                  <span className="sizing-range">({formatSizeRange(boardSizing.boardLengthMin, boardSizing.boardLengthMax)})</span>
+                )}
               </div>
             </div>
             <div className="sizing-row">
@@ -359,6 +440,28 @@ export function SportSizing({
                 </button>
               ))}
             </div>
+          </div>
+        )}
+
+        {/* Sizing model selector (Nordic only) */}
+        {(currentSport.id === 'nordic-classic' || currentSport.id === 'nordic-skate' || currentSport.id === 'nordic-combi') && (
+          <div className="px-6 py-2 bg-slate-50 border-b border-slate-100 flex items-center gap-2">
+            <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest mr-1">Model</span>
+            {NORDIC_MODELS.map((m) => (
+              <button
+                key={m}
+                onClick={() => setSizingModel(m)}
+                className={`px-3 py-1 rounded-lg text-[10px] font-bold border transition-colors ${
+                  sizingModel === m
+                    ? 'text-white border-transparent'
+                    : 'bg-white text-slate-500 border-slate-200 hover:border-slate-300'
+                }`}
+                style={sizingModel === m ? { backgroundColor: currentSport.color, borderColor: currentSport.color } : undefined}
+                aria-pressed={sizingModel === m}
+              >
+                {SIZING_MODEL_LABELS[m]}
+              </button>
+            ))}
           </div>
         )}
 

@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import type { User } from 'firebase/auth';
-import type { AppSettings, Sport } from '../types';
+import type { AppSettings, Sport, SizingModel } from '../types';
+import { SIZING_MODEL_LABELS } from '../types';
 import { ScreenHeader } from './ScreenHeader';
 
 interface SettingsScreenProps {
@@ -184,6 +185,58 @@ export function SettingsScreen({
                 />
                 <div className="w-10 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600" />
               </label>
+            </div>
+
+          </div>
+        </section>
+
+        {/* ── Sizing ────────────────────────────────── */}
+        <section>
+          <p className={sectionTitleCls}>Sizing</p>
+          <div className="bg-slate-50 rounded-2xl px-4">
+
+            <div className={rowCls}>
+              <div>
+                <p className={labelCls}>Size Display</p>
+                <p className={subLabelCls}>
+                  {settings.sizingDisplay === 'range'
+                    ? 'Show recommended + range (e.g. 185 cm, 175–195)'
+                    : 'Show recommended size only (e.g. 185 cm)'}
+                </p>
+              </div>
+              <button
+                className={toggleBtnCls}
+                onClick={() =>
+                  onUpdateSettings({ sizingDisplay: settings.sizingDisplay === 'range' ? 'single' : 'range' })
+                }
+                aria-label="Toggle sizing display format"
+              >
+                {settings.sizingDisplay === 'range' ? 'Range' : 'Single'}
+              </button>
+            </div>
+
+            <div className={rowCls}>
+              <div>
+                <p className={labelCls}>Default Nordic Model</p>
+                <p className={subLabelCls}>Sizing chart used for Nordic ski calculations</p>
+              </div>
+              <div className="flex gap-1">
+                {(['generic', 'fischer', 'evosports'] as SizingModel[]).map((m) => (
+                  <button
+                    key={m}
+                    className={`px-2.5 py-1.5 rounded-lg text-xs font-bold border transition-colors ${
+                      settings.sizingModel === m
+                        ? 'bg-blue-700 text-white border-blue-700'
+                        : 'bg-white text-slate-500 border-slate-200 hover:bg-slate-100'
+                    }`}
+                    onClick={() => onUpdateSettings({ sizingModel: m })}
+                    aria-pressed={settings.sizingModel === m}
+                    aria-label={`Set ${SIZING_MODEL_LABELS[m]} as default Nordic sizing model`}
+                  >
+                    {SIZING_MODEL_LABELS[m]}
+                  </button>
+                ))}
+              </div>
             </div>
 
           </div>

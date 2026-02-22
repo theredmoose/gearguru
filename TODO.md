@@ -16,6 +16,9 @@
 - [x] 516 tests passing
 - [x] CI/CD with GitHub Actions
 - [x] Deployed to Firebase Hosting
+- [x] Real gear photo analysis via Claude Vision API (with mock fallback)
+- [x] Fischer and Evosports Nordic sizing models with FA Value
+- [x] Range vs single size display toggle (per-session + default in Settings)
 
 ## Next Up
 - [x] Persist skill levels per member in database
@@ -26,10 +29,14 @@
 ## Future Enhancements
 - [ ] Growth tracking / size history
 - [ ] Hand-me-down suggestions between family members
-- [ ] Brand-specific sizing charts
+- [x] Brand-specific sizing charts — Fischer + Evosports Nordic models added; more manufacturers (Salomon, Atomic, Rossignol, K2) for Alpine/Snowboard
+- [ ] Add remaining manufacturer Alpine/Snowboard models (Salomon, Atomic, Rossignol, K2)
 - [ ] PWA support (offline, installable)
 - [ ] Dark mode
 - [ ] Multiple families / sharing
+- [ ] Age-specific sizing adjustments for children
+- [ ] Growth projections for kids (next season sizing)
+- [ ] Waist width recommendations for alpine skis
 
 ## Technical Debt
 - [x] Code-split Firebase to reduce bundle size — chunks exceed 500KB after minification (currently 680KB), use dynamic imports
@@ -42,6 +49,7 @@
 - [x] skillLevels field lost on Firestore read — was already fixed in `docToFamilyMember()`
 - [x] photos/extendedDetails fields lost on Firestore read — was already fixed in `docToGearItem()`
 - [x] No user-scoped Firebase queries — was already fixed in `getAllFamilyMembers()` and `getAllGearItems()`
+- [x] status/location/checkedOutTo/checkedOutDate lost on Firestore read — fixed in `docToGearItem()` (PR #39)
 
 ### Medium
 - [x] Negative/zero size values after conversion — MemberDetail now guards against footLength <= 0

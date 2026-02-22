@@ -11,6 +11,8 @@ const DEFAULT: AppSettings = {
   skiLengthUnit: 'cm',
   defaultSport: 'alpine',
   display: { showFoot: true, showHand: true },
+  sizingModel: 'generic',
+  sizingDisplay: 'range',
 };
 
 // localStorage mock

@@ -1,6 +1,7 @@
 import type {
   Measurements,
   SkillLevel,
+  SizingModel,
   NordicSkiSizing,
   NordicBootSizing,
   AlpineSkiSizing,
@@ -89,6 +90,183 @@ export function calculateNordicSkiSizing(
     poleLengthMax: poleMax,
     poleLengthRecommended: poleRecommended,
   };
+}
+
+/**
+ * Fischer Nordic sizing chart.
+ *
+ * Fischer uses slightly wider length brackets (especially for performance
+ * skiers) and adds FA Value — the recommended ski stiffness expressed as
+ * a percentage of body weight in kg.
+ *
+ * Classic FA:  body weight × 0.85–0.95 kg  (skin/zero-kick skis)
+ * Skate  FA:  body weight × 0.80–0.90 kg  (lighter flex for speed)
+ *
+ * Length ranges follow Fischer's published fit guide:
+ *   Classic  beginner →expert : height +10 to +30 cm
+ *   Skate    beginner →expert : height  +5 to +25 cm
+ */
+function calculateNordicSkiSizingFischer(
+  measurements: Measurements,
+  style: 'nordic-classic' | 'nordic-skate' | 'nordic-combi',
+  skillLevel: SkillLevel
+): NordicSkiSizing {
+  const { height, weight } = measurements;
+
+  const skillMultiplier: Record<SkillLevel, number> = {
+    beginner: 0, intermediate: 0.33, advanced: 0.66, expert: 1,
+  };
+  const skill = skillMultiplier[skillLevel];
+
+  let skiMin: number;
+  let skiMax: number;
+  let poleMultiplierMin: number;
+  let poleMultiplierMax: number;
+
+  switch (style) {
+    case 'nordic-classic':
+      skiMin = height + 10;
+      skiMax = height + 30;
+      poleMultiplierMin = 0.83;
+      poleMultiplierMax = 0.87;
+      break;
+    case 'nordic-skate':
+      skiMin = height + 5;
+      skiMax = height + 25;
+      poleMultiplierMin = 0.90;
+      poleMultiplierMax = 0.93;
+      break;
+    default: // combi
+      skiMin = height + 5;
+      skiMax = height + 15;
+      poleMultiplierMin = 0.86;
+      poleMultiplierMax = 0.88;
+  }
+
+  const weightAdjustment = weight > 80 ? 3 : weight < 60 ? -2 : 0;
+  const skiRecommended = Math.round(skiMin + (skiMax - skiMin) * skill + weightAdjustment);
+
+  const poleMin = Math.round(height * poleMultiplierMin);
+  const poleMax = Math.round(height * poleMultiplierMax);
+  const poleRecommended = Math.round(poleMin + (poleMax - poleMin) * skill);
+
+  // FA Value: recommended ski stiffness (spring load) in kg
+  const faMin = style === 'nordic-skate'
+    ? Math.round(weight * 0.80)
+    : Math.round(weight * 0.85);
+  const faMax = style === 'nordic-skate'
+    ? Math.round(weight * 0.90)
+    : Math.round(weight * 0.95);
+
+  const notes: string[] = [
+    `FA Value ${faMin}–${faMax} kg — confirm ski flex matches your body weight at a Fischer dealer.`,
+  ];
+  if (style === 'nordic-classic') {
+    notes.push('Fischer recommends kick-zone testing (paper test) when selecting classic ski length.');
+  }
+
+  return {
+    sport: style,
+    skiLengthMin: skiMin,
+    skiLengthMax: skiMax,
+    skiLengthRecommended: skiRecommended,
+    poleLengthMin: poleMin,
+    poleLengthMax: poleMax,
+    poleLengthRecommended: poleRecommended,
+    faValueRange: { min: faMin, max: faMax },
+    modelName: 'Fischer',
+    modelNotes: notes,
+  };
+}
+
+/**
+ * Evosports Nordic sizing guide.
+ *
+ * Evosports (Canadian Nordic distributor/retailer) follows industry-standard
+ * length tables but emphasises fit-first sizing — they recommend erring toward
+ * the shorter end of a range for recreational skiers to maximise control.
+ *
+ * Lengths match the generic formula; the key differentiator is the pole
+ * ratio (slightly longer skate poles for double-poling efficiency) and
+ * a bias toward the lower half of the range for beginners/intermediate.
+ */
+function calculateNordicSkiSizingEvosports(
+  measurements: Measurements,
+  style: 'nordic-classic' | 'nordic-skate' | 'nordic-combi',
+  skillLevel: SkillLevel
+): NordicSkiSizing {
+  const { height, weight } = measurements;
+
+  const skillMultiplier: Record<SkillLevel, number> = {
+    beginner: 0, intermediate: 0.25, advanced: 0.66, expert: 1,
+  };
+  const skill = skillMultiplier[skillLevel];
+
+  let skiMin: number;
+  let skiMax: number;
+  let poleMultiplierMin: number;
+  let poleMultiplierMax: number;
+
+  switch (style) {
+    case 'nordic-classic':
+      skiMin = height + 10;
+      skiMax = height + 20;
+      poleMultiplierMin = 0.83;
+      poleMultiplierMax = 0.85;
+      break;
+    case 'nordic-skate':
+      skiMin = height + 5;
+      skiMax = height + 15;
+      poleMultiplierMin = 0.90;
+      poleMultiplierMax = 0.92;
+      break;
+    default: // combi
+      skiMin = height + 5;
+      skiMax = height + 10;
+      poleMultiplierMin = 0.86;
+      poleMultiplierMax = 0.88;
+  }
+
+  const weightAdjustment = weight > 80 ? 2 : weight < 60 ? -2 : 0;
+  // Evosports bias: recommend toward the shorter (more manageable) end
+  const skiRecommended = Math.round(skiMin + (skiMax - skiMin) * skill * 0.85 + weightAdjustment);
+
+  const poleMin = Math.round(height * poleMultiplierMin);
+  const poleMax = Math.round(height * poleMultiplierMax);
+  const poleRecommended = Math.round(poleMin + (poleMax - poleMin) * skill);
+
+  const notes: string[] = [
+    'Evosports recommends choosing the shorter end of the range for all-round recreational use.',
+    'Longer skis offer more glide; shorter skis are easier to control in varied terrain.',
+  ];
+
+  return {
+    sport: style,
+    skiLengthMin: skiMin,
+    skiLengthMax: skiMax,
+    skiLengthRecommended: skiRecommended,
+    poleLengthMin: poleMin,
+    poleLengthMax: poleMax,
+    poleLengthRecommended: poleRecommended,
+    modelName: 'Evosports',
+    modelNotes: notes,
+  };
+}
+
+/**
+ * Unified Nordic sizing dispatcher — routes to the correct model.
+ */
+export function calculateNordicSkiSizingByModel(
+  measurements: Measurements,
+  style: 'nordic-classic' | 'nordic-skate' | 'nordic-combi',
+  skillLevel: SkillLevel,
+  model: SizingModel = 'generic'
+): NordicSkiSizing {
+  switch (model) {
+    case 'fischer':   return calculateNordicSkiSizingFischer(measurements, style, skillLevel);
+    case 'evosports': return calculateNordicSkiSizingEvosports(measurements, style, skillLevel);
+    default:          return calculateNordicSkiSizing(measurements, style, skillLevel);
+  }
 }
 
 /**
