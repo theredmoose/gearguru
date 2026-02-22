@@ -61,6 +61,15 @@ export function MemberForm({ member, onSubmit, onCancel }: MemberFormProps) {
       return;
     }
 
+    if (measurements.footLengthLeft > 0 && (measurements.footLengthLeft < 12 || measurements.footLengthLeft > 30)) {
+      setError('Left foot length must be between 12 and 30 cm');
+      return;
+    }
+    if (measurements.footLengthRight > 0 && (measurements.footLengthRight < 12 || measurements.footLengthRight > 30)) {
+      setError('Right foot length must be between 12 and 30 cm');
+      return;
+    }
+
     const dobDate = new Date(dateOfBirth);
     const today = new Date();
     const minDate = new Date();
@@ -216,7 +225,8 @@ export function MemberForm({ member, onSubmit, onCancel }: MemberFormProps) {
                     updateMeasurement('footLengthLeft', parseFloat(e.target.value) || 0)
                   }
                   placeholder="27.0"
-                  min="0"
+                  min="12"
+                  max="30"
                   step="0.1"
                 />
               </div>
@@ -232,7 +242,8 @@ export function MemberForm({ member, onSubmit, onCancel }: MemberFormProps) {
                     updateMeasurement('footLengthRight', parseFloat(e.target.value) || 0)
                   }
                   placeholder="27.0"
-                  min="0"
+                  min="12"
+                  max="30"
                   step="0.1"
                 />
               </div>

@@ -173,19 +173,28 @@ export function GearForm({
       return;
     }
 
+    if (year) {
+      const yearNum = parseInt(year, 10);
+      const currentYear = new Date().getFullYear();
+      if (isNaN(yearNum) || yearNum < 1980 || yearNum > currentYear + 1) {
+        setError(`Year must be between 1980 and ${currentYear + 1}.`);
+        return;
+      }
+    }
+
     setSubmitting(true);
 
     try {
       let finalExtendedDetails: ExtendedGearDetails | undefined = extendedDetails;
 
       if (type === 'ski' && sport === 'alpine') {
+        const tipN = parseInt(profileTip, 10);
+        const waistN = parseInt(profileWaist, 10);
+        const tailN = parseInt(profileTail, 10);
         const profile: SkiProfile | undefined =
-          profileTip && profileWaist && profileTail
-            ? {
-                tip: parseInt(profileTip, 10),
-                waist: parseInt(profileWaist, 10),
-                tail: parseInt(profileTail, 10),
-              }
+          profileTip && profileWaist && profileTail &&
+          !isNaN(tipN) && !isNaN(waistN) && !isNaN(tailN)
+            ? { tip: tipN, waist: waistN, tail: tailN }
             : undefined;
 
         const parsedDinSetting = dinSetting ? parseFloat(dinSetting) : undefined;
@@ -367,8 +376,8 @@ export function GearForm({
                     value={year}
                     onChange={(e) => setYear(e.target.value)}
                     placeholder="e.g., 2023"
-                    min="1990"
-                    max="2030"
+                    min="1980"
+                    max={new Date().getFullYear() + 1}
                   />
                 </div>
               </div>
