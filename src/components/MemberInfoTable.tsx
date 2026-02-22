@@ -6,6 +6,7 @@ import {
   calculateAlpineBootSizing,
   calculateSnowboardSizing,
   calculateSnowboardBootSizing,
+  calculateHockeySkateSize,
   calculateHelmetSizing,
 } from '../services/sizing';
 
@@ -50,10 +51,12 @@ export function MemberInfoTable({ member, sport, skillLevel }: MemberInfoTablePr
           boots: `${bootSizing.mondopoint} MP`,
         };
       }
-      case 'hockey':
+      case 'hockey': {
+        const skateSizing = calculateHockeySkateSize(measurements);
         return {
-          skates: `US ${Math.round((measurements.usShoeSize ?? footLength * 1.5 + 2 - 32) - 1.5)}`,
+          skates: `US ${skateSizing.skateSizeUS}`,
         };
+      }
       default:
         return {};
     }

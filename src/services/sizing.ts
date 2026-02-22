@@ -650,7 +650,10 @@ function determineSkateWidth(
   // Width ratio (foot width / foot length)
   const ratio = footWidth / footLength;
 
-  // Typical ratios: narrow < 0.38, standard 0.38-0.42, wide > 0.42
+  // Thresholds derived from Bauer/CCM fit guide width categories:
+  //   C (narrow):   ratio < 0.36  (~97 mm last on a 27 cm foot)
+  //   D (standard): ratio 0.36–0.40 (~100 mm last)
+  //   EE/W (wide):  ratio > 0.40  (~102+ mm last)
   if (ratio < 0.36) {
     return 'C';
   } else if (ratio < 0.40) {
