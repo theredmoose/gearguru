@@ -539,7 +539,7 @@ export function GearForm({
                     className={inputCls}
                     value={dinSetting}
                     onChange={(e) => setDinSetting(e.target.value)}
-                    placeholder={defaultDIN !== undefined ? `Default: ${defaultDIN}` : 'e.g., 5.5'}
+                    placeholder={defaultDIN !== undefined ? `Default: ${defaultDIN}` : 'DIN Setting'}
                     step="0.5"
                     min="1"
                     max="14"

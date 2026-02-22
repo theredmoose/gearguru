@@ -228,7 +228,7 @@ export function SettingsScreen({
                   const val = e.target.value;
                   onUpdateSettings({ defaultDIN: val === '' ? undefined : parseFloat(val) });
                 }}
-                placeholder="e.g. 5.5"
+                placeholder="DIN Setting"
                 step="0.5"
                 min="1"
                 max="14"
