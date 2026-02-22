@@ -348,6 +348,8 @@ function App() {
           onAddGear={handleAddGearFromSizing}
           onEditGear={handleEditGear}
           onDeleteGear={handleDeleteGear}
+          defaultSizingModel={settings.sizingModel}
+          defaultSizingDisplay={settings.sizingDisplay}
         />
       );
     }

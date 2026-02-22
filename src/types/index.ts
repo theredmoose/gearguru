@@ -57,6 +57,15 @@ export type SkillLevel = 'beginner' | 'intermediate' | 'advanced' | 'expert';
 // GEAR TYPES & SIZING
 // ============================================
 
+// Sizing model — which manufacturer's chart / formula is used
+export type SizingModel = 'generic' | 'fischer' | 'evosports';
+
+export const SIZING_MODEL_LABELS: Record<SizingModel, string> = {
+  generic:   'Generic',
+  fischer:   'Fischer',
+  evosports: 'Evosports',
+};
+
 // Nordic Skiing
 export interface NordicSkiSizing {
   sport: 'nordic-classic' | 'nordic-skate' | 'nordic-combi';
@@ -66,6 +75,10 @@ export interface NordicSkiSizing {
   poleLengthMin: number; // cm
   poleLengthMax: number; // cm
   poleLengthRecommended: number; // cm
+  // Model-specific extras (Fischer only)
+  faValueRange?: { min: number; max: number }; // recommended ski stiffness in kg
+  modelName?: string;
+  modelNotes?: string[];
 }
 
 export interface NordicBootSizing {
@@ -285,6 +298,7 @@ export type FirestoreGearItem = Omit<GearItem, 'createdAt' | 'updatedAt'> & {
 export type HeightUnit = 'cm' | 'ft-in';
 export type WeightUnit = 'kg' | 'lbs';
 export type SkiLengthUnit = 'cm' | 'in';
+export type SizingDisplay = 'range' | 'single';
 
 export interface DisplaySettings {
   showFoot: boolean;
@@ -297,6 +311,8 @@ export interface AppSettings {
   skiLengthUnit: SkiLengthUnit;
   defaultSport: Sport;
   display: DisplaySettings;
+  sizingModel: SizingModel;
+  sizingDisplay: SizingDisplay;
 }
 
 export const DEFAULT_SETTINGS: AppSettings = {
@@ -308,4 +324,6 @@ export const DEFAULT_SETTINGS: AppSettings = {
     showFoot: true,
     showHand: true,
   },
+  sizingModel: 'generic',
+  sizingDisplay: 'range',
 };
