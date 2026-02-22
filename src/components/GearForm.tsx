@@ -8,6 +8,7 @@ interface GearFormProps {
   item?: GearItem;
   ownerId: string;
   defaultSport?: Sport;
+  defaultDIN?: number;
   onSubmit: (data: Omit<GearItem, 'id' | 'userId' | 'createdAt' | 'updatedAt'>) => Promise<void>;
   onCancel: () => void;
 }
@@ -50,6 +51,7 @@ export function GearForm({
   item,
   ownerId,
   defaultSport,
+  defaultDIN,
   onSubmit,
   onCancel,
 }: GearFormProps) {
@@ -93,6 +95,16 @@ export function GearForm({
   const [bindingDin, setBindingDin] = useState(
     (extendedDetails?.type === 'alpineSki' ? extendedDetails.details.bindings?.dinRange : '') ?? ''
   );
+  const [dinSetting, setDinSetting] = useState<string>(() => {
+    // Prefer the value already saved on this gear item
+    const saved = extendedDetails?.type === 'alpineSki'
+      ? extendedDetails.details.bindings?.dinSetting
+      : undefined;
+    if (saved !== undefined) return saved.toString();
+    // Fall back to the user's default DIN
+    if (defaultDIN !== undefined) return defaultDIN.toString();
+    return '';
+  });
 
   const [submitting, setSubmitting] = useState(false);
   const [analyzing, setAnalyzing] = useState(false);
@@ -176,16 +188,18 @@ export function GearForm({
               }
             : undefined;
 
+        const parsedDinSetting = dinSetting ? parseFloat(dinSetting) : undefined;
         const alpineDetails: AlpineSkiDetails = {
           lengthCm: parseInt(size, 10) || 0,
           profile,
           radiusM: radius ? parseFloat(radius) : undefined,
           bindings:
-            bindingBrand || bindingModel
+            bindingBrand || bindingModel || bindingDin || parsedDinSetting !== undefined
               ? {
                   brand: bindingBrand,
                   model: bindingModel,
                   dinRange: bindingDin || undefined,
+                  dinSetting: parsedDinSetting,
                 }
               : undefined,
         };
@@ -499,7 +513,7 @@ export function GearForm({
                 </div>
 
                 <div>
-                  <label htmlFor="bindingDin" className={labelCls}>DIN Range</label>
+                  <label htmlFor="bindingDin" className={labelCls}>DIN Range (binding capacity)</label>
                   <input
                     id="bindingDin"
                     type="text"
@@ -508,6 +522,31 @@ export function GearForm({
                     onChange={(e) => setBindingDin(e.target.value)}
                     placeholder="e.g., 4-13"
                   />
+                </div>
+
+                <div>
+                  <label htmlFor="dinSetting" className={labelCls}>
+                    DIN Setting
+                    {defaultDIN !== undefined && !dinSetting && (
+                      <span className="ml-1 text-blue-500 normal-case font-semibold tracking-normal">
+                        (default: {defaultDIN})
+                      </span>
+                    )}
+                  </label>
+                  <input
+                    id="dinSetting"
+                    type="number"
+                    className={inputCls}
+                    value={dinSetting}
+                    onChange={(e) => setDinSetting(e.target.value)}
+                    placeholder={defaultDIN !== undefined ? `Default: ${defaultDIN}` : 'e.g., 5.5'}
+                    step="0.5"
+                    min="1"
+                    max="14"
+                  />
+                  <p className="text-[10px] text-slate-400 mt-1">
+                    The release value set by your technician. Verify with a certified shop.
+                  </p>
                 </div>
               </div>
             </section>
