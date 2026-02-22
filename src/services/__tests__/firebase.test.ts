@@ -386,7 +386,7 @@ describe('firebase service', () => {
 
   describe('getGearItemsByOwner', () => {
     it('returns empty array when no gear for owner', async () => {
-      const result = await getGearItemsByOwner('member-1');
+      const result = await getGearItemsByOwner('user-1', 'member-1');
       expect(result).toEqual([]);
     });
   });

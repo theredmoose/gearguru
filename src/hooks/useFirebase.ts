@@ -245,7 +245,7 @@ export function useGearItems(userId: string | null, ownerId?: string): UseGearIt
     setState((prev) => ({ ...prev, loading: true, error: null }));
     try {
       const items = ownerId
-        ? await firebaseService.getGearItemsByOwner(ownerId)
+        ? await firebaseService.getGearItemsByOwner(userId, ownerId)
         : await firebaseService.getAllGearItems(userId);
       setState({ data: items, loading: false, error: null });
     } catch (err) {
