@@ -1,12 +1,13 @@
 import { useState, useRef } from 'react';
 import { ChevronLeft } from 'lucide-react';
-import type { FamilyMember, GearItem, SkillLevel, Sport, GearType, SizingModel, SizingDisplay } from '../types';
-import { SIZING_MODEL_LABELS } from '../types';
+import type { FamilyMember, GearItem, SkillLevel, Sport, GearType, SizingModel, SizingDisplay, AlpineTerrain } from '../types';
+import { SIZING_MODEL_LABELS, ALPINE_TERRAIN_LABELS } from '../types';
 import {
   calculateNordicSkiSizingByModel,
   calculateNordicBootSizing,
   calculateAlpineSkiSizing,
   calculateAlpineBootSizing,
+  calculateAlpineWaistWidth,
   calculateSnowboardSizing,
   calculateSnowboardBootSizing,
   calculateHockeySkateSize,
@@ -52,6 +53,7 @@ export function SportSizing({
   const [currentIndex, setCurrentIndex] = useState(0);
   const [sizingModel, setSizingModel] = useState<SizingModel>(defaultSizingModel);
   const [sizingDisplay, setSizingDisplay] = useState<SizingDisplay>(defaultSizingDisplay);
+  const [alpineTerrain, setAlpineTerrain] = useState<AlpineTerrain>('all-mountain');
   const [skillLevels, setSkillLevels] = useState<Record<Sport, SkillLevel>>(() => ({
     'nordic-classic': member.skillLevels?.['nordic-classic'] ?? 'intermediate',
     'nordic-skate':   member.skillLevels?.['nordic-skate']   ?? 'intermediate',
@@ -191,6 +193,7 @@ export function SportSizing({
   const renderAlpineContent = () => {
     const skiSizing  = calculateAlpineSkiSizing(member.measurements, skillLevel, member.gender);
     const bootSizing = calculateAlpineBootSizing(member.measurements, skillLevel, member.gender);
+    const waistWidth = calculateAlpineWaistWidth(alpineTerrain);
     const showRange  = sizingDisplay === 'range';
 
     return (
@@ -215,6 +218,13 @@ export function SportSizing({
                 {showRange && (
                   <span className="sizing-range">({formatSizeRange(skiSizing.skiLengthMin, skiSizing.skiLengthMax)})</span>
                 )}
+              </div>
+            </div>
+            <div className="sizing-row">
+              <span className="sizing-label">Ski Waist</span>
+              <div className="sizing-value-group">
+                <span className="sizing-value">{waistWidth.min}–{waistWidth.max}</span>
+                <span className="sizing-unit">mm</span>
               </div>
             </div>
             <div className="sizing-row">
@@ -460,6 +470,28 @@ export function SportSizing({
                 aria-pressed={sizingModel === m}
               >
                 {SIZING_MODEL_LABELS[m]}
+              </button>
+            ))}
+          </div>
+        )}
+
+        {/* Terrain selector (Alpine only) */}
+        {currentSport.id === 'alpine' && (
+          <div className="px-6 py-2 bg-slate-50 border-b border-slate-100 flex items-center gap-2">
+            <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest mr-1">Terrain</span>
+            {(['groomed', 'all-mountain', 'powder'] as AlpineTerrain[]).map((t) => (
+              <button
+                key={t}
+                onClick={() => setAlpineTerrain(t)}
+                className={`px-3 py-1 rounded-lg text-[10px] font-bold border transition-colors ${
+                  alpineTerrain === t
+                    ? 'text-white border-transparent'
+                    : 'bg-white text-slate-500 border-slate-200 hover:border-slate-300'
+                }`}
+                style={alpineTerrain === t ? { backgroundColor: currentSport.color, borderColor: currentSport.color } : undefined}
+                aria-pressed={alpineTerrain === t}
+              >
+                {ALPINE_TERRAIN_LABELS[t]}
               </button>
             ))}
           </div>

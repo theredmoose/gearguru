@@ -4,6 +4,7 @@ import {
   calculateNordicBootSizing,
   calculateAlpineSkiSizing,
   calculateAlpineBootSizing,
+  calculateAlpineWaistWidth,
   calculateSnowboardSizing,
   calculateSnowboardBootSizing,
   calculateHockeySkateSize,
@@ -202,6 +203,37 @@ describe('sizing service', () => {
         const female = calculateAlpineBootSizing(MEASUREMENTS.adultFemale, 'intermediate', 'female');
         expect(female.flexRating.min).toBeLessThan(male.flexRating.min);
       });
+    });
+  });
+
+  // ============================================
+  // ALPINE WAIST WIDTH
+  // ============================================
+  describe('calculateAlpineWaistWidth', () => {
+    it('returns 65–80 mm for groomed terrain', () => {
+      const result = calculateAlpineWaistWidth('groomed');
+      expect(result.min).toBe(65);
+      expect(result.max).toBe(80);
+    });
+
+    it('returns 80–96 mm for all-mountain terrain', () => {
+      const result = calculateAlpineWaistWidth('all-mountain');
+      expect(result.min).toBe(80);
+      expect(result.max).toBe(96);
+    });
+
+    it('returns 96–120 mm for powder terrain', () => {
+      const result = calculateAlpineWaistWidth('powder');
+      expect(result.min).toBe(96);
+      expect(result.max).toBe(120);
+    });
+
+    it('ranges are in ascending order (groomed < all-mountain < powder)', () => {
+      const groomed     = calculateAlpineWaistWidth('groomed');
+      const allMountain = calculateAlpineWaistWidth('all-mountain');
+      const powder      = calculateAlpineWaistWidth('powder');
+      expect(groomed.max).toBeLessThanOrEqual(allMountain.min);
+      expect(allMountain.max).toBeLessThanOrEqual(powder.min);
     });
   });
 
