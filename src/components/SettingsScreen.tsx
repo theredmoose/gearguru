@@ -3,6 +3,7 @@ import type { User } from 'firebase/auth';
 import type { AppSettings, Sport, SizingModel } from '../types';
 import { SIZING_MODEL_LABELS } from '../types';
 import { ScreenHeader } from './ScreenHeader';
+import { SPORT_LABELS } from '../constants/labels';
 
 interface SettingsScreenProps {
   settings: AppSettings;
@@ -13,15 +14,6 @@ interface SettingsScreenProps {
   onSendPasswordReset: (email: string) => Promise<void>;
   onBack: () => void;
 }
-
-const SPORT_LABELS: Record<Sport, string> = {
-  alpine:           'Alpine / Downhill',
-  'nordic-classic': 'XC Classic',
-  'nordic-skate':   'XC Skate',
-  'nordic-combi':   'XC Combi',
-  snowboard:        'Snowboard',
-  hockey:           'Hockey',
-};
 
 const DEFAULT_SPORTS: Sport[] = ['alpine', 'nordic-classic', 'nordic-skate', 'snowboard', 'hockey'];
 

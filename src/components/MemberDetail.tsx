@@ -1,9 +1,10 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { Settings, PlusCircle, ChevronDown, CheckCircle2, AlertCircle, ArrowLeftRight } from 'lucide-react';
 import type { FamilyMember, GearItem, Sport, SkillLevel, AppSettings, BootUnit } from '../types';
 import { ScreenHeader } from './ScreenHeader';
 import { GearTypeIcon } from './GearIcons';
 import { getShoeSizesFromFootLength } from '../services/shoeSize';
+import { GEAR_TYPE_LABELS } from '../constants/labels';
 import {
   calculateAlpineSkiSizing,
   calculateAlpineBootSizing,
@@ -43,10 +44,6 @@ const LEVEL_OPTIONS: { value: SkillLevel; label: string }[] = [
   { value: 'expert',       label: 'Expert' },
 ];
 
-const GEAR_TYPE_LABELS: Record<string, string> = {
-  ski: 'Skis', pole: 'Poles', boot: 'Boots', binding: 'Bindings',
-  snowboard: 'Snowboard', skate: 'Skates', helmet: 'Helmet', other: 'Other',
-};
 
 type LengthUnit = 'cm' | 'in';
 const BOOT_UNIT_CYCLE: BootUnit[] = ['mp', 'eu', 'us-men', 'us-women'];
@@ -191,7 +188,10 @@ export function MemberDetail({
     });
   }
 
-  const sizingCards = getSizingCards(member, selectedSport, skillLevel, lengthUnit, bootUnit);
+  const sizingCards = useMemo(
+    () => getSizingCards(member, selectedSport, skillLevel, lengthUnit, bootUnit),
+    [member, selectedSport, skillLevel, lengthUnit, bootUnit]
+  );
 
   // Format shoe size for display
   const shoeDisplay = footLength > 0 ? `${footLength} cm` : '—';
