@@ -47,7 +47,7 @@
 
 ## Technical Debt
 - [x] Code-split Firebase to reduce bundle size — chunks exceed 500KB after minification (currently 680KB), use dynamic imports
-- [ ] Add E2E tests with Playwright
+- [x] Add E2E tests with Playwright — 15 auth-page smoke tests (PR #53)
 - [x] Increase test coverage to 80%+ for branches/functions — 88% stmts, 82% branches, 86% functions, 90% lines (516 tests)
 - [x] Increase PhotoCapture test coverage — from 38.2% to 96.6% statements / 100% functions (PR #52)
 - [x] Extract GEAR_TYPE_LABELS and SPORT_LABELS to a shared constants file — moved to `src/constants/labels.ts` (PR #51)
