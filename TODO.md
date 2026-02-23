@@ -72,7 +72,7 @@
 - [x] No validation for negative/zero measurements — MemberForm now validates weight > 0
 - [x] Missing Firebase env var validation — `src/config/firebase.ts` now throws with clear error listing missing vars
 - [ ] No account linking flow — users get stuck signing in with Google after creating email account with same address
-- [ ] No offline error handling — Firebase operations show raw errors when offline
+- [x] No offline error handling — read errors in App.tsx now use `getOperationErrorMessage()` with `'load'` context; network/unavailable codes produce friendly messages
 - [x] Year field in GearForm accepts invalid values — added submit-time validation (1980–currentYear+1); HTML min/max updated to match
 - [x] GearForm numeric fields (tip/waist/tail profile) use parseFloat/parseInt without isNaN guard — fixed: profile only built when all three fields parse to valid integers
 - [x] Foot measurement bounds not validated — MemberForm now validates 12–30 cm range with error message; HTML min/max updated
@@ -82,12 +82,12 @@
 - [x] No date-of-birth bounds validation — MemberForm now rejects future dates and dates > 120 years ago
 - [x] nordic-combi in skillLevels but not in SPORTS array — `SportSizing.tsx` now omits nordic-combi when persisting skill levels
 - [x] US shoe size conversion inconsistency — `sizing.ts` now uses `getShoeSizesFromFootLength()` from shoeSize service
-- [ ] Potential undefined skillLevel access — `skillLevels[currentSport.id]` in SportSizing has no fallback
+- [x] Potential undefined skillLevel access — already handled: `skillLevels` state initialised for all 6 sports with `?? 'intermediate'` fallback on line 68 of SportSizing.tsx
 - [x] No loading state for gear operations — gear delete/submit in App.tsx show no loading indicators; mutations now catch errors and surface a dismissible toast
 - [x] Race condition in useAuth — `setLoading(false)` and `setError()` now guarded by mounted ref
 - [ ] No email verification on signup — email accounts created without verifying address
 - [x] Hockey skate width thresholds (0.36, 0.40) hardcoded without source documentation — added Bauer/CCM fit guide comments to `determineSkateWidth()`
-- [ ] Firestore timestamp conversion drops nanoseconds (`firebase.ts:32`) — minor precision loss
+- [x] Firestore timestamp conversion drops nanoseconds — fixed: now includes `Math.round(nanoseconds / 1e6)` in milliseconds calculation
 
 ## Notes
 - App URL: https://gearguru-b3bc8.web.app
