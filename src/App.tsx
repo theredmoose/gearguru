@@ -1,9 +1,11 @@
 import { useState } from 'react';
 
-function getOperationErrorMessage(err: unknown): string {
+function getOperationErrorMessage(err: unknown, context: 'load' | 'save' = 'save'): string {
   const code = (err as { code?: string })?.code ?? '';
   if (code === 'unavailable' || code === 'network-request-failed') {
-    return 'Unable to save — check your connection and try again.';
+    return context === 'load'
+      ? 'Unable to load data — check your connection and try again.'
+      : 'Unable to save — check your connection and try again.';
   }
   if (code === 'permission-denied') {
     return 'Permission denied. Please sign out and sign back in.';
@@ -261,7 +263,7 @@ function App() {
 
             <div className="flex-1 overflow-y-auto bg-white px-6 py-6">
               {loading && <p className="loading">Loading...</p>}
-              {error && <p className="error-state">Error: {error.message}</p>}
+              {error && <p className="error-state">{getOperationErrorMessage(error, 'load')}</p>}
 
               {!loading && !error && members.length === 0 && (
                 <p className="empty-state">

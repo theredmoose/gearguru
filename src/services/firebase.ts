@@ -29,7 +29,7 @@ async function toFirestoreTimestamp(isoString: string) {
 }
 
 export function fromFirestoreTimestamp(timestamp: FirestoreTimestamp): string {
-  return new Date(timestamp.seconds * 1000).toISOString();
+  return new Date(timestamp.seconds * 1000 + Math.round(timestamp.nanoseconds / 1e6)).toISOString();
 }
 
 function now(): string {
