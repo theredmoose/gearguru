@@ -12,7 +12,7 @@ export const signUpWithEmail = async (
   password: string,
   displayName?: string
 ): Promise<UserCredential> => {
-  const { createUserWithEmailAndPassword, updateProfile } = await import('firebase/auth');
+  const { createUserWithEmailAndPassword, updateProfile, sendEmailVerification } = await import('firebase/auth');
   const auth = await getFirebaseAuth();
   const userCredential = await createUserWithEmailAndPassword(auth, email, password);
 
@@ -21,7 +21,28 @@ export const signUpWithEmail = async (
     await updateProfile(userCredential.user, { displayName });
   }
 
+  // Send verification email (best-effort — don't block signup if it fails)
+  try {
+    await sendEmailVerification(userCredential.user);
+  } catch {
+    // Verification email failure is non-critical
+  }
+
   return userCredential;
+};
+
+export const resendEmailVerification = async (): Promise<void> => {
+  const { sendEmailVerification } = await import('firebase/auth');
+  const auth = await getFirebaseAuth();
+  if (auth.currentUser) {
+    await sendEmailVerification(auth.currentUser);
+  }
+};
+
+export const getSignInMethodsForEmail = async (email: string): Promise<string[]> => {
+  const { fetchSignInMethodsForEmail } = await import('firebase/auth');
+  const auth = await getFirebaseAuth();
+  return fetchSignInMethodsForEmail(auth, email);
 };
 
 export const signInWithEmail = async (
@@ -106,7 +127,7 @@ export const getAuthErrorMessage = (errorCode: string): string => {
     case 'auth/cancelled-popup-request':
       return 'Sign-in was cancelled.';
     case 'auth/account-exists-with-different-credential':
-      return 'An account already exists with this email using a different sign-in method.';
+      return 'An account already exists with this email. Please sign in with email and password instead.';
     default:
       return 'An error occurred. Please try again.';
   }
