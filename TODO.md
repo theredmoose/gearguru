@@ -13,7 +13,7 @@
 - [x] Skill level per sport
 - [x] List layout for gear types
 - [x] Separate settings section (DIN, Stance)
-- [x] 516 tests passing
+- [x] 527 tests passing
 - [x] CI/CD with GitHub Actions
 - [x] Deployed to Firebase Hosting
 - [x] Real gear photo analysis via Claude Vision API (with mock fallback)
@@ -49,9 +49,9 @@
 - [x] Code-split Firebase to reduce bundle size — chunks exceed 500KB after minification (currently 680KB), use dynamic imports
 - [ ] Add E2E tests with Playwright
 - [x] Increase test coverage to 80%+ for branches/functions — 88% stmts, 82% branches, 86% functions, 90% lines (516 tests)
-- [ ] Increase PhotoCapture test coverage (currently 38.2% — lowest in codebase)
-- [ ] Extract GEAR_TYPE_LABELS and SPORT_LABELS to a shared constants file (currently duplicated across GearCard, MemberDetail, SettingsScreen, etc.)
-- [ ] Add useMemo to MemberDetail sizingCards calculation (recalculates on every render)
+- [x] Increase PhotoCapture test coverage — from 38.2% to 96.6% statements / 100% functions (PR #52)
+- [x] Extract GEAR_TYPE_LABELS and SPORT_LABELS to a shared constants file — moved to `src/constants/labels.ts` (PR #51)
+- [x] Add useMemo to MemberDetail sizingCards calculation (PR #51)
 
 ## Known Issues
 
