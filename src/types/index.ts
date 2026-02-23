@@ -66,6 +66,15 @@ export const SIZING_MODEL_LABELS: Record<SizingModel, string> = {
   evosports: 'Evosports',
 };
 
+// Alpine terrain preference — drives waist width recommendation
+export type AlpineTerrain = 'groomed' | 'all-mountain' | 'powder';
+
+export const ALPINE_TERRAIN_LABELS: Record<AlpineTerrain, string> = {
+  'groomed':      'Groomed',
+  'all-mountain': 'All-Mountain',
+  'powder':       'Powder',
+};
+
 // Nordic Skiing
 export interface NordicSkiSizing {
   sport: 'nordic-classic' | 'nordic-skate' | 'nordic-combi';
