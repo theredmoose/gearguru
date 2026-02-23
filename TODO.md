@@ -71,7 +71,7 @@
 - [x] Zero foot measurements cause invalid shoe sizes — `MemberDetail.tsx` shows "N/A" message when footLength is 0
 - [x] No validation for negative/zero measurements — MemberForm now validates weight > 0
 - [x] Missing Firebase env var validation — `src/config/firebase.ts` now throws with clear error listing missing vars
-- [ ] No account linking flow — users get stuck signing in with Google after creating email account with same address
+- [x] No account linking flow — fixed: `auth/account-exists-with-different-credential` detected in `useAuth`; conflict email extracted and surfaced; `AuthForm` auto-switches to sign-in mode with email pre-filled and shows guidance banner
 - [x] No offline error handling — read errors in App.tsx now use `getOperationErrorMessage()` with `'load'` context; network/unavailable codes produce friendly messages
 - [x] Year field in GearForm accepts invalid values — added submit-time validation (1980–currentYear+1); HTML min/max updated to match
 - [x] GearForm numeric fields (tip/waist/tail profile) use parseFloat/parseInt without isNaN guard — fixed: profile only built when all three fields parse to valid integers
@@ -85,7 +85,7 @@
 - [x] Potential undefined skillLevel access — already handled: `skillLevels` state initialised for all 6 sports with `?? 'intermediate'` fallback on line 68 of SportSizing.tsx
 - [x] No loading state for gear operations — gear delete/submit in App.tsx show no loading indicators; mutations now catch errors and surface a dismissible toast
 - [x] Race condition in useAuth — `setLoading(false)` and `setError()` now guarded by mounted ref
-- [ ] No email verification on signup — email accounts created without verifying address
+- [x] No email verification on signup — fixed: `sendEmailVerification` called after email signup; amber banner shown to unverified users with "Resend email" button in `App.tsx`
 - [x] Hockey skate width thresholds (0.36, 0.40) hardcoded without source documentation — added Bauer/CCM fit guide comments to `determineSkateWidth()`
 - [x] Firestore timestamp conversion drops nanoseconds — fixed: now includes `Math.round(nanoseconds / 1e6)` in milliseconds calculation
 

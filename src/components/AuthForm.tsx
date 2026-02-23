@@ -1,4 +1,4 @@
-import { useState, FormEvent } from 'react';
+import { useState, useEffect, FormEvent } from 'react';
 
 interface AuthFormProps {
   onEmailSignIn: (email: string, password: string) => Promise<void>;
@@ -9,6 +9,8 @@ interface AuthFormProps {
   error: string | null;
   loading: boolean;
   onClearError: () => void;
+  accountConflictEmail?: string | null;
+  onClearAccountConflict?: () => void;
 }
 
 type AuthMode = 'signin' | 'signup' | 'reset';
@@ -26,12 +28,23 @@ export function AuthForm({
   error,
   loading,
   onClearError,
+  accountConflictEmail,
+  onClearAccountConflict,
 }: AuthFormProps) {
   const [mode, setMode] = useState<AuthMode>('signin');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [displayName, setDisplayName] = useState('');
   const [resetSent, setResetSent] = useState(false);
+
+  // When a social sign-in detects an account conflict, pre-fill the email
+  // and switch to the email sign-in form so the user can sign in directly.
+  useEffect(() => {
+    if (accountConflictEmail) {
+      setEmail(accountConflictEmail);
+      setMode('signin');
+    }
+  }, [accountConflictEmail]);
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
@@ -67,6 +80,7 @@ export function AuthForm({
     setMode(newMode);
     setResetSent(false);
     onClearError();
+    onClearAccountConflict?.();
   };
 
   return (
@@ -181,6 +195,15 @@ export function AuthForm({
             {error && (
               <div className="bg-red-50 border border-red-200 text-red-600 text-sm font-bold rounded-xl px-4 py-3">
                 {error}
+              </div>
+            )}
+
+            {accountConflictEmail && mode === 'signin' && (
+              <div className="bg-amber-50 border border-amber-200 text-amber-800 text-sm rounded-xl px-4 py-3">
+                <p className="font-bold mb-1">Sign in with your password</p>
+                <p className="font-semibold text-xs">
+                  This email already has an account. Enter your password below to sign in.
+                </p>
               </div>
             )}
 

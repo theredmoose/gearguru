@@ -49,13 +49,16 @@ function App() {
     user,
     loading: authLoading,
     error: authError,
+    accountConflictEmail,
     signIn,
     signUp,
     signInGoogle,
     signInFacebook,
     signOut,
     sendPasswordReset,
+    resendVerification,
     clearError: clearAuthError,
+    clearAccountConflict,
   } = useAuth();
   const { members, loading, error, addMember, updateMember, updateSkillLevels, deleteMember } =
     useFamilyMembers(user?.uid ?? null);
@@ -208,6 +211,8 @@ function App() {
         error={authError}
         loading={authLoading}
         onClearError={clearAuthError}
+        accountConflictEmail={accountConflictEmail}
+        onClearAccountConflict={clearAccountConflict}
       />
     );
   }
@@ -394,8 +399,39 @@ function App() {
     );
   };
 
+  // Show email verification banner for email/password accounts that haven't verified yet
+  const isEmailProvider = user.providerData?.some(p => p.providerId === 'password');
+  const showVerificationBanner = isEmailProvider && !user.emailVerified;
+  const [verificationResent, setVerificationResent] = useState(false);
+
+  const handleResendVerification = async () => {
+    try {
+      await resendVerification();
+      setVerificationResent(true);
+    } catch {
+      // error already set in hook
+    }
+  };
+
   return (
     <div className="app flex flex-col" style={{ minHeight: '100dvh' }}>
+      {showVerificationBanner && (
+        <div className="bg-amber-50 border-b border-amber-200 px-4 py-2 flex items-center justify-between gap-3 text-xs">
+          <span className="text-amber-800 font-semibold">
+            {verificationResent
+              ? 'Verification email sent — check your inbox.'
+              : 'Please verify your email address.'}
+          </span>
+          {!verificationResent && (
+            <button
+              className="text-amber-700 font-black underline hover:text-amber-900 whitespace-nowrap"
+              onClick={handleResendVerification}
+            >
+              Resend email
+            </button>
+          )}
+        </div>
+      )}
       {renderView()}
       {operationError && (
         <div
