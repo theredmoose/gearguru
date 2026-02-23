@@ -2,6 +2,7 @@ import { Pencil, Trash2, MapPin } from 'lucide-react';
 import type { GearItem, FamilyMember } from '../types';
 import { GearStatusBadge } from './GearStatusBadge';
 import { GearTypeIcon } from './GearIcons';
+import { GEAR_TYPE_LABELS, SPORT_LABELS } from '../constants/labels';
 
 interface GearCardProps {
   item: GearItem;
@@ -10,26 +11,6 @@ interface GearCardProps {
   showOwner?: boolean;
   members?: FamilyMember[];
 }
-
-const GEAR_TYPE_LABELS: Record<string, string> = {
-  ski: 'Skis',
-  pole: 'Poles',
-  boot: 'Boots',
-  binding: 'Bindings',
-  snowboard: 'Snowboard',
-  skate: 'Skates',
-  helmet: 'Helmet',
-  other: 'Other',
-};
-
-const SPORT_LABELS: Record<string, string> = {
-  'nordic-classic': 'Nordic Classic',
-  'nordic-skate': 'Nordic Skate',
-  'nordic-combi': 'Nordic Combi',
-  alpine: 'Alpine',
-  snowboard: 'Snowboard',
-  hockey: 'Hockey',
-};
 
 const CONDITION_COLORS: Record<string, string> = {
   new:  '#22c55e',

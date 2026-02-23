@@ -64,7 +64,7 @@ describe('GearCard', () => {
 
     it('displays sport label', () => {
       render(<GearCard {...defaultProps} />);
-      expect(screen.getByText('Alpine')).toBeInTheDocument();
+      expect(screen.getByText('Alpine / Downhill')).toBeInTheDocument();
     });
   });
 
