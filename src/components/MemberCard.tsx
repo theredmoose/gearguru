@@ -1,5 +1,7 @@
 import { Pencil, Trash2, ChevronRight } from 'lucide-react';
 import type { FamilyMember } from '../types';
+import { shouldWarnGrowth, isMeasurementStale, analyzeGrowthTrend } from '../services/growthAnalysis';
+import { GrowthWarningBadge } from './GrowthWarningBadge';
 
 interface MemberCardProps {
   member: FamilyMember;
@@ -20,6 +22,14 @@ function calculateAge(dateOfBirth: string): number {
 export function MemberCard({ member, onSelect, onEdit, onDelete }: MemberCardProps) {
   const age = calculateAge(member.dateOfBirth);
   const { measurements } = member;
+  const showWarning = shouldWarnGrowth(member);
+  const badgeReason = showWarning
+    ? isMeasurementStale(member) && analyzeGrowthTrend(member.measurementHistory ?? []).isGrowing
+      ? 'both'
+      : isMeasurementStale(member)
+        ? 'stale'
+        : 'growing'
+    : null;
 
   const handleDelete = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -48,7 +58,10 @@ export function MemberCard({ member, onSelect, onEdit, onDelete }: MemberCardPro
 
         {/* Info */}
         <div>
-          <p className="text-sm font-black text-slate-900 leading-tight">{member.name}</p>
+          <p className="text-sm font-black text-slate-900 leading-tight">
+            {member.name}
+            {badgeReason && <GrowthWarningBadge reason={badgeReason} />}
+          </p>
           <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wide mt-0.5">
             {age} yrs · {measurements.height} cm · {measurements.weight} kg
           </p>

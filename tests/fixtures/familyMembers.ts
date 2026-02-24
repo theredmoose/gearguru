@@ -1,4 +1,4 @@
-import type { FamilyMember } from '../../src/types';
+import type { FamilyMember, MeasurementEntry } from '../../src/types';
 import { MEASUREMENTS } from './measurements';
 
 /**
@@ -66,3 +66,18 @@ export const FAMILY_MEMBERS = {
  * Array of all family members for list testing
  */
 export const ALL_FAMILY_MEMBERS = Object.values(FAMILY_MEMBERS);
+
+/**
+ * Helper to create a MeasurementEntry for tests
+ */
+export const createMeasurementEntry = (
+  overrides?: Partial<MeasurementEntry>
+): MeasurementEntry => ({
+  id: 'test-entry-1',
+  recordedAt: '2024-01-15T10:00:00.000Z',
+  height: 175,
+  weight: 70,
+  footLengthLeft: 27,
+  footLengthRight: 27.2,
+  ...overrides,
+});
