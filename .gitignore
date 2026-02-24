@@ -42,4 +42,6 @@ venv/
 # Testing
 coverage/
 .nyc_output/
+test-results/
+playwright-report/
 tsconfig.tsbuildinfo
