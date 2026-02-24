@@ -5,6 +5,7 @@ import {
   calculateAlpineSkiSizing,
   calculateAlpineBootSizing,
   calculateAlpineWaistWidth,
+  checkDINSafety,
   calculateSnowboardSizing,
   calculateSnowboardBootSizing,
   calculateHockeySkateSize,
@@ -234,6 +235,40 @@ describe('sizing service', () => {
       const powder      = calculateAlpineWaistWidth('powder');
       expect(groomed.max).toBeLessThanOrEqual(allMountain.min);
       expect(allMountain.max).toBeLessThanOrEqual(powder.min);
+    });
+  });
+
+  // ============================================
+  // DIN SAFETY CHECK
+  // ============================================
+  describe('checkDINSafety', () => {
+    const range = { min: 5, max: 7 };
+
+    it('returns "safe" when DIN is within range', () => {
+      expect(checkDINSafety(5, range)).toBe('safe');
+      expect(checkDINSafety(6, range)).toBe('safe');
+      expect(checkDINSafety(7, range)).toBe('safe');
+    });
+
+    it('returns "too-low" when DIN is below minimum', () => {
+      expect(checkDINSafety(4, range)).toBe('too-low');
+      expect(checkDINSafety(1, range)).toBe('too-low');
+    });
+
+    it('returns "too-high" when DIN is above maximum', () => {
+      expect(checkDINSafety(8, range)).toBe('too-high');
+      expect(checkDINSafety(12, range)).toBe('too-high');
+    });
+
+    it('treats boundary values as safe', () => {
+      expect(checkDINSafety(range.min, range)).toBe('safe');
+      expect(checkDINSafety(range.max, range)).toBe('safe');
+    });
+
+    it('works with fractional DIN settings', () => {
+      expect(checkDINSafety(5.5, range)).toBe('safe');
+      expect(checkDINSafety(4.5, range)).toBe('too-low');
+      expect(checkDINSafety(7.5, range)).toBe('too-high');
     });
   });
 

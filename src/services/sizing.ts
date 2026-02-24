@@ -371,6 +371,27 @@ export function calculateAlpineWaistWidth(
 }
 
 /**
+ * Check whether a stored DIN setting is within the recommended safe range
+ * for a given member profile.
+ *
+ * - 'too-low'  → binding may pre-release during normal skiing (fall risk)
+ * - 'safe'     → within recommended range
+ * - 'too-high' → binding unlikely to release in a crash (injury risk)
+ *
+ * The recommendedRange should come from AlpineSkiSizing.din (calculateAlpineSkiSizing).
+ */
+export type DINSafetyStatus = 'too-low' | 'safe' | 'too-high';
+
+export function checkDINSafety(
+  dinSetting: number,
+  recommendedRange: { min: number; max: number }
+): DINSafetyStatus {
+  if (dinSetting < recommendedRange.min) return 'too-low';
+  if (dinSetting > recommendedRange.max) return 'too-high';
+  return 'safe';
+}
+
+/**
  * Calculate DIN release setting
  * This is a simplified calculation - actual DIN should be set by a professional
  */

@@ -8,6 +8,7 @@ import {
   calculateAlpineSkiSizing,
   calculateAlpineBootSizing,
   calculateAlpineWaistWidth,
+  checkDINSafety,
   calculateSnowboardSizing,
   calculateSnowboardBootSizing,
   calculateHockeySkateSize,
@@ -196,6 +197,13 @@ export function SportSizing({
     const waistWidth = calculateAlpineWaistWidth(alpineTerrain);
     const showRange  = sizingDisplay === 'range';
 
+    // Collect gear items that have a DIN setting stored so we can check safety
+    const skisWithDIN = sportGearItems.filter(
+      (item) =>
+        item.extendedDetails?.type === 'alpineSki' &&
+        item.extendedDetails.details.bindings?.dinSetting !== undefined
+    );
+
     return (
       <div className="sizing-sections">
         <section className="sizing-section">
@@ -254,11 +262,48 @@ export function SportSizing({
             <div className="sizing-row">
               <span className="sizing-label">DIN</span>
               <div className="sizing-value-group">
-                <span className="sizing-value">{skiSizing.din.min}-{skiSizing.din.max}</span>
+                <span className="sizing-value">{skiSizing.din.min}–{skiSizing.din.max}</span>
                 <span className="sizing-note">Verify with tech</span>
               </div>
             </div>
           </div>
+
+          {/* DIN safety check — shown when gear items have a stored DIN setting */}
+          {skisWithDIN.length > 0 && (
+            <div className="mt-3 space-y-2">
+              {skisWithDIN.map((ski) => {
+                const ext = ski.extendedDetails;
+                const alpineDetails = ext?.type === 'alpineSki' ? ext.details : null;
+                const din = alpineDetails?.bindings?.dinSetting ?? 0;
+                const status = checkDINSafety(din, skiSizing.din);
+                const name = [ski.brand, ski.model].filter(Boolean).join(' ');
+                return (
+                  <div
+                    key={ski.id}
+                    role="alert"
+                    className={`flex items-start gap-2 px-3 py-2.5 rounded-xl text-xs border ${
+                      status === 'safe'
+                        ? 'bg-green-50 border-green-100 text-green-700'
+                        : status === 'too-low'
+                        ? 'bg-amber-50 border-amber-200 text-amber-800'
+                        : 'bg-red-50 border-red-200 text-red-700'
+                    }`}
+                  >
+                    <span className="font-black flex-shrink-0 mt-px" aria-hidden="true">
+                      {status === 'safe' ? '✓' : '⚠'}
+                    </span>
+                    <p className="font-semibold leading-snug">
+                      <span className="font-black">{name}</span>
+                      {' DIN '}{din}
+                      {status === 'safe' && ' — within safe range'}
+                      {status === 'too-low' && ` — below recommended (${skiSizing.din.min}–${skiSizing.din.max}). May pre-release.`}
+                      {status === 'too-high' && ` — above recommended (${skiSizing.din.min}–${skiSizing.din.max}). Injury risk.`}
+                    </p>
+                  </div>
+                );
+              })}
+            </div>
+          )}
         </section>
       </div>
     );
