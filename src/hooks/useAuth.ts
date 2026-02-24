@@ -105,6 +105,8 @@ export function useAuth(): AuthState & AuthActions {
       setError(null);
       setLoading(true);
       await signInWithGoogle();
+      // On success, onAuthStateChanged fires and sets user + loading=false together,
+      // avoiding a flash of the unauthenticated state (loading=false, user=null).
     } catch (err: unknown) {
       const errorCode = (err as { code?: string })?.code || 'unknown';
       if (mountedRef.current) {
@@ -113,10 +115,9 @@ export function useAuth(): AuthState & AuthActions {
           setAccountConflictEmail(conflictEmail);
         }
         setError(getAuthErrorMessage(errorCode));
+        setLoading(false);
       }
       throw err;
-    } finally {
-      if (mountedRef.current) setLoading(false);
     }
   }, []);
 
@@ -126,6 +127,7 @@ export function useAuth(): AuthState & AuthActions {
       setError(null);
       setLoading(true);
       await signInWithFacebook();
+      // Same as Google: let onAuthStateChanged clear loading on success.
     } catch (err: unknown) {
       const errorCode = (err as { code?: string })?.code || 'unknown';
       if (mountedRef.current) {
@@ -134,10 +136,9 @@ export function useAuth(): AuthState & AuthActions {
           setAccountConflictEmail(conflictEmail);
         }
         setError(getAuthErrorMessage(errorCode));
+        setLoading(false);
       }
       throw err;
-    } finally {
-      if (mountedRef.current) setLoading(false);
     }
   }, []);
 
