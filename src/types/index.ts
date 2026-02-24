@@ -9,6 +9,7 @@ export interface FamilyMember {
   dateOfBirth: string; // ISO date string
   gender: 'male' | 'female' | 'other';
   measurements: Measurements;
+  measurementHistory?: MeasurementEntry[];
   skillLevels?: Partial<Record<Sport, SkillLevel>>;
   createdAt: string;
   updatedAt: string;
@@ -37,6 +38,23 @@ export interface Measurements {
 
   // Last measured date
   measuredAt: string;
+}
+
+export interface MeasurementEntry {
+  id: string;            // uuid - for targeting edits/deletes
+  recordedAt: string;    // ISO date string - user-editable
+  height: number;
+  weight: number;
+  footLengthLeft: number;
+  footLengthRight: number;
+  footWidthLeft?: number;
+  footWidthRight?: number;
+  usShoeSize?: number;
+  euShoeSize?: number;
+  armLength?: number;
+  inseam?: number;
+  headCircumference?: number;
+  handSize?: number;
 }
 
 // ============================================

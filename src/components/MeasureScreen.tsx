@@ -1,5 +1,7 @@
 import type { FamilyMember } from '../types';
 import { ScreenHeader } from './ScreenHeader';
+import { shouldWarnGrowth, isMeasurementStale, analyzeGrowthTrend } from '../services/growthAnalysis';
+import { GrowthWarningBadge } from './GrowthWarningBadge';
 
 interface MeasureScreenProps {
   members: FamilyMember[];
@@ -23,6 +25,14 @@ export function MeasureScreen({ members, onSelectMember }: MeasureScreenProps) {
           <div className="space-y-3">
             {members.map((member) => {
               const { measurements } = member;
+              const showWarning = shouldWarnGrowth(member);
+              const badgeReason = showWarning
+                ? isMeasurementStale(member) && analyzeGrowthTrend(member.measurementHistory ?? []).isGrowing
+                  ? 'both'
+                  : isMeasurementStale(member)
+                    ? 'stale'
+                    : 'growing'
+                : null;
               return (
                 <button
                   key={member.id}
@@ -34,7 +44,10 @@ export function MeasureScreen({ members, onSelectMember }: MeasureScreenProps) {
                       {member.name.charAt(0).toUpperCase()}
                     </div>
                     <div>
-                      <p className="text-sm font-black text-slate-900">{member.name}</p>
+                      <p className="text-sm font-black text-slate-900">
+                        {member.name}
+                        {badgeReason && <GrowthWarningBadge reason={badgeReason} />}
+                      </p>
                       <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wide">
                         {measurements.height} cm · {measurements.weight} kg
                       </p>

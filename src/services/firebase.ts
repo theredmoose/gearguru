@@ -5,6 +5,7 @@ import type {
   GearItem,
   GearPhoto,
   Measurements,
+  MeasurementEntry,
   FirestoreTimestamp,
   Sport,
   SkillLevel,
@@ -149,14 +150,103 @@ export async function updateMeasurements(
   memberId: string,
   measurements: Measurements
 ): Promise<void> {
-  const { doc, updateDoc } = await import('firebase/firestore');
+  const { doc, getDoc, updateDoc } = await import('firebase/firestore');
   const db = await getDb();
   const docRef = doc(db, COLLECTIONS.FAMILY_MEMBERS, memberId);
+  const measuredAt = now();
+
+  // Build a new history entry from the incoming measurements
+  const newEntry: MeasurementEntry = {
+    id: crypto.randomUUID(),
+    recordedAt: measuredAt,
+    height: measurements.height,
+    weight: measurements.weight,
+    footLengthLeft: measurements.footLengthLeft,
+    footLengthRight: measurements.footLengthRight,
+    ...(measurements.footWidthLeft !== undefined && { footWidthLeft: measurements.footWidthLeft }),
+    ...(measurements.footWidthRight !== undefined && { footWidthRight: measurements.footWidthRight }),
+    ...(measurements.usShoeSize !== undefined && { usShoeSize: measurements.usShoeSize }),
+    ...(measurements.euShoeSize !== undefined && { euShoeSize: measurements.euShoeSize }),
+    ...(measurements.armLength !== undefined && { armLength: measurements.armLength }),
+    ...(measurements.inseam !== undefined && { inseam: measurements.inseam }),
+    ...(measurements.headCircumference !== undefined && { headCircumference: measurements.headCircumference }),
+    ...(measurements.handSize !== undefined && { handSize: measurements.handSize }),
+  };
+
+  // Read current history, prepend new entry, write back
+  const snapshot = await getDoc(docRef);
+  const existingHistory: MeasurementEntry[] = snapshot.exists()
+    ? (snapshot.data().measurementHistory ?? [])
+    : [];
+
   await updateDoc(docRef, {
     measurements: {
       ...measurements,
-      measuredAt: now(),
+      measuredAt,
     },
+    measurementHistory: [newEntry, ...existingHistory],
+    updatedAt: await toFirestoreTimestamp(measuredAt),
+  });
+}
+
+export async function addMeasurementEntry(
+  memberId: string,
+  entry: MeasurementEntry
+): Promise<void> {
+  const { doc, getDoc, updateDoc } = await import('firebase/firestore');
+  const db = await getDb();
+  const docRef = doc(db, COLLECTIONS.FAMILY_MEMBERS, memberId);
+
+  const snapshot = await getDoc(docRef);
+  const existing: MeasurementEntry[] = snapshot.exists()
+    ? (snapshot.data().measurementHistory ?? [])
+    : [];
+
+  await updateDoc(docRef, {
+    measurementHistory: [entry, ...existing],
+    updatedAt: await toFirestoreTimestamp(now()),
+  });
+}
+
+export async function updateMeasurementEntry(
+  memberId: string,
+  entryId: string,
+  updates: Partial<Omit<MeasurementEntry, 'id'>>
+): Promise<void> {
+  const { doc, getDoc, updateDoc } = await import('firebase/firestore');
+  const db = await getDb();
+  const docRef = doc(db, COLLECTIONS.FAMILY_MEMBERS, memberId);
+
+  const snapshot = await getDoc(docRef);
+  if (!snapshot.exists()) return;
+
+  const existing: MeasurementEntry[] = snapshot.data().measurementHistory ?? [];
+  const updated = existing.map((e) =>
+    e.id === entryId ? { ...e, ...updates } : e
+  );
+
+  await updateDoc(docRef, {
+    measurementHistory: updated,
+    updatedAt: await toFirestoreTimestamp(now()),
+  });
+}
+
+export async function deleteMeasurementEntry(
+  memberId: string,
+  entryId: string
+): Promise<void> {
+  const { doc, getDoc, updateDoc } = await import('firebase/firestore');
+  const db = await getDb();
+  const docRef = doc(db, COLLECTIONS.FAMILY_MEMBERS, memberId);
+
+  const snapshot = await getDoc(docRef);
+  if (!snapshot.exists()) return;
+
+  const existing: MeasurementEntry[] = snapshot.data().measurementHistory ?? [];
+  const filtered = existing.filter((e) => e.id !== entryId);
+
+  await updateDoc(docRef, {
+    measurementHistory: filtered,
     updatedAt: await toFirestoreTimestamp(now()),
   });
 }
@@ -331,6 +421,7 @@ export function docToFamilyMember(id: string, data: DocumentData): FamilyMember 
     dateOfBirth: data.dateOfBirth,
     gender: data.gender,
     measurements: data.measurements,
+    measurementHistory: data.measurementHistory ?? undefined,
     skillLevels: data.skillLevels,
     createdAt: fromFirestoreTimestamp(data.createdAt),
     updatedAt: fromFirestoreTimestamp(data.updatedAt),

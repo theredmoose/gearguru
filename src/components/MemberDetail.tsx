@@ -3,8 +3,10 @@ import { Settings, PlusCircle, ChevronDown, CheckCircle2, AlertCircle, ArrowLeft
 import type { FamilyMember, GearItem, Sport, SkillLevel, AppSettings, BootUnit } from '../types';
 import { ScreenHeader } from './ScreenHeader';
 import { GearTypeIcon } from './GearIcons';
+import { GrowthWarningBadge } from './GrowthWarningBadge';
 import { getShoeSizesFromFootLength } from '../services/shoeSize';
 import { GEAR_TYPE_LABELS } from '../constants/labels';
+import { shouldWarnGrowth, isMeasurementStale, analyzeGrowthTrend } from '../services/growthAnalysis';
 import {
   calculateAlpineSkiSizing,
   calculateAlpineBootSizing,
@@ -27,6 +29,7 @@ interface MemberDetailProps {
   onOpenConverter: () => void;
   onAddGear: () => void;
   onEditGear: (item: GearItem) => void;
+  onViewHistory?: () => void;
 }
 
 const SPORT_OPTIONS: { value: Sport; label: string }[] = [
@@ -158,9 +161,18 @@ export function MemberDetail({
   onOpenConverter,
   onAddGear,
   onEditGear,
+  onViewHistory,
 }: MemberDetailProps) {
   const { measurements: m } = member;
   const age = calculateAge(member.dateOfBirth);
+  const showGrowthWarning = shouldWarnGrowth(member);
+  const growthBadgeReason = showGrowthWarning
+    ? isMeasurementStale(member) && analyzeGrowthTrend(member.measurementHistory ?? []).isGrowing
+      ? 'both'
+      : isMeasurementStale(member)
+        ? 'stale'
+        : 'growing'
+    : null;
   const footLength = Math.max(m.footLengthLeft, m.footLengthRight);
 
   const defaultSport: Sport =
@@ -219,11 +231,17 @@ export function MemberDetail({
 
   const statRows = [
     { label: 'Age',    value: `${age} yrs` },
-    { label: 'Height', value: heightDisplay, onToggle: () => setHeightUnit(u => u === 'cm' ? 'ft' : 'cm') },
+    { label: 'Height', value: heightDisplay, badge: growthBadgeReason, onToggle: () => setHeightUnit(u => u === 'cm' ? 'ft' : 'cm') },
     { label: 'Weight', value: weightDisplay, onToggle: () => setWeightUnit(u => u === 'kg' ? 'lbs' : 'kg') },
     ...(showFoot ? [{ label: 'Foot', value: shoeDisplay, action: footLength > 0 ? onOpenConverter : undefined }] : []),
     ...(showHand ? [{ label: 'Hand', value: handDisplay }] : []),
-  ];
+  ] as Array<{
+    label: string;
+    value: string;
+    badge?: string | null;
+    onToggle?: () => void;
+    action?: () => void;
+  }>;
 
   return (
     <div className="member-detail flex flex-col min-h-screen">
@@ -325,6 +343,7 @@ export function MemberDetail({
                       aria-label={`Toggle ${row.label} units`}
                     >
                       <span className="text-sm font-extrabold text-slate-800 group-hover:text-blue-600 transition-colors">{row.value}</span>
+                      {row.badge && <GrowthWarningBadge reason={row.badge as 'stale' | 'growing' | 'both'} />}
                       <ArrowLeftRight className="w-3 h-3 text-slate-300 group-hover:text-blue-400 transition-colors" />
                     </button>
                   ) : (
@@ -333,6 +352,16 @@ export function MemberDetail({
                 </div>
               ))}
             </div>
+
+            {/* View History link */}
+            {onViewHistory && (
+              <button
+                onClick={onViewHistory}
+                className="text-[10px] font-black text-blue-500 uppercase tracking-widest hover:text-blue-700 transition-colors mt-2"
+              >
+                View History →
+              </button>
+            )}
           </div>
         </div>
 

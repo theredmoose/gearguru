@@ -27,10 +27,12 @@ import {
   MeasureScreen,
   ResourcesScreen,
   SettingsScreen,
+  MeasurementHistoryScreen,
+  EditMeasurementEntryScreen,
 } from './components';
 import type { TopLevelTab } from './components';
 import { useFamilyMembers, useAuth, useGearItems, useSettings } from './hooks';
-import type { FamilyMember, GearItem, Sport } from './types';
+import type { FamilyMember, GearItem, Sport, MeasurementEntry } from './types';
 
 type View =
   | 'home'
@@ -42,7 +44,9 @@ type View =
   | 'inventory'
   | 'add-gear'
   | 'edit-gear'
-  | 'settings';
+  | 'settings'
+  | 'measurement-history'
+  | 'edit-measurement-entry';
 
 function App() {
   const {
@@ -73,6 +77,7 @@ function App() {
   const [selectedGearItem, setSelectedGearItem] = useState<GearItem | null>(null);
   const [gearOwnerId, setGearOwnerId] = useState<string | null>(null);
   const [gearDefaultSport, setGearDefaultSport] = useState<Sport | undefined>(undefined);
+  const [selectedMeasurementEntry, setSelectedMeasurementEntry] = useState<MeasurementEntry | null>(null);
 
   // ── Tab navigation ──────────────────────────────────────────────
   const handleTabChange = (tab: TopLevelTab) => {
@@ -341,6 +346,39 @@ function App() {
           onOpenConverter={() => setView('converter')}
           onAddGear={() => handleAddGearFromSizing('alpine')}
           onEditGear={handleEditGear}
+          onViewHistory={() => setView('measurement-history')}
+        />
+      );
+    }
+
+    if (view === 'measurement-history' && selectedMember) {
+      return (
+        <MeasurementHistoryScreen
+          member={selectedMember}
+          onBack={() => setView('detail')}
+          onEditEntry={(entry) => {
+            setSelectedMeasurementEntry(entry);
+            setView('edit-measurement-entry');
+          }}
+          onAddEntry={() => {
+            setSelectedMeasurementEntry(null);
+            setView('edit-measurement-entry');
+          }}
+          onHistoryUpdated={(updatedMember) => setSelectedMember(updatedMember)}
+        />
+      );
+    }
+
+    if (view === 'edit-measurement-entry' && selectedMember) {
+      return (
+        <EditMeasurementEntryScreen
+          member={selectedMember}
+          entry={selectedMeasurementEntry}
+          onBack={() => setView('measurement-history')}
+          onSaved={(updatedMember) => {
+            setSelectedMember(updatedMember);
+            setView('measurement-history');
+          }}
         />
       );
     }

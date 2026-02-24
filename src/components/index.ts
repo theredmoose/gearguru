@@ -18,3 +18,6 @@ export { MeasureScreen } from './MeasureScreen';
 export { ResourcesScreen } from './ResourcesScreen';
 export { SettingsScreen } from './SettingsScreen';
 export { GearTypeIcon, SkiIcon, BootIcon, PoleIcon, HelmetIcon, SnowboardIcon, SkateIcon } from './GearIcons';
+export { GrowthWarningBadge } from './GrowthWarningBadge';
+export { MeasurementHistoryScreen } from './MeasurementHistoryScreen';
+export { EditMeasurementEntryScreen } from './EditMeasurementEntryScreen';
