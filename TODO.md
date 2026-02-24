@@ -13,7 +13,7 @@
 - [x] Skill level per sport
 - [x] List layout for gear types
 - [x] Separate settings section (DIN, Stance)
-- [x] 531 tests passing
+- [x] 536 tests passing
 - [x] CI/CD with GitHub Actions
 - [x] Deployed to Firebase Hosting
 - [x] Real gear photo analysis via Claude Vision API (with mock fallback)
@@ -38,7 +38,7 @@
 - [ ] Age-specific sizing adjustments for children
 - [ ] Growth projections for kids (next season sizing)
 - [x] Waist width recommendations for alpine skis — terrain selector (Groomed/All-Mountain/Powder) with mm ranges (PR #54)
-- [ ] Binding safety check — warn when DIN setting is outside safe range for user's weight/skill
+- [x] Binding safety check — inline green/amber/red badges in Gear Settings when stored DIN is outside safe range (PR #55)
 - [ ] Multi-brand sizing comparison view when adding gear
 - [ ] Equipment lifespan tracking based on condition progression
 - [ ] Stance width measurement guide (visual diagram)
