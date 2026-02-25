@@ -55,21 +55,50 @@ export const signInWithEmail = async (
 };
 
 // Google Authentication
-export const signInWithGoogle = async (): Promise<UserCredential> => {
-  const { signInWithPopup, GoogleAuthProvider } = await import('firebase/auth');
+// Falls back to redirect when the popup is blocked (common on mobile browsers).
+export const signInWithGoogle = async (): Promise<UserCredential | null> => {
+  const { signInWithPopup, signInWithRedirect, GoogleAuthProvider } = await import('firebase/auth');
   const auth = await getFirebaseAuth();
   const googleProvider = new GoogleAuthProvider();
-  return signInWithPopup(auth, googleProvider);
+  try {
+    return await signInWithPopup(auth, googleProvider);
+  } catch (err: unknown) {
+    const code = (err as { code?: string })?.code;
+    if (code === 'auth/popup-blocked' || code === 'auth/cancelled-popup-request') {
+      // Popup was blocked or superseded — redirect instead.
+      await signInWithRedirect(auth, googleProvider);
+      return null; // page navigates away; this line is never reached
+    }
+    throw err;
+  }
 };
 
 // Facebook Authentication
-export const signInWithFacebook = async (): Promise<UserCredential> => {
-  const { signInWithPopup, FacebookAuthProvider } = await import('firebase/auth');
+// Falls back to redirect when the popup is blocked (common on mobile browsers).
+export const signInWithFacebook = async (): Promise<UserCredential | null> => {
+  const { signInWithPopup, signInWithRedirect, FacebookAuthProvider } = await import('firebase/auth');
   const auth = await getFirebaseAuth();
   const facebookProvider = new FacebookAuthProvider();
   facebookProvider.addScope('email');
   facebookProvider.addScope('public_profile');
-  return signInWithPopup(auth, facebookProvider);
+  try {
+    return await signInWithPopup(auth, facebookProvider);
+  } catch (err: unknown) {
+    const code = (err as { code?: string })?.code;
+    if (code === 'auth/popup-blocked' || code === 'auth/cancelled-popup-request') {
+      await signInWithRedirect(auth, facebookProvider);
+      return null;
+    }
+    throw err;
+  }
+};
+
+// Check for a pending redirect result (called on app startup).
+// Needed to surface redirect-flow errors; successes are handled by onAuthStateChanged.
+export const checkRedirectResult = async (): Promise<void> => {
+  const { getRedirectResult } = await import('firebase/auth');
+  const auth = await getFirebaseAuth();
+  await getRedirectResult(auth);
 };
 
 // Sign Out
@@ -124,6 +153,8 @@ export const getAuthErrorMessage = (errorCode: string): string => {
       return 'Too many failed attempts. Please try again later.';
     case 'auth/popup-closed-by-user':
       return 'Sign-in popup was closed. Please try again.';
+    case 'auth/popup-blocked':
+      return 'Sign-in popup was blocked by your browser. Trying another method…';
     case 'auth/cancelled-popup-request':
       return 'Sign-in was cancelled.';
     case 'auth/account-exists-with-different-credential':
