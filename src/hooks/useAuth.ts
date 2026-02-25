@@ -9,6 +9,7 @@ import {
   resetPassword,
   resendEmailVerification,
   onAuthChange,
+  checkRedirectResult,
   getAuthErrorMessage,
 } from '../services/auth';
 
@@ -57,6 +58,18 @@ export function useAuth(): AuthState & AuthActions {
       cleanup = unsubscribe;
     });
     return () => cleanup?.();
+  }, []);
+
+  // Handle pending redirect result (Google/Facebook redirect sign-in flow).
+  // onAuthStateChanged covers the success case; this catches redirect errors.
+  useEffect(() => {
+    checkRedirectResult().catch((err: unknown) => {
+      const errorCode = (err as { code?: string })?.code || 'unknown';
+      if (mountedRef.current) {
+        setError(getAuthErrorMessage(errorCode));
+        setLoading(false);
+      }
+    });
   }, []);
 
   // Clear error
