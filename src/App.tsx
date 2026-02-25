@@ -78,6 +78,7 @@ function App() {
   const [gearOwnerId, setGearOwnerId] = useState<string | null>(null);
   const [gearDefaultSport, setGearDefaultSport] = useState<Sport | undefined>(undefined);
   const [selectedMeasurementEntry, setSelectedMeasurementEntry] = useState<MeasurementEntry | null>(null);
+  const [verificationResent, setVerificationResent] = useState(false);
 
   // ── Tab navigation ──────────────────────────────────────────────
   const handleTabChange = (tab: TopLevelTab) => {
@@ -440,7 +441,6 @@ function App() {
   // Show email verification banner for email/password accounts that haven't verified yet
   const isEmailProvider = user.providerData?.some(p => p.providerId === 'password');
   const showVerificationBanner = isEmailProvider && !user.emailVerified;
-  const [verificationResent, setVerificationResent] = useState(false);
 
   const handleResendVerification = async () => {
     try {
