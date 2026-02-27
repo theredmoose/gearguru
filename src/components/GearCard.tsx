@@ -152,7 +152,15 @@ export function GearCard({
         {/* Owner / Sport */}
         {showOwner
           ? <p className="text-[10px] text-slate-400 font-bold mt-0.5">{ownerName}</p>
-          : <p className="text-[10px] text-slate-400 font-bold mt-0.5">{SPORT_LABELS[item.sport] ?? item.sport}</p>
+          : (
+            <div className="flex flex-wrap gap-1 mt-0.5">
+              {item.sports.map((s) => (
+                <span key={s} className="text-[9px] font-black px-1.5 py-0.5 rounded-md bg-slate-100 text-slate-500 uppercase tracking-wide">
+                  {SPORT_LABELS[s] ?? s}
+                </span>
+              ))}
+            </div>
+          )
         }
       </div>
 
