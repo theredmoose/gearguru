@@ -56,10 +56,22 @@ export function EditMeasurementEntryScreen({
 
     if (!recordedAt) { setError('Date is required'); return; }
     if (height <= 0) { setError('Height must be greater than 0'); return; }
+    if (height > 300) { setError('Height must be 300 cm or less'); return; }
     if (weight <= 0) { setError('Weight must be greater than 0'); return; }
+    if (weight > 300) { setError('Weight must be 300 kg or less'); return; }
     if (footLengthLeft <= 0) { setError('Left foot length is required'); return; }
+    if (footLengthLeft > 30) { setError('Left foot length must be 30 cm or less'); return; }
     if (footLengthRight <= 0) { setError('Right foot length is required'); return; }
-    if (handSize !== '' && Number(handSize) <= 0) { setError('Hand size must be greater than 0'); return; }
+    if (footLengthRight > 30) { setError('Right foot length must be 30 cm or less'); return; }
+    if (footWidthLeft !== '' && Number(footWidthLeft) > 15) { setError('Left foot width must be 15 cm or less'); return; }
+    if (footWidthRight !== '' && Number(footWidthRight) > 15) { setError('Right foot width must be 15 cm or less'); return; }
+    if (usShoeSize !== '' && Number(usShoeSize) > 25) { setError('US shoe size must be 25 or less'); return; }
+    if (euShoeSize !== '' && Number(euShoeSize) > 60) { setError('EU shoe size must be 60 or less'); return; }
+    if (armLength !== '' && Number(armLength) > 120) { setError('Arm length must be 120 cm or less'); return; }
+    if (inseam !== '' && Number(inseam) > 120) { setError('Inseam must be 120 cm or less'); return; }
+    if (headCircumference !== '' && (Number(headCircumference) < 40 || Number(headCircumference) > 70)) { setError('Head circumference must be between 40 and 70 cm'); return; }
+    if (handSize !== '' && Number(handSize) < 4) { setError('Hand size must be 4 cm or more'); return; }
+    if (handSize !== '' && Number(handSize) > 30) { setError('Hand size must be 30 cm or less'); return; }
 
     const recordedAtIso = new Date(recordedAt + 'T12:00:00').toISOString();
 
@@ -150,6 +162,7 @@ export function EditMeasurementEntryScreen({
               onChange={(e) => setHeight(parseFloat(e.target.value) || 0)}
               placeholder="e.g. 142"
               min="0"
+              max="300"
               step="0.1"
             />
           </div>
@@ -165,6 +178,7 @@ export function EditMeasurementEntryScreen({
               onChange={(e) => setWeight(parseFloat(e.target.value) || 0)}
               placeholder="e.g. 38"
               min="0"
+              max="300"
               step="0.1"
             />
           </div>
@@ -180,7 +194,8 @@ export function EditMeasurementEntryScreen({
                 value={footLengthLeft || ''}
                 onChange={(e) => setFootLengthLeft(parseFloat(e.target.value) || 0)}
                 placeholder="e.g. 22.5"
-                min="0"
+                min="12"
+                max="30"
                 step="0.1"
               />
             </div>
@@ -193,7 +208,8 @@ export function EditMeasurementEntryScreen({
                 value={footLengthRight || ''}
                 onChange={(e) => setFootLengthRight(parseFloat(e.target.value) || 0)}
                 placeholder="e.g. 22.5"
-                min="0"
+                min="12"
+                max="30"
                 step="0.1"
               />
             </div>
@@ -211,6 +227,7 @@ export function EditMeasurementEntryScreen({
                 onChange={(e) => setFootWidthLeft(e.target.value)}
                 placeholder="optional"
                 min="0"
+                max="15"
                 step="0.1"
               />
             </div>
@@ -224,6 +241,7 @@ export function EditMeasurementEntryScreen({
                 onChange={(e) => setFootWidthRight(e.target.value)}
                 placeholder="optional"
                 min="0"
+                max="15"
                 step="0.1"
               />
             </div>
@@ -240,6 +258,7 @@ export function EditMeasurementEntryScreen({
                 onChange={(e) => setUsShoeSize(e.target.value)}
                 placeholder="optional"
                 min="0"
+                max="25"
                 step="0.5"
               />
             </div>
@@ -253,6 +272,7 @@ export function EditMeasurementEntryScreen({
                 onChange={(e) => setEuShoeSize(e.target.value)}
                 placeholder="optional"
                 min="0"
+                max="60"
                 step="1"
               />
             </div>
@@ -269,6 +289,7 @@ export function EditMeasurementEntryScreen({
                 onChange={(e) => setArmLength(e.target.value)}
                 placeholder="optional"
                 min="0"
+                max="120"
                 step="0.1"
               />
             </div>
@@ -282,6 +303,7 @@ export function EditMeasurementEntryScreen({
                 onChange={(e) => setInseam(e.target.value)}
                 placeholder="optional"
                 min="0"
+                max="120"
                 step="0.1"
               />
             </div>
@@ -297,7 +319,8 @@ export function EditMeasurementEntryScreen({
                 value={headCircumference}
                 onChange={(e) => setHeadCircumference(e.target.value)}
                 placeholder="optional"
-                min="0"
+                min="40"
+                max="70"
                 step="0.1"
               />
             </div>
@@ -310,7 +333,8 @@ export function EditMeasurementEntryScreen({
                 value={handSize}
                 onChange={(e) => setHandSize(e.target.value)}
                 placeholder="optional"
-                min="0"
+                min="4"
+                max="30"
                 step="0.1"
               />
             </div>

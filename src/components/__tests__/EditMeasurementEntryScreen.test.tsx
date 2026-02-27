@@ -136,17 +136,114 @@ describe('EditMeasurementEntryScreen', () => {
         });
       });
 
-      it('shows error when hand size is provided but zero', async () => {
+      it('shows error when hand size is below minimum', async () => {
         render(<EditMeasurementEntryScreen {...defaultAddProps} />);
         fillRequiredFields();
         fireEvent.change(screen.getByLabelText('Hand Size (cm)'), {
-          target: { value: '0' },
+          target: { value: '2' },
         });
         fireEvent.click(screen.getByRole('button', { name: /save/i }));
         await waitFor(() => {
           expect(
-            screen.getByText('Hand size must be greater than 0')
+            screen.getByText('Hand size must be 4 cm or more')
           ).toBeInTheDocument();
+        });
+        expect(addMeasurementEntry).not.toHaveBeenCalled();
+      });
+
+      it('shows error when left foot length exceeds 30 cm', async () => {
+        render(<EditMeasurementEntryScreen {...defaultAddProps} />);
+        fillRequiredFields(142, 38, 31, 22.5);
+        fireEvent.click(screen.getByRole('button', { name: /save/i }));
+        await waitFor(() => {
+          expect(screen.getByText('Left foot length must be 30 cm or less')).toBeInTheDocument();
+        });
+        expect(addMeasurementEntry).not.toHaveBeenCalled();
+      });
+
+      it('shows error when right foot length exceeds 30 cm', async () => {
+        render(<EditMeasurementEntryScreen {...defaultAddProps} />);
+        fillRequiredFields(142, 38, 22, 31);
+        fireEvent.click(screen.getByRole('button', { name: /save/i }));
+        await waitFor(() => {
+          expect(screen.getByText('Right foot length must be 30 cm or less')).toBeInTheDocument();
+        });
+        expect(addMeasurementEntry).not.toHaveBeenCalled();
+      });
+
+      it('shows error when foot width exceeds 15 cm', async () => {
+        render(<EditMeasurementEntryScreen {...defaultAddProps} />);
+        fillRequiredFields();
+        fireEvent.change(screen.getByLabelText('Foot W L (cm)'), { target: { value: '16' } });
+        fireEvent.click(screen.getByRole('button', { name: /save/i }));
+        await waitFor(() => {
+          expect(screen.getByText('Left foot width must be 15 cm or less')).toBeInTheDocument();
+        });
+        expect(addMeasurementEntry).not.toHaveBeenCalled();
+      });
+
+      it('shows error when US shoe size exceeds 25', async () => {
+        render(<EditMeasurementEntryScreen {...defaultAddProps} />);
+        fillRequiredFields();
+        fireEvent.change(screen.getByLabelText('US Shoe'), { target: { value: '26' } });
+        fireEvent.click(screen.getByRole('button', { name: /save/i }));
+        await waitFor(() => {
+          expect(screen.getByText('US shoe size must be 25 or less')).toBeInTheDocument();
+        });
+        expect(addMeasurementEntry).not.toHaveBeenCalled();
+      });
+
+      it('shows error when EU shoe size exceeds 60', async () => {
+        render(<EditMeasurementEntryScreen {...defaultAddProps} />);
+        fillRequiredFields();
+        fireEvent.change(screen.getByLabelText('EU Shoe'), { target: { value: '61' } });
+        fireEvent.click(screen.getByRole('button', { name: /save/i }));
+        await waitFor(() => {
+          expect(screen.getByText('EU shoe size must be 60 or less')).toBeInTheDocument();
+        });
+        expect(addMeasurementEntry).not.toHaveBeenCalled();
+      });
+
+      it('shows error when arm length exceeds 120 cm', async () => {
+        render(<EditMeasurementEntryScreen {...defaultAddProps} />);
+        fillRequiredFields();
+        fireEvent.change(screen.getByLabelText('Arm Length (cm)'), { target: { value: '121' } });
+        fireEvent.click(screen.getByRole('button', { name: /save/i }));
+        await waitFor(() => {
+          expect(screen.getByText('Arm length must be 120 cm or less')).toBeInTheDocument();
+        });
+        expect(addMeasurementEntry).not.toHaveBeenCalled();
+      });
+
+      it('shows error when inseam exceeds 120 cm', async () => {
+        render(<EditMeasurementEntryScreen {...defaultAddProps} />);
+        fillRequiredFields();
+        fireEvent.change(screen.getByLabelText('Inseam (cm)'), { target: { value: '121' } });
+        fireEvent.click(screen.getByRole('button', { name: /save/i }));
+        await waitFor(() => {
+          expect(screen.getByText('Inseam must be 120 cm or less')).toBeInTheDocument();
+        });
+        expect(addMeasurementEntry).not.toHaveBeenCalled();
+      });
+
+      it('shows error when head circumference is out of range', async () => {
+        render(<EditMeasurementEntryScreen {...defaultAddProps} />);
+        fillRequiredFields();
+        fireEvent.change(screen.getByLabelText('Head Circ. (cm)'), { target: { value: '80' } });
+        fireEvent.click(screen.getByRole('button', { name: /save/i }));
+        await waitFor(() => {
+          expect(screen.getByText('Head circumference must be between 40 and 70 cm')).toBeInTheDocument();
+        });
+        expect(addMeasurementEntry).not.toHaveBeenCalled();
+      });
+
+      it('shows error when hand size exceeds 30 cm', async () => {
+        render(<EditMeasurementEntryScreen {...defaultAddProps} />);
+        fillRequiredFields();
+        fireEvent.change(screen.getByLabelText('Hand Size (cm)'), { target: { value: '31' } });
+        fireEvent.click(screen.getByRole('button', { name: /save/i }));
+        await waitFor(() => {
+          expect(screen.getByText('Hand size must be 30 cm or less')).toBeInTheDocument();
         });
         expect(addMeasurementEntry).not.toHaveBeenCalled();
       });
@@ -159,6 +256,26 @@ describe('EditMeasurementEntryScreen', () => {
         await waitFor(() => {
           expect(addMeasurementEntry).toHaveBeenCalled();
         });
+      });
+
+      it('shows error when height exceeds 300 cm', async () => {
+        render(<EditMeasurementEntryScreen {...defaultAddProps} />);
+        fillRequiredFields(301, 38, 22, 22.5);
+        fireEvent.click(screen.getByRole('button', { name: /save/i }));
+        await waitFor(() => {
+          expect(screen.getByText('Height must be 300 cm or less')).toBeInTheDocument();
+        });
+        expect(addMeasurementEntry).not.toHaveBeenCalled();
+      });
+
+      it('shows error when weight exceeds 300 kg', async () => {
+        render(<EditMeasurementEntryScreen {...defaultAddProps} />);
+        fillRequiredFields(142, 301, 22, 22.5);
+        fireEvent.click(screen.getByRole('button', { name: /save/i }));
+        await waitFor(() => {
+          expect(screen.getByText('Weight must be 300 kg or less')).toBeInTheDocument();
+        });
+        expect(addMeasurementEntry).not.toHaveBeenCalled();
       });
 
       it('shows error when right foot length is zero', async () => {
