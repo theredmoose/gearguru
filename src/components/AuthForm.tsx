@@ -84,17 +84,17 @@ export function AuthForm({
   };
 
   return (
-    <div className="min-h-dvh bg-gradient-to-b from-[#008751] to-[#00522f] flex flex-col items-center justify-center py-8 px-6">
+    <div className="min-h-dvh bg-white flex flex-col items-center justify-center py-8 px-6">
       {/* Branding */}
       <div className="mb-6 text-center">
-        <h1 className="text-3xl font-black text-white tracking-tight uppercase">
-          Gear <span className="text-emerald-200">Guru</span>
+        <h1 className="text-3xl font-black text-[#008751] tracking-tight uppercase">
+          Gear <span className="text-[#1e3a32]">Guru</span>
         </h1>
-        <p className="text-emerald-300 text-xs font-bold uppercase tracking-widest mt-2">Family Gear Sizing</p>
+        <p className="text-[#008751] text-xs font-bold uppercase tracking-widest mt-2">Family Gear Sizing</p>
       </div>
 
       {/* Card */}
-      <div className="w-full max-w-sm bg-white rounded-3xl shadow-2xl overflow-hidden">
+      <div className="w-full max-w-sm bg-white rounded-3xl border border-slate-100 shadow-lg overflow-hidden">
         {mode === 'reset' ? (
           <form onSubmit={handleSubmit} className="p-7 flex flex-col gap-5">
             <h2 className="text-lg font-black text-slate-800">Reset Password</h2>
