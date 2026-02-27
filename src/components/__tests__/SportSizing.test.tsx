@@ -148,7 +148,7 @@ describe('SportSizing', () => {
       id: 'gear-1',
       userId: 'user-1',
       ownerId: 'member-1',
-      sport: 'nordic-classic' as const,
+      sports: ['nordic-classic' as const],
       type: 'ski' as const,
       brand: 'Fischer',
       model: 'Crown',

@@ -70,7 +70,7 @@ export function SportSizing({
   const currentSport = SPORTS[currentIndex];
   const skillLevel = skillLevels[currentSport.id] ?? 'intermediate';
 
-  const sportGearItems = gearItems.filter((item) => item.sport === currentSport.id);
+  const sportGearItems = gearItems.filter((item) => item.sports.includes(currentSport.id));
 
   const handleSlotTap = (slotType: GearType) => {
     const existingGear = sportGearItems.find((item) => item.type === slotType);

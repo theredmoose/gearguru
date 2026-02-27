@@ -134,7 +134,7 @@ describe('firebase service', () => {
       expect(result.id).toBe('gear-1');
       expect(result.userId).toBe('user-123');
       expect(result.ownerId).toBe('member-1');
-      expect(result.sport).toBe('alpine');
+      expect(result.sports).toEqual(['alpine']);
       expect(result.type).toBe('ski');
       expect(result.brand).toBe('Rossignol');
       expect(result.model).toBe('Experience 88');
@@ -214,6 +214,26 @@ describe('firebase service', () => {
         const data = { ...baseMockData, condition };
         const result = docToGearItem('gear-1', data);
         expect(result.condition).toBe(condition);
+      });
+    });
+
+    describe('sports migration', () => {
+      it('returns sports array from legacy sport field', () => {
+        const legacyData = { ...baseMockData, sport: 'alpine' };
+        const result = docToGearItem('gear-1', legacyData);
+        expect(result.sports).toEqual(['alpine']);
+      });
+
+      it('returns sports array when sports field exists', () => {
+        const modernData = { ...baseMockData, sports: ['alpine', 'snowboard'] };
+        const result = docToGearItem('gear-1', modernData);
+        expect(result.sports).toEqual(['alpine', 'snowboard']);
+      });
+
+      it('prefers sports over sport when both exist', () => {
+        const bothData = { ...baseMockData, sport: 'alpine', sports: ['snowboard'] };
+        const result = docToGearItem('gear-1', bothData);
+        expect(result.sports).toEqual(['snowboard']);
       });
     });
   });

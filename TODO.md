@@ -13,7 +13,7 @@
 - [x] Skill level per sport
 - [x] List layout for gear types
 - [x] Separate settings section (DIN, Stance)
-- [x] 640 tests passing (branch coverage 81.98%, above 80% threshold)
+- [x] 670 tests passing (branch coverage 81.98%, above 80% threshold)
 - [x] CI/CD with GitHub Actions
 - [x] Deployed to Firebase Hosting
 - [x] Real gear photo analysis via Claude Vision API (with mock fallback)
@@ -36,6 +36,7 @@
 - [ ] Add remaining manufacturer Alpine/Snowboard models (Salomon, Atomic, Rossignol, K2)
 - [ ] PWA support (offline, installable)
 - [ ] Dark mode
+- [ ] Personalized color theme — let users pick an accent color (or preset theme) in Settings, replacing the hardcoded green (#008751)
 - [ ] Multiple families / sharing
 - [ ] Age-specific sizing adjustments for children
 - [ ] Growth projections for kids (next season sizing)

@@ -10,7 +10,7 @@ describe('GearCard', () => {
   const baseGearItem: GearItem = {
     id: 'gear-1',
     ownerId: 'member-1',
-    sport: 'alpine',
+    sports: ['alpine'],
     type: 'ski',
     brand: 'Atomic',
     model: 'Redster X9',
@@ -62,9 +62,16 @@ describe('GearCard', () => {
       expect(screen.getByText('good')).toBeInTheDocument();
     });
 
-    it('displays sport label', () => {
+    it('displays alpine sport badge', () => {
       render(<GearCard {...defaultProps} />);
       expect(screen.getByText('Alpine / Downhill')).toBeInTheDocument();
+    });
+
+    it('renders a badge for each sport in the sports array', () => {
+      const multiSportItem = { ...baseGearItem, sports: ['alpine', 'snowboard'] as import('../../types').Sport[] };
+      render(<GearCard {...defaultProps} item={multiSportItem} />);
+      expect(screen.getByText('Alpine / Downhill')).toBeInTheDocument();
+      expect(screen.getByText('Snowboard')).toBeInTheDocument();
     });
   });
 
@@ -282,9 +289,9 @@ describe('GearCard', () => {
       expect(screen.getByText('Unknown')).toBeInTheDocument();
     });
 
-    it('hides sport label when showing owner', () => {
+    it('hides sport badges when showing owner', () => {
       render(<GearCard {...defaultProps} showOwner members={members} />);
-      expect(screen.queryByText('Alpine')).not.toBeInTheDocument();
+      expect(screen.queryByText('Alpine / Downhill')).not.toBeInTheDocument();
     });
   });
 });

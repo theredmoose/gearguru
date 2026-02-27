@@ -341,7 +341,7 @@ export async function createGearItem(
   const docData: DocumentData = {
     userId: data.userId,
     ownerId: data.ownerId,
-    sport: data.sport,
+    sports: data.sports,
     type: data.type,
     brand: data.brand,
     model: data.model,
@@ -384,7 +384,7 @@ export async function updateGearItem(
   // Add only the fields that are being updated
   if (data.userId !== undefined) updateData.userId = data.userId;
   if (data.ownerId !== undefined) updateData.ownerId = data.ownerId;
-  if (data.sport !== undefined) updateData.sport = data.sport;
+  if (data.sports !== undefined) updateData.sports = data.sports;
   if (data.type !== undefined) updateData.type = data.type;
   if (data.brand !== undefined) updateData.brand = data.brand;
   if (data.model !== undefined) updateData.model = data.model;
@@ -429,11 +429,13 @@ export function docToFamilyMember(id: string, data: DocumentData): FamilyMember 
 }
 
 export function docToGearItem(id: string, data: DocumentData): GearItem {
+  // On-read migration: old docs have `sport` (string), new docs have `sports` (array)
+  const sports: Sport[] = data.sports ?? (data.sport ? [data.sport as Sport] : []);
   return {
     id,
     userId: data.userId,
     ownerId: data.ownerId,
-    sport: data.sport,
+    sports,
     type: data.type,
     brand: data.brand,
     model: data.model,
