@@ -17,7 +17,7 @@ type AuthMode = 'signin' | 'signup' | 'reset';
 
 const inputCls =
   'w-full border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-800 bg-white focus:outline-none focus:ring-2 focus:ring-emerald-400 placeholder:text-slate-300 disabled:opacity-50';
-const labelCls = 'block text-[10px] font-black text-emerald-700 uppercase tracking-widest mb-1.5';
+const labelCls = 'block text-xs font-black text-emerald-700 uppercase tracking-widest mb-1.5';
 
 export function AuthForm({
   onEmailSignIn,
@@ -234,7 +234,7 @@ export function AuthForm({
             {/* Divider */}
             <div className="flex items-center gap-3">
               <div className="flex-1 h-px bg-slate-100" />
-              <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">or</span>
+              <span className="text-xs font-black text-slate-400 uppercase tracking-widest">or</span>
               <div className="flex-1 h-px bg-slate-100" />
             </div>
 

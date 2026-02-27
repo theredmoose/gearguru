@@ -62,7 +62,7 @@ export function MemberCard({ member, onSelect, onEdit, onDelete }: MemberCardPro
             {member.name}
             {badgeReason && <GrowthWarningBadge reason={badgeReason} />}
           </p>
-          <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wide mt-0.5">
+          <p className="text-xs font-bold text-slate-400 uppercase tracking-wide mt-0.5">
             {age} yrs · {measurements.height} cm · {measurements.weight} kg
           </p>
         </div>
@@ -71,14 +71,14 @@ export function MemberCard({ member, onSelect, onEdit, onDelete }: MemberCardPro
       {/* Actions */}
       <div className="flex items-center gap-1">
         <button
-          className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-slate-100 transition-colors text-slate-400 hover:text-[#008751]"
+          className="w-11 h-11 flex items-center justify-center rounded-full hover:bg-slate-100 transition-colors text-slate-400 hover:text-[#008751]"
           onClick={handleEdit}
           aria-label="Edit member"
         >
           <Pencil className="w-4 h-4" />
         </button>
         <button
-          className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-red-50 transition-colors text-slate-400 hover:text-red-500"
+          className="w-11 h-11 flex items-center justify-center rounded-full hover:bg-red-50 transition-colors text-slate-400 hover:text-red-500"
           onClick={handleDelete}
           aria-label="Delete member"
         >
