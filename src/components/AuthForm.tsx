@@ -16,8 +16,8 @@ interface AuthFormProps {
 type AuthMode = 'signin' | 'signup' | 'reset';
 
 const inputCls =
-  'w-full border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-800 bg-white focus:outline-none focus:ring-2 focus:ring-blue-400 placeholder:text-slate-300 disabled:opacity-50';
-const labelCls = 'block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1.5';
+  'w-full border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-800 bg-white focus:outline-none focus:ring-2 focus:ring-emerald-400 placeholder:text-slate-300 disabled:opacity-50';
+const labelCls = 'block text-[10px] font-black text-emerald-700 uppercase tracking-widest mb-1.5';
 
 export function AuthForm({
   onEmailSignIn,
@@ -84,11 +84,13 @@ export function AuthForm({
   };
 
   return (
-    <div className="min-h-dvh bg-gradient-to-b from-blue-700 to-blue-900 flex flex-col items-center justify-start pt-16 pb-8 px-6">
+    <div className="min-h-dvh bg-gradient-to-b from-[#008751] to-[#00522f] flex flex-col items-center justify-start pt-16 pb-8 px-6">
       {/* Branding */}
       <div className="mb-8 text-center">
-        <h1 className="text-3xl font-black text-white tracking-tight">Gear Guru</h1>
-        <p className="text-blue-200 text-sm font-bold mt-1">Sports Equipment Sizing</p>
+        <h1 className="text-3xl font-black text-white tracking-tight uppercase">
+          Gear <span className="text-emerald-200">Guru</span>
+        </h1>
+        <p className="text-emerald-300 text-xs font-bold uppercase tracking-widest mt-2">Family Gear Sizing</p>
       </div>
 
       {/* Card */}
@@ -135,7 +137,7 @@ export function AuthForm({
 
             <button
               type="button"
-              className="text-sm font-bold text-blue-600 hover:text-blue-800 transition-colors text-center"
+              className="text-sm font-bold text-[#008751] hover:text-emerald-800 transition-colors text-center"
               onClick={() => switchMode('signin')}
             >
               ← Back to Sign In
@@ -222,7 +224,7 @@ export function AuthForm({
             {mode === 'signin' && (
               <button
                 type="button"
-                className="text-xs font-bold text-slate-400 hover:text-slate-600 transition-colors text-center -mt-2"
+                className="text-xs font-bold text-slate-400 hover:text-emerald-700 transition-colors text-center -mt-2"
                 onClick={() => switchMode('reset')}
               >
                 Forgot password?
@@ -273,7 +275,7 @@ export function AuthForm({
                   No account?{' '}
                   <button
                     type="button"
-                    className="text-blue-600 hover:text-blue-800 transition-colors font-black"
+                    className="text-[#008751] hover:text-emerald-800 transition-colors font-black"
                     onClick={() => switchMode('signup')}
                   >
                     Sign Up
@@ -284,7 +286,7 @@ export function AuthForm({
                   Have an account?{' '}
                   <button
                     type="button"
-                    className="text-blue-600 hover:text-blue-800 transition-colors font-black"
+                    className="text-[#008751] hover:text-emerald-800 transition-colors font-black"
                     onClick={() => switchMode('signin')}
                   >
                     Sign In
