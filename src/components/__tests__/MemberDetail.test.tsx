@@ -101,7 +101,7 @@ describe('MemberDetail', () => {
 
     it('shows empty gear state when no gear items', () => {
       render(<MemberDetail {...defaultProps} gearItems={[]} />);
-      expect(screen.getByText(/no gear yet/i)).toBeInTheDocument();
+      expect(screen.getByText(/no gear added yet/i)).toBeInTheDocument();
     });
 
     it('renders gear items when provided', () => {

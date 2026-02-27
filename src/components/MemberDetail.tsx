@@ -42,7 +42,7 @@ const SPORT_OPTIONS: { value: Sport; label: string }[] = [
 
 const LEVEL_OPTIONS: { value: SkillLevel; label: string }[] = [
   { value: 'beginner',     label: 'Beginner' },
-  { value: 'intermediate', label: 'Intermed.' },
+  { value: 'intermediate', label: 'Intermediate' },
   { value: 'advanced',     label: 'Advanced' },
   { value: 'expert',       label: 'Expert' },
 ];
@@ -265,31 +265,12 @@ export function MemberDetail({
         {/* ── Profile Card ── */}
         <div className="bg-white p-4 rounded-[2.5rem] shadow-[0_15px_35px_rgba(0,0,0,0.03)] border border-white mb-4 flex gap-5">
 
-          {/* Left column: avatar + sport selector */}
-          <div className="w-1/2 flex flex-col gap-3">
-            <div className="aspect-[3/4] bg-[#F1F5F9] rounded-[2rem] border-2 border-slate-50 flex items-center justify-center overflow-hidden">
+          {/* Left column: avatar */}
+          <div className="w-1/2 flex flex-col">
+            <div className="aspect-[3/4] bg-gradient-to-br from-emerald-50 to-slate-100 rounded-[2rem] border-2 border-white flex items-center justify-center overflow-hidden">
               <span className="text-6xl font-black text-[#008751] select-none">
                 {member.name.charAt(0).toUpperCase()}
               </span>
-            </div>
-
-            {/* Sport picker (full width, left column) */}
-            <div className="relative">
-              <label className="text-[10px] text-emerald-700 font-black uppercase tracking-widest block mb-1">Sport</label>
-              <select
-                value={selectedSport}
-                onChange={(e) => {
-                  const s = e.target.value as Sport;
-                  setSelectedSport(s);
-                  setSkillLevel(member.skillLevels?.[s] ?? 'intermediate');
-                }}
-                className="w-full bg-[#ECFDF5] border-none rounded-xl px-2 py-2 text-[10px] font-black text-[#008751] appearance-none focus:outline-none focus:ring-2 focus:ring-emerald-500/20 transition-all cursor-pointer"
-              >
-                {SPORT_OPTIONS.map(o => (
-                  <option key={o.value} value={o.value}>{o.label}</option>
-                ))}
-              </select>
-              <ChevronDown className="absolute right-1.5 bottom-2.5 w-3 h-3 text-emerald-400 pointer-events-none" />
             </div>
           </div>
 
@@ -305,7 +286,7 @@ export function MemberDetail({
             <div className="space-y-0.5 mb-3">
               {statRows.map((row) => (
                 <div key={row.label} className="flex items-center justify-between border-b border-slate-50 py-1.5">
-                  <span className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">
+                  <span className="text-[11px] text-slate-400 font-bold uppercase tracking-widest">
                     {row.label}
                   </span>
                   {row.action ? (
@@ -336,26 +317,46 @@ export function MemberDetail({
             {onViewHistory && (
               <button
                 onClick={onViewHistory}
-                className="text-[10px] font-black text-[#008751] uppercase tracking-widest hover:text-emerald-800 transition-colors block mb-3"
+                className="text-[11px] font-black text-[#008751] uppercase tracking-widest hover:text-emerald-800 transition-colors block mb-3"
               >
                 View History →
               </button>
             )}
 
-            {/* Skill level picker (bottom of right column) */}
-            <div className="relative">
-              <label className="text-[10px] text-emerald-700 font-black uppercase tracking-widest block mb-1">Skill Level</label>
-              <select
-                value={skillLevel}
-                onChange={(e) => setSkillLevel(e.target.value as SkillLevel)}
-                className="w-full bg-[#ECFDF5] border-none rounded-xl px-2 py-2 text-[10px] font-black text-[#008751] appearance-none focus:outline-none focus:ring-2 focus:ring-emerald-500/20 transition-all cursor-pointer"
-              >
-                {LEVEL_OPTIONS.map(o => (
-                  <option key={o.value} value={o.value}>{o.label}</option>
-                ))}
-              </select>
-              <ChevronDown className="absolute right-1.5 bottom-2.5 w-3 h-3 text-emerald-400 pointer-events-none" />
-            </div>
+          </div>
+        </div>
+
+        {/* ── Sport & Skill Level ── */}
+        <div className="flex gap-3 mb-4">
+          <div className="flex-1 relative">
+            <label className="text-[11px] text-emerald-700 font-black uppercase tracking-widest block mb-1 ml-1">Sport</label>
+            <select
+              value={selectedSport}
+              onChange={(e) => {
+                const s = e.target.value as Sport;
+                setSelectedSport(s);
+                setSkillLevel(member.skillLevels?.[s] ?? 'intermediate');
+              }}
+              className="w-full bg-white border border-slate-100 rounded-2xl px-3 py-2.5 text-xs font-black text-[#008751] appearance-none focus:outline-none focus:ring-2 focus:ring-emerald-500/20 transition-all cursor-pointer shadow-[0_4px_12px_rgba(0,0,0,0.02)]"
+            >
+              {SPORT_OPTIONS.map(o => (
+                <option key={o.value} value={o.value}>{o.label}</option>
+              ))}
+            </select>
+            <ChevronDown className="absolute right-3 bottom-3 w-3 h-3 text-emerald-400 pointer-events-none" />
+          </div>
+          <div className="flex-1 relative">
+            <label className="text-[11px] text-emerald-700 font-black uppercase tracking-widest block mb-1 ml-1">Skill Level</label>
+            <select
+              value={skillLevel}
+              onChange={(e) => setSkillLevel(e.target.value as SkillLevel)}
+              className="w-full bg-white border border-slate-100 rounded-2xl px-3 py-2.5 text-xs font-black text-[#008751] appearance-none focus:outline-none focus:ring-2 focus:ring-emerald-500/20 transition-all cursor-pointer shadow-[0_4px_12px_rgba(0,0,0,0.02)]"
+            >
+              {LEVEL_OPTIONS.map(o => (
+                <option key={o.value} value={o.value}>{o.label}</option>
+              ))}
+            </select>
+            <ChevronDown className="absolute right-3 bottom-3 w-3 h-3 text-emerald-400 pointer-events-none" />
           </div>
         </div>
 
@@ -379,8 +380,8 @@ export function MemberDetail({
                 key={card.label}
                 className="bg-white rounded-[2rem] p-4 flex items-start gap-3 min-h-[86px] border border-white shadow-[0_15px_30px_rgba(0,0,0,0.02)] relative overflow-hidden"
               >
-                <div className="flex-shrink-0 bg-slate-50 p-2 rounded-2xl">
-                  <GearTypeIcon type={card.type} className="w-9 h-9" />
+                <div className="flex-shrink-0 bg-slate-50 p-1.5 rounded-xl">
+                  <GearTypeIcon type={card.type} className="w-7 h-7" />
                 </div>
                 <div className="flex flex-col flex-1 min-w-0">
                   <div className="flex items-center justify-between mb-1.5">
@@ -402,9 +403,9 @@ export function MemberDetail({
                   </div>
                   <div className="space-y-1">
                     {card.items.map((item, i) => (
-                      <div key={i} className="flex justify-between items-center w-full">
-                        <span className="text-[10px] font-bold text-slate-400 truncate">{item.label}</span>
-                        <span className="text-[10px] font-black text-slate-900 ml-1 flex-shrink-0">{item.value}</span>
+                      <div key={i} className="flex justify-between items-baseline gap-1 w-full">
+                        <span className="text-[10px] font-bold text-slate-400 truncate min-w-0">{item.label}</span>
+                        <span className="text-[10px] font-black text-slate-900 whitespace-nowrap">{item.value}</span>
                       </div>
                     ))}
                   </div>
@@ -430,9 +431,13 @@ export function MemberDetail({
           </div>
 
           {gearItems.length === 0 ? (
-            <p className="text-slate-400 text-sm text-center py-6 bg-white rounded-[2rem] shadow-[0_15px_30px_rgba(0,0,0,0.02)]">
-              No gear yet. Tap + to add.
-            </p>
+            <div className="flex flex-col items-center gap-2 py-8 bg-white rounded-[2rem] shadow-[0_15px_30px_rgba(0,0,0,0.02)]">
+              <div className="w-12 h-12 rounded-2xl bg-slate-50 flex items-center justify-center">
+                <PlusCircle className="w-6 h-6 text-slate-300" />
+              </div>
+              <p className="text-slate-500 text-sm font-bold">No gear added yet</p>
+              <p className="text-slate-300 text-xs">Tap + to start building your vault</p>
+            </div>
           ) : (
             <div className="space-y-3">
               {gearItems.map((item) => {
