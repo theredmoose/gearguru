@@ -13,7 +13,7 @@
 - [x] Skill level per sport
 - [x] List layout for gear types
 - [x] Separate settings section (DIN, Stance)
-- [x] 581 tests passing
+- [x] 640 tests passing (branch coverage 81.98%, above 80% threshold)
 - [x] CI/CD with GitHub Actions
 - [x] Deployed to Firebase Hosting
 - [x] Real gear photo analysis via Claude Vision API (with mock fallback)
@@ -28,6 +28,8 @@
 - [ ] Add data export (PDF/CSV)
 
 ## Future Enhancements
+- [ ] Settings toggle: track foot and hand measurements as a single value or left/right separately — controls whether MemberForm and EditMeasurementEntryScreen show one field or paired L/R fields for foot length, foot width, and hand size
+
 - [x] Growth tracking / size history — measurement history with per-entry edit/delete, growth-trend analysis, ⚠ badge in MemberCard/MemberDetail/MeasureScreen
 - [ ] Hand-me-down suggestions between family members
 - [x] Brand-specific sizing charts — Fischer + Evosports Nordic models added; more manufacturers (Salomon, Atomic, Rossignol, K2) for Alpine/Snowboard

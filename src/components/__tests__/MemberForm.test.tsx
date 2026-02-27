@@ -84,6 +84,27 @@ describe('MemberForm', () => {
       expect(await screen.findByText('Weight must be greater than 0')).toBeInTheDocument();
     });
 
+    it('shows error when height exceeds 300 cm', async () => {
+      render(<MemberForm {...defaultProps} />);
+      fireEvent.change(screen.getByLabelText(/name/i), { target: { value: 'John' } });
+      fireEvent.change(screen.getByLabelText(/date of birth/i), { target: { value: '1990-05-15' } });
+      fireEvent.change(screen.getByLabelText(/height \(cm\)/i), { target: { value: '301' } });
+      fireEvent.click(screen.getByRole('button', { name: /add member/i }));
+      expect(await screen.findByText('Height must be 300 cm or less')).toBeInTheDocument();
+      expect(defaultProps.onSubmit).not.toHaveBeenCalled();
+    });
+
+    it('shows error when weight exceeds 300 kg', async () => {
+      render(<MemberForm {...defaultProps} />);
+      fireEvent.change(screen.getByLabelText(/name/i), { target: { value: 'John' } });
+      fireEvent.change(screen.getByLabelText(/date of birth/i), { target: { value: '1990-05-15' } });
+      fireEvent.change(screen.getByLabelText(/height \(cm\)/i), { target: { value: '180' } });
+      fireEvent.change(screen.getByLabelText(/weight \(kg\)/i), { target: { value: '301' } });
+      fireEvent.click(screen.getByRole('button', { name: /add member/i }));
+      expect(await screen.findByText('Weight must be 300 kg or less')).toBeInTheDocument();
+      expect(defaultProps.onSubmit).not.toHaveBeenCalled();
+    });
+
     it('shows error when date of birth is in the future', async () => {
       render(<MemberForm {...defaultProps} />);
       fireEvent.change(screen.getByLabelText(/name/i), { target: { value: 'John' } });
@@ -106,6 +127,67 @@ describe('MemberForm', () => {
       fireEvent.change(screen.getByLabelText(/weight \(kg\)/i), { target: { value: '75' } });
       fireEvent.click(screen.getByRole('button', { name: /add member/i }));
       expect(await screen.findByText('Date of birth is too far in the past')).toBeInTheDocument();
+    });
+
+    const fillBasicValid = () => {
+      fireEvent.change(screen.getByLabelText(/name/i), { target: { value: 'John' } });
+      fireEvent.change(screen.getByLabelText(/date of birth/i), { target: { value: '1990-05-15' } });
+      fireEvent.change(screen.getByLabelText(/height \(cm\)/i), { target: { value: '180' } });
+      fireEvent.change(screen.getByLabelText(/weight \(kg\)/i), { target: { value: '75' } });
+    };
+
+    it('shows error when left foot width exceeds 15 cm', async () => {
+      render(<MemberForm {...defaultProps} />);
+      fillBasicValid();
+      fireEvent.change(screen.getByLabelText(/left width/i), { target: { value: '16' } });
+      fireEvent.click(screen.getByRole('button', { name: /add member/i }));
+      expect(await screen.findByText('Left foot width must be 15 cm or less')).toBeInTheDocument();
+      expect(defaultProps.onSubmit).not.toHaveBeenCalled();
+    });
+
+    it('shows error when right foot width exceeds 15 cm', async () => {
+      render(<MemberForm {...defaultProps} />);
+      fillBasicValid();
+      fireEvent.change(screen.getByLabelText(/right width/i), { target: { value: '16' } });
+      fireEvent.click(screen.getByRole('button', { name: /add member/i }));
+      expect(await screen.findByText('Right foot width must be 15 cm or less')).toBeInTheDocument();
+      expect(defaultProps.onSubmit).not.toHaveBeenCalled();
+    });
+
+    it('shows error when US shoe size exceeds 25', async () => {
+      render(<MemberForm {...defaultProps} />);
+      fillBasicValid();
+      fireEvent.change(screen.getByLabelText(/us size/i), { target: { value: '26' } });
+      fireEvent.click(screen.getByRole('button', { name: /add member/i }));
+      expect(await screen.findByText('US shoe size must be 25 or less')).toBeInTheDocument();
+      expect(defaultProps.onSubmit).not.toHaveBeenCalled();
+    });
+
+    it('shows error when EU shoe size exceeds 60', async () => {
+      render(<MemberForm {...defaultProps} />);
+      fillBasicValid();
+      fireEvent.change(screen.getByLabelText(/eu size/i), { target: { value: '61' } });
+      fireEvent.click(screen.getByRole('button', { name: /add member/i }));
+      expect(await screen.findByText('EU shoe size must be 60 or less')).toBeInTheDocument();
+      expect(defaultProps.onSubmit).not.toHaveBeenCalled();
+    });
+
+    it('shows error when head circumference is out of range', async () => {
+      render(<MemberForm {...defaultProps} />);
+      fillBasicValid();
+      fireEvent.change(screen.getByLabelText(/head circumference/i), { target: { value: '80' } });
+      fireEvent.click(screen.getByRole('button', { name: /add member/i }));
+      expect(await screen.findByText('Head circumference must be between 40 and 70 cm')).toBeInTheDocument();
+      expect(defaultProps.onSubmit).not.toHaveBeenCalled();
+    });
+
+    it('shows error when hand size is out of range', async () => {
+      render(<MemberForm {...defaultProps} />);
+      fillBasicValid();
+      fireEvent.change(screen.getByLabelText(/hand size/i), { target: { value: '35' } });
+      fireEvent.click(screen.getByRole('button', { name: /add member/i }));
+      expect(await screen.findByText('Hand size must be between 4 and 30 cm')).toBeInTheDocument();
+      expect(defaultProps.onSubmit).not.toHaveBeenCalled();
     });
   });
 
