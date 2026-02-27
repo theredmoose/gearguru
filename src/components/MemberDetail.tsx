@@ -5,7 +5,6 @@ import { ScreenHeader } from './ScreenHeader';
 import { GearTypeIcon } from './GearIcons';
 import { GrowthWarningBadge } from './GrowthWarningBadge';
 import { getShoeSizesFromFootLength } from '../services/shoeSize';
-import { GEAR_TYPE_LABELS } from '../constants/labels';
 import { shouldWarnGrowth, isMeasurementStale, analyzeGrowthTrend } from '../services/growthAnalysis';
 import {
   calculateAlpineSkiSizing,
