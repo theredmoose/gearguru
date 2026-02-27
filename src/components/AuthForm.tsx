@@ -86,7 +86,7 @@ export function AuthForm({
   return (
     <div className="min-h-dvh bg-gradient-to-b from-[#008751] to-[#00522f] flex flex-col items-center justify-center py-8 px-6">
       {/* Branding */}
-      <div className="mb-8 text-center">
+      <div className="mb-6 text-center">
         <h1 className="text-3xl font-black text-white tracking-tight uppercase">
           Gear <span className="text-emerald-200">Guru</span>
         </h1>
