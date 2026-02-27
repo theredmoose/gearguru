@@ -59,6 +59,7 @@ export function EditMeasurementEntryScreen({
     if (weight <= 0) { setError('Weight must be greater than 0'); return; }
     if (footLengthLeft <= 0) { setError('Left foot length is required'); return; }
     if (footLengthRight <= 0) { setError('Right foot length is required'); return; }
+    if (handSize !== '' && Number(handSize) <= 0) { setError('Hand size must be greater than 0'); return; }
 
     const recordedAtIso = new Date(recordedAt + 'T12:00:00').toISOString();
 

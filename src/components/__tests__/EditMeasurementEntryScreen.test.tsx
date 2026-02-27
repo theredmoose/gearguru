@@ -136,6 +136,31 @@ describe('EditMeasurementEntryScreen', () => {
         });
       });
 
+      it('shows error when hand size is provided but zero', async () => {
+        render(<EditMeasurementEntryScreen {...defaultAddProps} />);
+        fillRequiredFields();
+        fireEvent.change(screen.getByLabelText('Hand Size (cm)'), {
+          target: { value: '0' },
+        });
+        fireEvent.click(screen.getByRole('button', { name: /save/i }));
+        await waitFor(() => {
+          expect(
+            screen.getByText('Hand size must be greater than 0')
+          ).toBeInTheDocument();
+        });
+        expect(addMeasurementEntry).not.toHaveBeenCalled();
+      });
+
+      it('does not show hand size error when hand size is empty', async () => {
+        render(<EditMeasurementEntryScreen {...defaultAddProps} />);
+        fillRequiredFields();
+        // hand size left empty — no validation error expected
+        fireEvent.click(screen.getByRole('button', { name: /save/i }));
+        await waitFor(() => {
+          expect(addMeasurementEntry).toHaveBeenCalled();
+        });
+      });
+
       it('shows error when right foot length is zero', async () => {
         render(<EditMeasurementEntryScreen {...defaultAddProps} />);
         fireEvent.change(screen.getByLabelText('Height (cm)'), {

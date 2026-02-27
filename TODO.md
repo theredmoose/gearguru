@@ -28,6 +28,8 @@
 - [ ] Add data export (PDF/CSV)
 
 ## Future Enhancements
+- [ ] Settings toggle: track foot and hand measurements as a single value or left/right separately — controls whether MemberForm and EditMeasurementEntryScreen show one field or paired L/R fields for foot length, foot width, and hand size
+
 - [x] Growth tracking / size history — measurement history with per-entry edit/delete, growth-trend analysis, ⚠ badge in MemberCard/MemberDetail/MeasureScreen
 - [ ] Hand-me-down suggestions between family members
 - [x] Brand-specific sizing charts — Fischer + Evosports Nordic models added; more manufacturers (Salomon, Atomic, Rossignol, K2) for Alpine/Snowboard
