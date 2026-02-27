@@ -36,6 +36,7 @@
 - [ ] Add remaining manufacturer Alpine/Snowboard models (Salomon, Atomic, Rossignol, K2)
 - [ ] PWA support (offline, installable)
 - [ ] Dark mode
+- [ ] Personalized color theme — let users pick an accent color (or preset theme) in Settings, replacing the hardcoded green (#008751)
 - [ ] Multiple families / sharing
 - [ ] Age-specific sizing adjustments for children
 - [ ] Growth projections for kids (next season sizing)
