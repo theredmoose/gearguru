@@ -8,7 +8,7 @@ interface ScreenHeaderProps {
 
 export function ScreenHeader({ title, onBack, right }: ScreenHeaderProps) {
   return (
-    <div className="px-6 py-4 flex items-center justify-between bg-white border-b border-slate-100 shadow-sm">
+    <div className="px-6 py-5 flex items-center justify-between bg-white border-b border-slate-100 shadow-sm">
       <div className="w-11 flex items-center justify-start">
         {onBack && (
           <button

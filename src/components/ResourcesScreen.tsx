@@ -59,11 +59,11 @@ export function ResourcesScreen() {
         </p>
 
         {SIZING_GUIDES.map((guide) => (
-          <div key={guide.sport} className={`rounded-2xl border p-4 ${guide.color}`}>
-            <h2 className={`text-xs font-black uppercase tracking-widest mb-3 ${guide.labelColor}`}>
+          <div key={guide.sport} className={`rounded-2xl border p-5 ${guide.color}`}>
+            <h2 className={`text-xs font-black uppercase tracking-widest mb-4 ${guide.labelColor}`}>
               {guide.sport}
             </h2>
-            <div className="space-y-1.5">
+            <div className="space-y-3">
               {guide.rules.map((rule) => (
                 <div key={rule.label} className="flex justify-between items-start gap-2">
                   <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wide whitespace-nowrap">

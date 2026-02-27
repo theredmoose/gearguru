@@ -260,10 +260,10 @@ export function MemberDetail({
       />
 
       {/* Scrollable body */}
-      <div className="flex-1 overflow-y-auto bg-[#F8FAFC] px-6 pt-4 pb-28">
+      <div className="flex-1 overflow-y-auto bg-[#F8FAFC] px-6 pt-6 pb-28">
 
         {/* ── Profile Card ── */}
-        <div className="bg-white p-4 rounded-[2.5rem] shadow-[0_15px_35px_rgba(0,0,0,0.03)] border border-white mb-4 flex gap-5">
+        <div className="bg-white p-4 rounded-[2.5rem] shadow-[0_15px_35px_rgba(0,0,0,0.03)] border border-white mb-5 flex gap-5">
 
           {/* Left column: avatar */}
           <div className="w-1/2 flex flex-col">
@@ -285,7 +285,7 @@ export function MemberDetail({
 
             <div className="space-y-0.5 mb-3">
               {statRows.map((row) => (
-                <div key={row.label} className="flex items-center justify-between border-b border-slate-50 py-1.5">
+                <div key={row.label} className="flex items-center justify-between border-b border-slate-50 py-2.5">
                   <span className="text-[11px] text-slate-400 font-bold uppercase tracking-widest">
                     {row.label}
                   </span>
@@ -362,7 +362,7 @@ export function MemberDetail({
 
         {/* ── Sizing ── */}
         <div className="mb-6">
-          <div className="flex items-center justify-between mb-3 ml-2">
+          <div className="flex items-center justify-between mb-4 ml-2">
             <h2 className="text-xl font-black tracking-tighter uppercase" style={{ color: '#008751' }}>
               Sizing <span style={{ color: '#1e3a32' }}>Guide</span>
             </h2>
@@ -417,7 +417,7 @@ export function MemberDetail({
 
         {/* ── Gear Vault ── */}
         <div>
-          <div className="flex items-center justify-between mb-3 px-2">
+          <div className="flex items-center justify-between mb-4 px-2">
             <h2 className="text-xl font-black tracking-tighter uppercase" style={{ color: '#008751' }}>
               Gear <span style={{ color: '#1e3a32' }}>Vault</span>
             </h2>

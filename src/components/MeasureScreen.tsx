@@ -22,7 +22,7 @@ export function MeasureScreen({ members, onSelectMember }: MeasureScreenProps) {
             No family members yet. Add someone on the Family tab.
           </p>
         ) : (
-          <div className="space-y-3">
+          <div className="space-y-4">
             {members.map((member) => {
               const { measurements } = member;
               const showWarning = shouldWarnGrowth(member);
@@ -40,8 +40,10 @@ export function MeasureScreen({ members, onSelectMember }: MeasureScreenProps) {
                   className="w-full bg-slate-50 border border-slate-100 rounded-2xl p-4 flex items-center justify-between shadow-sm hover:shadow-md active:scale-[0.98] transition-all text-left"
                 >
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-full bg-[#008751] flex items-center justify-center text-white font-black text-lg">
-                      {member.name.charAt(0).toUpperCase()}
+                    <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-emerald-50 to-slate-100 border border-slate-100 flex items-center justify-center flex-shrink-0">
+                      <span className="text-xl font-black text-[#008751] select-none">
+                        {member.name.charAt(0).toUpperCase()}
+                      </span>
                     </div>
                     <div>
                       <p className="text-sm font-black text-slate-900">
