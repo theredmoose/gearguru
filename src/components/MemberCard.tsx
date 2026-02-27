@@ -45,7 +45,7 @@ export function MemberCard({ member, onSelect, onEdit, onDelete }: MemberCardPro
 
   return (
     <div
-      className="bg-white border border-slate-200 rounded-2xl p-4 flex items-center justify-between shadow-sm hover:shadow-md active:scale-[0.98] transition-all cursor-pointer mb-3"
+      className="bg-white border border-slate-200 rounded-3xl p-4 flex items-center justify-between shadow-sm hover:shadow-md active:scale-[0.98] transition-all cursor-pointer mb-3"
       onClick={() => onSelect(member)}
     >
       <div className="flex items-center gap-3">

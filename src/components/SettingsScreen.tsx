@@ -57,7 +57,7 @@ export function SettingsScreen({
         {/* ── Units ─────────────────────────────────── */}
         <section>
           <p className={sectionTitleCls}>Units</p>
-          <div className="bg-slate-50 rounded-2xl px-4">
+          <div className="bg-slate-50 rounded-3xl px-4">
 
             <div className={rowCls}>
               <div>
@@ -116,7 +116,7 @@ export function SettingsScreen({
           <p className="text-[11px] text-slate-400 mb-2">
             The sport shown first when viewing member sizing details.
           </p>
-          <div className="bg-slate-50 rounded-2xl px-4">
+          <div className="bg-slate-50 rounded-3xl px-4">
             {DEFAULT_SPORTS.map(sport => (
               <div key={sport} className={rowCls}>
                 <p className={labelCls}>{SPORT_LABELS[sport]}</p>
@@ -143,7 +143,7 @@ export function SettingsScreen({
           <p className="text-[11px] text-slate-400 mb-2">
             Choose which measurements appear in member profiles.
           </p>
-          <div className="bg-slate-50 rounded-2xl px-4">
+          <div className="bg-slate-50 rounded-3xl px-4">
 
             <div className={rowCls}>
               <div>
@@ -185,7 +185,7 @@ export function SettingsScreen({
         {/* ── Sizing ────────────────────────────────── */}
         <section>
           <p className={sectionTitleCls}>Sizing</p>
-          <div className="bg-slate-50 rounded-2xl px-4">
+          <div className="bg-slate-50 rounded-3xl px-4">
 
             <div className={rowCls}>
               <div>
@@ -258,7 +258,7 @@ export function SettingsScreen({
         {/* ── Account ───────────────────────────────── */}
         <section>
           <p className={sectionTitleCls}>Account</p>
-          <div className="bg-slate-50 rounded-2xl px-4">
+          <div className="bg-slate-50 rounded-3xl px-4">
 
             <div className={rowCls}>
               <div>

@@ -37,7 +37,7 @@ export function MeasureScreen({ members, onSelectMember }: MeasureScreenProps) {
                 <button
                   key={member.id}
                   onClick={() => onSelectMember(member)}
-                  className="w-full bg-slate-50 border border-slate-100 rounded-2xl p-4 flex items-center justify-between shadow-sm hover:shadow-md active:scale-[0.98] transition-all text-left"
+                  className="w-full bg-slate-50 border border-slate-100 rounded-3xl p-4 flex items-center justify-between shadow-sm hover:shadow-md active:scale-[0.98] transition-all text-left"
                 >
                   <div className="flex items-center gap-3">
                     <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-emerald-50 to-slate-100 border border-slate-100 flex items-center justify-center flex-shrink-0">

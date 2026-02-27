@@ -59,7 +59,7 @@ export function ResourcesScreen() {
         </p>
 
         {SIZING_GUIDES.map((guide) => (
-          <div key={guide.sport} className={`rounded-2xl border p-5 ${guide.color}`}>
+          <div key={guide.sport} className={`rounded-3xl border p-5 ${guide.color}`}>
             <h2 className={`text-xs font-black uppercase tracking-widest mb-4 ${guide.labelColor}`}>
               {guide.sport}
             </h2>

@@ -64,7 +64,7 @@ export function GearCard({
 
   return (
     <div
-      className="gear-card bg-white border border-slate-200 rounded-2xl p-3.5 flex items-center gap-3 shadow-sm hover:shadow-md active:scale-[0.98] transition-all cursor-pointer mb-3"
+      className="gear-card bg-white border border-slate-200 rounded-3xl p-3.5 flex items-center gap-3 shadow-sm hover:shadow-md active:scale-[0.98] transition-all cursor-pointer mb-3"
       onClick={() => onEdit(item)}
     >
       {/* Icon tile or photo */}
