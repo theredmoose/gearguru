@@ -10,7 +10,7 @@ function makeGearItem(overrides: Partial<GearItem> = {}): GearItem {
     id: 'gear-1',
     userId: 'user-1',
     ownerId: 'test-member-1',
-    sport: 'alpine',
+    sports: ['alpine'],
     type: 'ski',
     brand: 'Atomic',
     model: 'Redster',
@@ -113,6 +113,23 @@ describe('MemberDetail', () => {
     it('shows "All Sports →" link', () => {
       render(<MemberDetail {...defaultProps} />);
       expect(screen.getByText(/all sports/i)).toBeInTheDocument();
+    });
+
+    it('shows only gear tagged for selected sport', () => {
+      const alpineGear = makeGearItem({ id: 'g1', sports: ['alpine'] as import('../../types').Sport[] });
+      const nordicGear = makeGearItem({ id: 'g2', sports: ['nordic-classic'] as import('../../types').Sport[] });
+      render(<MemberDetail {...defaultProps} gearItems={[alpineGear, nordicGear]} />);
+      // Default sport is alpine — only alpine gear visible
+      expect(screen.getByText('Atomic Redster')).toBeInTheDocument();
+      // nordic gear has same brand/model in factory but different id; both have same text so check count
+      expect(screen.getAllByText('Atomic Redster')).toHaveLength(1);
+    });
+
+    it('shows empty state copy with sport name when no gear matches selected sport', () => {
+      const nordicGear = makeGearItem({ sports: ['nordic-classic'] as import('../../types').Sport[] });
+      render(<MemberDetail {...defaultProps} gearItems={[nordicGear]} />);
+      // Default sport is alpine — nordic gear is hidden, show sport-specific empty state
+      expect(screen.getByText(/No Downhill gear yet/i)).toBeInTheDocument();
     });
   });
 

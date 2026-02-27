@@ -429,17 +429,25 @@ export function MemberDetail({
             </button>
           </div>
 
-          {gearItems.length === 0 ? (
-            <div className="flex flex-col items-center gap-2 py-8 bg-white rounded-[2rem] shadow-[0_15px_30px_rgba(0,0,0,0.02)]">
-              <div className="w-12 h-12 rounded-2xl bg-slate-50 flex items-center justify-center">
-                <PlusCircle className="w-6 h-6 text-slate-300" />
-              </div>
-              <p className="text-slate-500 text-sm font-bold">No gear added yet</p>
-              <p className="text-slate-300 text-xs">Tap + to start building your vault</p>
-            </div>
-          ) : (
+          {(() => {
+            const sportLabel = SPORT_OPTIONS.find(o => o.value === selectedSport)?.label ?? selectedSport;
+            const filteredGear = gearItems.filter((item) => item.sports.includes(selectedSport));
+            if (filteredGear.length === 0) {
+              return (
+                <div className="flex flex-col items-center gap-2 py-8 bg-white rounded-[2rem] shadow-[0_15px_30px_rgba(0,0,0,0.02)]">
+                  <div className="w-12 h-12 rounded-2xl bg-slate-50 flex items-center justify-center">
+                    <PlusCircle className="w-6 h-6 text-slate-300" />
+                  </div>
+                  <p className="text-slate-500 text-sm font-bold">
+                    {gearItems.length === 0 ? 'No gear added yet' : `No ${sportLabel} gear yet`}
+                  </p>
+                  <p className="text-slate-300 text-xs">Tap + to add.</p>
+                </div>
+              );
+            }
+            return (
             <div className="space-y-3">
-              {gearItems.map((item) => {
+              {filteredGear.map((item) => {
                 const status = gearFitStatus(item);
                 const isUpdate = status === 'Update';
                 const spec = [item.size, item.year].filter(Boolean).join(' · ');
@@ -489,7 +497,8 @@ export function MemberDetail({
                 );
               })}
             </div>
-          )}
+            );
+          })()}
         </div>
       </div>
     </div>
