@@ -253,9 +253,9 @@ function App() {
         return (
           <div className="flex flex-col min-h-0 flex-1">
             {/* App header */}
-            <div className="px-5 py-3 bg-white border-b border-slate-100 shadow-sm flex items-center justify-between">
+            <div className="px-6 py-4 bg-white border-b border-slate-100 shadow-sm flex items-center justify-between">
               <div>
-                <h1 className="text-lg font-black text-slate-900 tracking-tight">
+                <h1 className="text-xl font-black text-slate-900 tracking-tighter uppercase">
                   Gear <span style={{ color: '#008751' }}>Guru</span>
                 </h1>
                 <p className="text-slate-400 text-xs">Sports equipment sizing</p>
@@ -266,7 +266,7 @@ function App() {
                 </span>
                 <button
                   onClick={() => setView('settings')}
-                  className="p-2 bg-slate-50 border border-slate-100 rounded-2xl text-emerald-700 shadow-sm hover:bg-white transition-all"
+                  className="p-3 bg-slate-50 border border-slate-100 rounded-2xl text-emerald-700 shadow-sm hover:bg-white transition-all"
                   aria-label="Open settings"
                 >
                   <Settings className="w-5 h-5" />
@@ -274,7 +274,7 @@ function App() {
               </div>
             </div>
 
-            <div className="flex-1 overflow-y-auto bg-white px-6 py-6">
+            <div className="flex-1 overflow-y-auto bg-[#F8FAFC] px-6 py-6">
               {loading && <p className="loading">Loading...</p>}
               {error && <p className="error-state">{getOperationErrorMessage(error, 'load')}</p>}
 

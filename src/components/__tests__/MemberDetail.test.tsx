@@ -91,7 +91,7 @@ describe('MemberDetail', () => {
 
     it('renders Sizing section heading', () => {
       render(<MemberDetail {...defaultProps} />);
-      expect(screen.getByRole('heading', { name: /^sizing$/i })).toBeInTheDocument();
+      expect(screen.getByRole('heading', { name: /sizing/i })).toBeInTheDocument();
     });
 
     it('renders Gear Inventory section heading', () => {

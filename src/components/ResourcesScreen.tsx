@@ -53,7 +53,7 @@ export function ResourcesScreen() {
   return (
     <div className="flex flex-col min-h-0 flex-1">
       <ScreenHeader title="Resources" />
-      <div className="flex-1 overflow-y-auto bg-white px-6 py-6 space-y-5">
+      <div className="flex-1 overflow-y-auto bg-[#F8FAFC] px-6 py-6 space-y-5">
         <p className="text-[11px] text-slate-400 font-bold uppercase tracking-widest">
           Quick sizing reference
         </p>

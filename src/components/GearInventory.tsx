@@ -45,9 +45,9 @@ export function GearInventory({
   return (
     <div className="flex flex-col min-h-0 flex-1">
       {/* Header */}
-      <div className="px-5 py-3 bg-white border-b border-slate-100 shadow-sm flex items-center gap-3">
+      <div className="px-6 py-4 bg-white border-b border-slate-100 shadow-sm flex items-center gap-3">
         <button
-          className="p-2 bg-slate-50 border border-slate-100 rounded-2xl text-emerald-700 shadow-sm hover:bg-white transition-all flex-shrink-0"
+          className="p-3 bg-slate-50 border border-slate-100 rounded-2xl text-emerald-700 shadow-sm hover:bg-white transition-all flex-shrink-0"
           onClick={onBack}
           aria-label="Back"
         >
@@ -78,7 +78,7 @@ export function GearInventory({
       </div>
 
       {/* Content */}
-      <div className="flex-1 overflow-y-auto bg-white px-6 py-4">
+      <div className="flex-1 overflow-y-auto bg-[#F8FAFC] px-6 py-6">
         {filteredItems.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-16 gap-4">
             <p className="text-slate-400 font-bold text-sm">No gear found.</p>

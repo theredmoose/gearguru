@@ -251,7 +251,7 @@ export function MemberDetail({
         right={
           <button
             onClick={onEdit}
-            className="p-2 bg-slate-50 border border-slate-100 rounded-2xl text-emerald-700 shadow-sm hover:bg-white transition-all"
+            className="p-3 bg-slate-50 border border-slate-100 rounded-2xl text-emerald-700 shadow-sm hover:bg-white transition-all"
             aria-label="Edit member"
           >
             <Settings className="w-5 h-5" />
@@ -260,79 +260,58 @@ export function MemberDetail({
       />
 
       {/* Scrollable body */}
-      <div className="flex-1 overflow-y-auto bg-white px-6 pb-6">
+      <div className="flex-1 overflow-y-auto bg-[#F8FAFC] px-6 pt-4 pb-28">
 
-        {/* ── Profile ── */}
-        <div className="mt-5 mb-5 flex items-start gap-4">
+        {/* ── Profile Card ── */}
+        <div className="bg-white p-4 rounded-[2.5rem] shadow-[0_15px_35px_rgba(0,0,0,0.03)] border border-white mb-4 flex gap-5">
 
-          {/* Left column: avatar + sport/level selectors */}
-          <div className="w-[48%] flex flex-col gap-3">
-            <div className="aspect-[3/4] bg-slate-100 rounded-3xl border border-slate-100 flex items-center justify-center overflow-hidden">
+          {/* Left column: avatar + sport selector */}
+          <div className="w-1/2 flex flex-col gap-3">
+            <div className="aspect-[3/4] bg-[#F1F5F9] rounded-[2rem] border-2 border-slate-50 flex items-center justify-center overflow-hidden">
               <span className="text-6xl font-black text-[#008751] select-none">
                 {member.name.charAt(0).toUpperCase()}
               </span>
             </div>
 
-            <div className="flex gap-2">
-              {/* Sport picker */}
-              <div className="flex-1">
-                <label className="text-[9px] text-slate-400 font-bold uppercase tracking-widest block mb-1">Sport</label>
-                <div className="relative">
-                  <select
-                    value={selectedSport}
-                    onChange={(e) => {
-                      const s = e.target.value as Sport;
-                      setSelectedSport(s);
-                      setSkillLevel(member.skillLevels?.[s] ?? 'intermediate');
-                    }}
-                    className="w-full bg-[#ECFDF5] border-none rounded-lg px-2 py-1.5 text-[10px] font-bold text-[#008751] appearance-none focus:outline-none focus:ring-2 focus:ring-emerald-500/20 transition-all cursor-pointer"
-                  >
-                    {SPORT_OPTIONS.map(o => (
-                      <option key={o.value} value={o.value}>{o.label}</option>
-                    ))}
-                  </select>
-                  <ChevronDown className="absolute right-1.5 top-1/2 -translate-y-1/2 w-3 h-3 text-slate-400 pointer-events-none" />
-                </div>
-              </div>
-
-              {/* Level picker */}
-              <div className="flex-1">
-                <label className="text-[9px] text-slate-400 font-bold uppercase tracking-widest block mb-1">Level</label>
-                <div className="relative">
-                  <select
-                    value={skillLevel}
-                    onChange={(e) => setSkillLevel(e.target.value as SkillLevel)}
-                    className="w-full bg-[#ECFDF5] border-none rounded-lg px-2 py-1.5 text-[10px] font-bold text-[#008751] appearance-none focus:outline-none focus:ring-2 focus:ring-emerald-500/20 transition-all cursor-pointer"
-                  >
-                    {LEVEL_OPTIONS.map(o => (
-                      <option key={o.value} value={o.value}>{o.label}</option>
-                    ))}
-                  </select>
-                  <ChevronDown className="absolute right-1.5 top-1/2 -translate-y-1/2 w-3 h-3 text-slate-400 pointer-events-none" />
-                </div>
-              </div>
+            {/* Sport picker (full width, left column) */}
+            <div className="relative">
+              <label className="text-[10px] text-emerald-700 font-black uppercase tracking-widest block mb-1">Sport</label>
+              <select
+                value={selectedSport}
+                onChange={(e) => {
+                  const s = e.target.value as Sport;
+                  setSelectedSport(s);
+                  setSkillLevel(member.skillLevels?.[s] ?? 'intermediate');
+                }}
+                className="w-full bg-[#ECFDF5] border-none rounded-xl px-2 py-2 text-[10px] font-black text-[#008751] appearance-none focus:outline-none focus:ring-2 focus:ring-emerald-500/20 transition-all cursor-pointer"
+              >
+                {SPORT_OPTIONS.map(o => (
+                  <option key={o.value} value={o.value}>{o.label}</option>
+                ))}
+              </select>
+              <ChevronDown className="absolute right-1.5 bottom-2.5 w-3 h-3 text-emerald-400 pointer-events-none" />
             </div>
           </div>
 
-          {/* Right column: name + stat rows */}
-          <div className="flex-1 pt-1 space-y-1.5">
+          {/* Right column: name + stat rows + skill level */}
+          <div className="w-1/2 pt-1">
             <div className="flex items-center gap-2 mb-2">
               <h2 className="text-2xl font-black text-slate-900 tracking-tight leading-none">
                 {member.name}
               </h2>
-              <div className="w-2.5 h-2.5 rounded-full bg-green-500 shadow-sm shadow-green-200 flex-shrink-0" />
+              <div className="w-2.5 h-2.5 rounded-full bg-[#008751] shadow-[0_0_10px_rgba(0,135,81,0.5)] flex-shrink-0" />
             </div>
 
-            <div className="space-y-0.5">
+            <div className="space-y-0.5 mb-3">
               {statRows.map((row) => (
-                <div key={row.label} className="flex items-center justify-between border-b border-slate-50 py-1">
+                <div key={row.label} className="flex items-center justify-between border-b border-slate-50 py-1.5">
                   <span className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">
                     {row.label}
                   </span>
                   {row.action ? (
                     <button
                       onClick={row.action}
-                      className="text-sm font-extrabold text-[#008751] hover:text-emerald-800 transition-colors"
+                      className="text-xs font-extrabold text-[#008751] hover:text-emerald-800 transition-colors"
                     >
                       {row.value}
                     </button>
@@ -342,12 +321,12 @@ export function MemberDetail({
                       className="flex items-center gap-1 group"
                       aria-label={`Toggle ${row.label} units`}
                     >
-                      <span className="text-sm font-extrabold text-slate-800 group-hover:text-[#008751] transition-colors">{row.value}</span>
+                      <span className="text-xs font-black text-slate-800 group-hover:text-[#008751] transition-colors">{row.value}</span>
                       {row.badge && <GrowthWarningBadge reason={row.badge as 'stale' | 'growing' | 'both'} />}
                       <ArrowLeftRight className="w-3 h-3 text-slate-300 group-hover:text-emerald-400 transition-colors" />
                     </button>
                   ) : (
-                    <span className="text-sm font-extrabold text-slate-800">{row.value}</span>
+                    <span className="text-xs font-black text-slate-800">{row.value}</span>
                   )}
                 </div>
               ))}
@@ -357,20 +336,35 @@ export function MemberDetail({
             {onViewHistory && (
               <button
                 onClick={onViewHistory}
-                className="text-[10px] font-black text-[#008751] uppercase tracking-widest hover:text-emerald-800 transition-colors mt-2"
+                className="text-[10px] font-black text-[#008751] uppercase tracking-widest hover:text-emerald-800 transition-colors block mb-3"
               >
                 View History →
               </button>
             )}
+
+            {/* Skill level picker (bottom of right column) */}
+            <div className="relative">
+              <label className="text-[10px] text-emerald-700 font-black uppercase tracking-widest block mb-1">Skill Level</label>
+              <select
+                value={skillLevel}
+                onChange={(e) => setSkillLevel(e.target.value as SkillLevel)}
+                className="w-full bg-[#ECFDF5] border-none rounded-xl px-2 py-2 text-[10px] font-black text-[#008751] appearance-none focus:outline-none focus:ring-2 focus:ring-emerald-500/20 transition-all cursor-pointer"
+              >
+                {LEVEL_OPTIONS.map(o => (
+                  <option key={o.value} value={o.value}>{o.label}</option>
+                ))}
+              </select>
+              <ChevronDown className="absolute right-1.5 bottom-2.5 w-3 h-3 text-emerald-400 pointer-events-none" />
+            </div>
           </div>
         </div>
 
-        <div className="h-px bg-slate-100 w-full mb-5" />
-
         {/* ── Sizing ── */}
-        <div className="mb-7">
-          <div className="flex items-center justify-between mb-3">
-            <h2 className="text-lg font-black tracking-tight" style={{ color: '#008751' }}>Sizing</h2>
+        <div className="mb-6">
+          <div className="flex items-center justify-between mb-3 ml-2">
+            <h2 className="text-xl font-black tracking-tighter uppercase" style={{ color: '#008751' }}>
+              Sizing <span style={{ color: '#1e3a32' }}>Guide</span>
+            </h2>
             <button
               onClick={onGetSizing}
               className="text-[10px] font-black text-[#008751] uppercase tracking-widest hover:text-emerald-800 transition-colors"
@@ -379,18 +373,18 @@ export function MemberDetail({
             </button>
           </div>
 
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-2 gap-4">
             {sizingCards.map((card) => (
               <div
                 key={card.label}
-                className="bg-slate-50 border border-slate-100 rounded-2xl p-3 flex items-start gap-3 min-h-[88px]"
+                className="bg-white rounded-[2rem] p-4 flex items-start gap-3 min-h-[86px] border border-white shadow-[0_15px_30px_rgba(0,0,0,0.02)] relative overflow-hidden"
               >
-                <div className="flex-shrink-0 pt-0.5">
+                <div className="flex-shrink-0 bg-slate-50 p-2 rounded-2xl">
                   <GearTypeIcon type={card.type} className="w-9 h-9" />
                 </div>
                 <div className="flex flex-col flex-1 min-w-0">
-                  <div className="flex items-center justify-between mb-1">
-                    <span className="text-[11px] text-emerald-700 font-bold uppercase tracking-wide">
+                  <div className="flex items-center justify-between mb-1.5">
+                    <span className="text-[10px] text-emerald-700 font-black uppercase tracking-widest">
                       {card.label}
                     </span>
                     {card.toggleKind && (
@@ -406,33 +400,37 @@ export function MemberDetail({
                       </button>
                     )}
                   </div>
-                  {card.items.map((item, i) => (
-                    <div key={i} className="flex justify-between items-center w-full">
-                      <span className="text-[11px] font-bold text-slate-600 truncate">{item.label}</span>
-                      <span className="text-[11px] font-black text-slate-900 ml-1 flex-shrink-0">{item.value}</span>
-                    </div>
-                  ))}
+                  <div className="space-y-1">
+                    {card.items.map((item, i) => (
+                      <div key={i} className="flex justify-between items-center w-full">
+                        <span className="text-[10px] font-bold text-slate-400 truncate">{item.label}</span>
+                        <span className="text-[10px] font-black text-slate-900 ml-1 flex-shrink-0">{item.value}</span>
+                      </div>
+                    ))}
+                  </div>
                 </div>
               </div>
             ))}
           </div>
         </div>
 
-        {/* ── Gear Inventory ── */}
+        {/* ── Gear Vault ── */}
         <div>
-          <div className="flex items-center justify-between mb-3">
-            <h2 className="text-lg font-black tracking-tight" style={{ color: '#008751' }}>Gear Vault</h2>
+          <div className="flex items-center justify-between mb-3 px-2">
+            <h2 className="text-xl font-black tracking-tighter uppercase" style={{ color: '#008751' }}>
+              Gear <span style={{ color: '#1e3a32' }}>Vault</span>
+            </h2>
             <button
               onClick={onAddGear}
-              className="bg-[#008751] p-1.5 rounded-xl text-white shadow-sm transition-all active:scale-95"
+              className="bg-[#008751] p-2 rounded-xl text-white shadow-lg shadow-emerald-100 transition-all active:scale-90"
               aria-label="Add gear"
             >
-              <PlusCircle className="w-6 h-6" />
+              <PlusCircle className="w-5 h-5" />
             </button>
           </div>
 
           {gearItems.length === 0 ? (
-            <p className="text-slate-400 text-sm text-center py-6 bg-slate-50 rounded-2xl">
+            <p className="text-slate-400 text-sm text-center py-6 bg-white rounded-[2rem] shadow-[0_15px_30px_rgba(0,0,0,0.02)]">
               No gear yet. Tap + to add.
             </p>
           ) : (
@@ -445,28 +443,22 @@ export function MemberDetail({
                   <button
                     key={item.id}
                     onClick={() => onEditGear(item)}
-                    className="w-full bg-white border border-slate-200 rounded-2xl p-3.5 flex items-center justify-between shadow-sm hover:shadow-md active:scale-[0.98] transition-all text-left"
+                    className="w-full bg-white rounded-[2.5rem] p-4 flex items-center justify-between shadow-[0_20px_40px_rgba(0,0,0,0.02)] border border-white hover:border-emerald-100 active:scale-[0.98] transition-all text-left"
                   >
-                    <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-4">
                       {/* Icon tile */}
-                      <div className={`w-14 h-14 rounded-xl flex flex-col items-center justify-center border flex-shrink-0 ${
-                        isUpdate ? 'bg-red-50 border-red-100' : 'bg-slate-50 border-slate-100'
-                      }`}>
+                      <div className="w-14 h-14 rounded-[1.2rem] flex items-center justify-center flex-shrink-0 bg-[#F8FAFC]">
                         <GearTypeIcon type={item.type} className="w-9 h-9" />
-                        <span className="text-[8px] font-black uppercase tracking-tighter text-slate-500 mt-0.5">
-                          {GEAR_TYPE_LABELS[item.type] ?? item.type}
-                        </span>
                       </div>
 
                       {/* Info */}
                       <div className="min-w-0">
-                        <p className="text-sm font-black text-slate-900 leading-tight truncate">
+                        <p className="text-sm font-black text-slate-900 leading-tight truncate mb-0.5">
                           {item.brand} {item.model}
                         </p>
-                        <p className="text-[10px] font-bold text-slate-500 uppercase tracking-tight leading-tight mt-0.5">
+                        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest leading-tight">
                           {spec}
                         </p>
-                        {/* Photo indicator */}
                         {item.photos && item.photos.length > 0 && (
                           <p className="text-[9px] text-emerald-500 font-bold mt-0.5">
                             {item.photos.length} photo{item.photos.length !== 1 ? 's' : ''}
@@ -477,19 +469,15 @@ export function MemberDetail({
 
                     {/* Status */}
                     <div className="flex flex-col items-end gap-1.5 flex-shrink-0 ml-2">
-                      <span className={`text-[9px] font-black px-2 py-0.5 rounded-md uppercase tracking-widest ${
-                        isUpdate
-                          ? 'bg-orange-100 text-orange-600 animate-pulse'
-                          : 'bg-[#E3F9F1] text-[#008751]'
+                      <div className={`text-[8px] font-black px-2.5 py-1 rounded-lg uppercase tracking-widest ${
+                        isUpdate ? 'bg-orange-100 text-orange-600 animate-pulse' : 'bg-[#E3F9F1] text-[#008751]'
                       }`}>
                         {status}
-                      </span>
-                      <div className={`p-1 rounded-full ${
-                        isUpdate ? 'bg-orange-50 text-orange-500' : 'bg-[#E3F9F1] text-[#008751]'
-                      }`}>
+                      </div>
+                      <div className="w-5 h-5 rounded-full flex items-center justify-center bg-slate-50 border border-slate-100">
                         {isUpdate
-                          ? <AlertCircle className="w-4 h-4" />
-                          : <CheckCircle2 className="w-4 h-4" />
+                          ? <AlertCircle className="w-3.5 h-3.5 text-orange-500" />
+                          : <CheckCircle2 className="w-3.5 h-3.5 text-[#008751]" />
                         }
                       </div>
                     </div>

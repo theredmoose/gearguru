@@ -12,7 +12,7 @@ export function MeasureScreen({ members, onSelectMember }: MeasureScreenProps) {
   return (
     <div className="flex flex-col min-h-0 flex-1">
       <ScreenHeader title="Measure" />
-      <div className="flex-1 overflow-y-auto bg-white px-6 py-6">
+      <div className="flex-1 overflow-y-auto bg-[#F8FAFC] px-6 py-6">
         <p className="text-[11px] text-slate-400 font-bold uppercase tracking-widest mb-4">
           Select a member to update measurements
         </p>

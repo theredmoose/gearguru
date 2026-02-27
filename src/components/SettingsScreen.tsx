@@ -52,7 +52,7 @@ export function SettingsScreen({
     <div className="flex flex-col min-h-0 flex-1">
       <ScreenHeader title="Settings" onBack={onBack} />
 
-      <div className="flex-1 overflow-y-auto bg-white px-6 py-6 flex flex-col gap-8">
+      <div className="flex-1 overflow-y-auto bg-[#F8FAFC] px-6 py-6 flex flex-col gap-8">
 
         {/* ── Units ─────────────────────────────────── */}
         <section>
