@@ -253,25 +253,24 @@ function App() {
         return (
           <div className="flex flex-col min-h-0 flex-1">
             {/* App header */}
-            <div className="px-6 py-4 bg-white border-b border-slate-100 shadow-sm flex items-center justify-between">
-              <div>
-                <h1 className="text-xl font-black text-slate-900 tracking-tighter uppercase">
+            <div className="px-6 bg-white border-b border-slate-100 shadow-sm">
+              {/* spacing row above */}
+              <div className="h-5" />
+              {/* centered logo row */}
+              <div className="flex items-center justify-center relative">
+                <h1 className="text-xl font-black text-slate-900 tracking-tighter uppercase text-center">
                   Gear <span style={{ color: '#008751' }}>Guru</span>
                 </h1>
-                <p className="text-slate-400 text-xs">Sports equipment sizing</p>
-              </div>
-              <div className="flex items-center gap-3">
-                <span className="text-slate-400 text-xs truncate max-w-[100px]">
-                  {user.displayName || user.email}
-                </span>
                 <button
                   onClick={() => setView('settings')}
-                  className="p-3 bg-slate-50 border border-slate-100 rounded-2xl text-emerald-700 shadow-sm hover:bg-white transition-all"
+                  className="absolute right-0 p-3 bg-slate-50 border border-slate-100 rounded-2xl text-emerald-700 shadow-sm hover:bg-white transition-all"
                   aria-label="Open settings"
                 >
                   <Settings className="w-5 h-5" />
                 </button>
               </div>
+              {/* spacing row below */}
+              <div className="h-5" />
             </div>
 
             <div className="flex-1 overflow-y-auto bg-[#F8FAFC] px-6 py-6">

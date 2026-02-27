@@ -58,7 +58,6 @@ describe('App Integration', () => {
     it('renders the app header', () => {
       render(<App />);
       expect(screen.getByText(/gear/i, { selector: 'h1' })).toBeInTheDocument();
-      expect(screen.getByText(/sports equipment sizing/i)).toBeInTheDocument();
     });
 
     it('shows empty state when no members', () => {
