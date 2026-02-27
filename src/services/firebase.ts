@@ -18,6 +18,7 @@ import type {
 const COLLECTIONS = {
   FAMILY_MEMBERS: 'familyMembers',
   GEAR_ITEMS: 'gearItems',
+  NOTIFICATION_STATE: 'userNotificationState',
 } as const;
 
 // ============================================
@@ -464,6 +465,53 @@ export async function subscribeToGearItems(
     onError
   );
   return unsubscribe;
+}
+
+// ============================================
+// DOCUMENT CONVERTERS (exported for testing)
+// ============================================
+
+// ============================================
+// NOTIFICATION DISMISSALS
+// ============================================
+
+/**
+ * Returns the list of notification IDs the user has dismissed.
+ * All dismissed IDs live in a single document per user.
+ */
+export async function getDismissedNotificationIds(userId: string): Promise<string[]> {
+  const { doc, getDoc } = await import('firebase/firestore');
+  const db = await getDb();
+  const docRef = doc(db, COLLECTIONS.NOTIFICATION_STATE, userId);
+  const snapshot = await getDoc(docRef);
+  if (!snapshot.exists()) return [];
+  return (snapshot.data().dismissedIds ?? []) as string[];
+}
+
+/** Adds a notification ID to the user's dismissed list. */
+export async function dismissNotificationForUser(userId: string, notificationId: string): Promise<void> {
+  const { doc, getDoc, setDoc } = await import('firebase/firestore');
+  const db = await getDb();
+  const docRef = doc(db, COLLECTIONS.NOTIFICATION_STATE, userId);
+  const snapshot = await getDoc(docRef);
+  const existing: string[] = snapshot.exists() ? (snapshot.data().dismissedIds ?? []) : [];
+  if (!existing.includes(notificationId)) {
+    await setDoc(docRef, { dismissedIds: [...existing, notificationId], userId }, { merge: true });
+  }
+}
+
+/** Removes a notification ID from the user's dismissed list (restore). */
+export async function undismissNotificationForUser(userId: string, notificationId: string): Promise<void> {
+  const { doc, getDoc, setDoc } = await import('firebase/firestore');
+  const db = await getDb();
+  const docRef = doc(db, COLLECTIONS.NOTIFICATION_STATE, userId);
+  const snapshot = await getDoc(docRef);
+  if (!snapshot.exists()) return;
+  const existing: string[] = snapshot.data().dismissedIds ?? [];
+  await setDoc(docRef, {
+    dismissedIds: existing.filter((id) => id !== notificationId),
+    userId,
+  }, { merge: true });
 }
 
 // ============================================

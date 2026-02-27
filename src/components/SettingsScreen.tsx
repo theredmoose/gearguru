@@ -272,6 +272,29 @@ export function SettingsScreen({
           </div>
         </section>
 
+        {/* ── Notifications ─────────────────────────── */}
+        <section>
+          <p className={sectionTitleCls}>Notifications</p>
+          <div className="bg-slate-50 rounded-2xl px-4">
+            <div className={rowCls}>
+              <div>
+                <p className={labelCls}>Gear Notifications</p>
+                <p className={subLabelCls}>Alerts for worn, old, or fair-condition gear</p>
+              </div>
+              <label className="relative inline-flex items-center cursor-pointer" aria-label="Toggle gear notifications">
+                <input
+                  type="checkbox"
+                  className="sr-only peer"
+                  checked={settings.notificationsEnabled}
+                  onChange={(e) => onUpdateSettings({ notificationsEnabled: e.target.checked })}
+                  aria-label="Enable gear notifications"
+                />
+                <div className="w-10 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600" />
+              </label>
+            </div>
+          </div>
+        </section>
+
         {/* ── Account ───────────────────────────────── */}
         <section>
           <p className={sectionTitleCls}>Account</p>

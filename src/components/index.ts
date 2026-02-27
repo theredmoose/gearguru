@@ -21,3 +21,5 @@ export { GearTypeIcon, SkiIcon, BootIcon, PoleIcon, HelmetIcon, SnowboardIcon, S
 export { GrowthWarningBadge } from './GrowthWarningBadge';
 export { MeasurementHistoryScreen } from './MeasurementHistoryScreen';
 export { EditMeasurementEntryScreen } from './EditMeasurementEntryScreen';
+export { NotificationsPanel } from './NotificationsPanel';
+export { NotificationsScreen } from './NotificationsScreen';
