@@ -219,7 +219,6 @@ export function MemberForm({ member, onSubmit, onCancel }: MemberFormProps) {
                   onChange={(e) =>
                     updateMeasurement('height', parseFloat(e.target.value) || 0)
                   }
-                  placeholder="175"
                   min="0"
                   max="300"
                   step="0.5"
@@ -236,7 +235,6 @@ export function MemberForm({ member, onSubmit, onCancel }: MemberFormProps) {
                   onChange={(e) =>
                     updateMeasurement('weight', parseFloat(e.target.value) || 0)
                   }
-                  placeholder="70"
                   min="0"
                   max="300"
                   step="0.5"
@@ -259,7 +257,6 @@ export function MemberForm({ member, onSubmit, onCancel }: MemberFormProps) {
                   onChange={(e) =>
                     updateMeasurement('footLengthLeft', parseFloat(e.target.value) || 0)
                   }
-                  placeholder="27.0"
                   min="12"
                   max="30"
                   step="0.1"
@@ -276,7 +273,6 @@ export function MemberForm({ member, onSubmit, onCancel }: MemberFormProps) {
                   onChange={(e) =>
                     updateMeasurement('footLengthRight', parseFloat(e.target.value) || 0)
                   }
-                  placeholder="27.0"
                   min="12"
                   max="30"
                   step="0.1"
@@ -296,7 +292,6 @@ export function MemberForm({ member, onSubmit, onCancel }: MemberFormProps) {
                       e.target.value === '' ? undefined : parseFloat(e.target.value)
                     )
                   }
-                  placeholder="10.0"
                   min="0"
                   max="15"
                   step="0.1"
@@ -316,7 +311,6 @@ export function MemberForm({ member, onSubmit, onCancel }: MemberFormProps) {
                       e.target.value === '' ? undefined : parseFloat(e.target.value)
                     )
                   }
-                  placeholder="10.0"
                   min="0"
                   max="15"
                   step="0.1"
@@ -342,7 +336,6 @@ export function MemberForm({ member, onSubmit, onCancel }: MemberFormProps) {
                       e.target.value === '' ? undefined : parseFloat(e.target.value)
                     )
                   }
-                  placeholder="10"
                   min="0"
                   max="25"
                   step="0.5"
@@ -362,7 +355,6 @@ export function MemberForm({ member, onSubmit, onCancel }: MemberFormProps) {
                       e.target.value === '' ? undefined : parseFloat(e.target.value)
                     )
                   }
-                  placeholder="43"
                   min="0"
                   max="60"
                   step="1"
@@ -388,7 +380,6 @@ export function MemberForm({ member, onSubmit, onCancel }: MemberFormProps) {
                       e.target.value === '' ? undefined : parseFloat(e.target.value)
                     )
                   }
-                  placeholder="57"
                   min="40"
                   max="70"
                   step="0.5"
@@ -408,7 +399,6 @@ export function MemberForm({ member, onSubmit, onCancel }: MemberFormProps) {
                       e.target.value === '' ? undefined : parseFloat(e.target.value)
                     )
                   }
-                  placeholder="19"
                   min="4"
                   max="30"
                   step="0.5"

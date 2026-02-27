@@ -160,7 +160,6 @@ export function EditMeasurementEntryScreen({
               className={inputCls}
               value={height || ''}
               onChange={(e) => setHeight(parseFloat(e.target.value) || 0)}
-              placeholder="e.g. 142"
               min="0"
               max="300"
               step="0.1"
@@ -176,7 +175,6 @@ export function EditMeasurementEntryScreen({
               className={inputCls}
               value={weight || ''}
               onChange={(e) => setWeight(parseFloat(e.target.value) || 0)}
-              placeholder="e.g. 38"
               min="0"
               max="300"
               step="0.1"
@@ -193,7 +191,6 @@ export function EditMeasurementEntryScreen({
                 className={inputCls}
                 value={footLengthLeft || ''}
                 onChange={(e) => setFootLengthLeft(parseFloat(e.target.value) || 0)}
-                placeholder="e.g. 22.5"
                 min="12"
                 max="30"
                 step="0.1"
@@ -207,7 +204,6 @@ export function EditMeasurementEntryScreen({
                 className={inputCls}
                 value={footLengthRight || ''}
                 onChange={(e) => setFootLengthRight(parseFloat(e.target.value) || 0)}
-                placeholder="e.g. 22.5"
                 min="12"
                 max="30"
                 step="0.1"
