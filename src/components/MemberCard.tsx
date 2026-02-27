@@ -50,8 +50,8 @@ export function MemberCard({ member, onSelect, onEdit, onDelete }: MemberCardPro
     >
       <div className="flex items-center gap-3">
         {/* Avatar */}
-        <div className="w-11 h-11 rounded-full bg-[#008751] flex items-center justify-center flex-shrink-0">
-          <span className="text-lg font-black text-white">
+        <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-emerald-50 to-slate-100 border border-slate-100 flex items-center justify-center flex-shrink-0">
+          <span className="text-2xl font-black text-[#008751] select-none">
             {member.name.charAt(0).toUpperCase()}
           </span>
         </div>
