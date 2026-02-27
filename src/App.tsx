@@ -158,7 +158,7 @@ function App() {
   const handleEditGear = (item: GearItem) => {
     setSelectedGearItem(item);
     setGearOwnerId(item.ownerId);
-    setGearDefaultSport(item.sport);
+    setGearDefaultSport(item.sports[0]);
     setView('edit-gear');
   };
 

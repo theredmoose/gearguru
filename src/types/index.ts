@@ -249,8 +249,6 @@ export interface GearItem {
   userId: string; // Firebase Auth user ID
   ownerId: string; // FamilyMember id
   sports: Sport[];  // required, min 1
-  /** @deprecated use sports */
-  sport?: Sport;
   type: GearType;
   brand: string;
   model: string;
