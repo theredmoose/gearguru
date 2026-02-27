@@ -21,7 +21,7 @@ const sectionTitleCls = 'text-[10px] font-black text-slate-500 uppercase trackin
 const rowCls = 'flex items-center justify-between py-3 border-b border-slate-100 last:border-0';
 const labelCls = 'text-sm font-semibold text-slate-700';
 const subLabelCls = 'text-[11px] text-slate-400 mt-0.5';
-const toggleBtnCls = 'px-3 py-1.5 rounded-lg text-xs font-bold bg-blue-50 text-blue-700 border border-blue-200 hover:bg-blue-100 transition-colors';
+const toggleBtnCls = 'px-3 py-1.5 rounded-lg text-xs font-bold bg-[#ECFDF5] text-[#008751] border border-emerald-200 hover:bg-emerald-50 transition-colors';
 
 export function SettingsScreen({
   settings,
@@ -123,7 +123,7 @@ export function SettingsScreen({
                 <button
                   className={`px-3 py-1.5 rounded-lg text-xs font-bold border transition-colors ${
                     settings.defaultSport === sport
-                      ? 'bg-blue-700 text-white border-blue-700'
+                      ? 'bg-[#008751] text-white border-[#008751]'
                       : 'bg-slate-100 text-slate-500 border-slate-200 hover:bg-slate-200'
                   }`}
                   onClick={() => onUpdateSettings({ defaultSport: sport })}
@@ -158,7 +158,7 @@ export function SettingsScreen({
                   onChange={e => onUpdateSettings({ display: { ...settings.display, showFoot: e.target.checked } })}
                   aria-label="Show foot length"
                 />
-                <div className="w-10 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600" />
+                <div className="w-10 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#008751]" />
               </label>
             </div>
 
@@ -175,7 +175,7 @@ export function SettingsScreen({
                   onChange={e => onUpdateSettings({ display: { ...settings.display, showHand: e.target.checked } })}
                   aria-label="Show hand size"
                 />
-                <div className="w-10 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600" />
+                <div className="w-10 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#008751]" />
               </label>
             </div>
 
@@ -214,7 +214,7 @@ export function SettingsScreen({
               </div>
               <input
                 type="number"
-                className="w-20 border border-slate-200 rounded-xl px-3 py-1.5 text-sm text-slate-800 bg-white focus:outline-none focus:ring-2 focus:ring-blue-400 text-center"
+                className="w-20 border border-slate-200 rounded-xl px-3 py-1.5 text-sm text-slate-800 bg-white focus:outline-none focus:ring-2 focus:ring-[#008751]/30 text-center"
                 value={settings.defaultDIN ?? ''}
                 onChange={(e) => {
                   const val = e.target.value;
@@ -239,7 +239,7 @@ export function SettingsScreen({
                     key={m}
                     className={`px-2.5 py-1.5 rounded-lg text-xs font-bold border transition-colors ${
                       settings.sizingModel === m
-                        ? 'bg-blue-700 text-white border-blue-700'
+                        ? 'bg-[#008751] text-white border-[#008751]'
                         : 'bg-white text-slate-500 border-slate-200 hover:bg-slate-100'
                     }`}
                     onClick={() => onUpdateSettings({ sizingModel: m })}

@@ -252,22 +252,24 @@ function App() {
       default: // 'family'
         return (
           <div className="flex flex-col min-h-0 flex-1">
-            {/* Blue app header */}
-            <div className="px-6 py-4 bg-blue-700 border-b border-blue-800 shadow-sm flex items-center justify-between">
+            {/* App header */}
+            <div className="px-5 py-3 bg-white border-b border-slate-100 shadow-sm flex items-center justify-between">
               <div>
-                <h1 className="text-lg font-black text-white tracking-tight">Gear Guru</h1>
-                <p className="text-blue-200 text-xs">Sports equipment sizing</p>
+                <h1 className="text-lg font-black text-slate-900 tracking-tight">
+                  Gear <span style={{ color: '#008751' }}>Guru</span>
+                </h1>
+                <p className="text-slate-400 text-xs">Sports equipment sizing</p>
               </div>
               <div className="flex items-center gap-3">
-                <span className="text-blue-200 text-xs truncate max-w-[100px]">
+                <span className="text-slate-400 text-xs truncate max-w-[100px]">
                   {user.displayName || user.email}
                 </span>
                 <button
                   onClick={() => setView('settings')}
-                  className="p-1.5 hover:bg-blue-600 rounded-full transition-colors"
+                  className="p-2 bg-slate-50 border border-slate-100 rounded-2xl text-emerald-700 shadow-sm hover:bg-white transition-all"
                   aria-label="Open settings"
                 >
-                  <Settings className="w-5 h-5 text-white" />
+                  <Settings className="w-5 h-5" />
                 </button>
               </div>
             </div>

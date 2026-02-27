@@ -40,7 +40,7 @@ export function MeasureScreen({ members, onSelectMember }: MeasureScreenProps) {
                   className="w-full bg-slate-50 border border-slate-100 rounded-2xl p-4 flex items-center justify-between shadow-sm hover:shadow-md active:scale-[0.98] transition-all text-left"
                 >
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-full bg-blue-700 flex items-center justify-center text-white font-black text-lg">
+                    <div className="w-10 h-10 rounded-full bg-[#008751] flex items-center justify-center text-white font-black text-lg">
                       {member.name.charAt(0).toUpperCase()}
                     </div>
                     <div>
@@ -53,7 +53,7 @@ export function MeasureScreen({ members, onSelectMember }: MeasureScreenProps) {
                       </p>
                     </div>
                   </div>
-                  <span className="text-[10px] font-black text-blue-700 uppercase tracking-widest">
+                  <span className="text-[10px] font-black text-[#008751] uppercase tracking-widest">
                     Edit →
                   </span>
                 </button>

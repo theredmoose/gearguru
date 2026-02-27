@@ -159,7 +159,7 @@ export function GearCard({
       {/* Actions */}
       <div className="flex flex-col gap-1 flex-shrink-0">
         <button
-          className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-slate-100 transition-colors text-slate-400 hover:text-blue-600"
+          className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-slate-100 transition-colors text-slate-400 hover:text-[#008751]"
           onClick={handleEdit}
           aria-label="Edit gear"
         >

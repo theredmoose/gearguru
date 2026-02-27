@@ -251,10 +251,10 @@ export function MemberDetail({
         right={
           <button
             onClick={onEdit}
-            className="p-1.5 hover:bg-blue-600 rounded-full transition-colors"
+            className="p-2 bg-slate-50 border border-slate-100 rounded-2xl text-emerald-700 shadow-sm hover:bg-white transition-all"
             aria-label="Edit member"
           >
-            <Settings className="w-5 h-5 text-white" />
+            <Settings className="w-5 h-5" />
           </button>
         }
       />
@@ -268,7 +268,7 @@ export function MemberDetail({
           {/* Left column: avatar + sport/level selectors */}
           <div className="w-[48%] flex flex-col gap-3">
             <div className="aspect-[3/4] bg-slate-100 rounded-3xl border border-slate-100 flex items-center justify-center overflow-hidden">
-              <span className="text-6xl font-black text-blue-700 select-none">
+              <span className="text-6xl font-black text-[#008751] select-none">
                 {member.name.charAt(0).toUpperCase()}
               </span>
             </div>
@@ -285,7 +285,7 @@ export function MemberDetail({
                       setSelectedSport(s);
                       setSkillLevel(member.skillLevels?.[s] ?? 'intermediate');
                     }}
-                    className="w-full bg-white border border-slate-200 rounded-lg px-2 py-1.5 text-[10px] font-bold text-slate-700 appearance-none focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all cursor-pointer shadow-sm"
+                    className="w-full bg-[#ECFDF5] border-none rounded-lg px-2 py-1.5 text-[10px] font-bold text-[#008751] appearance-none focus:outline-none focus:ring-2 focus:ring-emerald-500/20 transition-all cursor-pointer"
                   >
                     {SPORT_OPTIONS.map(o => (
                       <option key={o.value} value={o.value}>{o.label}</option>
@@ -302,7 +302,7 @@ export function MemberDetail({
                   <select
                     value={skillLevel}
                     onChange={(e) => setSkillLevel(e.target.value as SkillLevel)}
-                    className="w-full bg-white border border-slate-200 rounded-lg px-2 py-1.5 text-[10px] font-bold text-slate-700 appearance-none focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all cursor-pointer shadow-sm"
+                    className="w-full bg-[#ECFDF5] border-none rounded-lg px-2 py-1.5 text-[10px] font-bold text-[#008751] appearance-none focus:outline-none focus:ring-2 focus:ring-emerald-500/20 transition-all cursor-pointer"
                   >
                     {LEVEL_OPTIONS.map(o => (
                       <option key={o.value} value={o.value}>{o.label}</option>
@@ -332,7 +332,7 @@ export function MemberDetail({
                   {row.action ? (
                     <button
                       onClick={row.action}
-                      className="text-sm font-extrabold text-blue-600 hover:text-blue-700 transition-colors"
+                      className="text-sm font-extrabold text-[#008751] hover:text-emerald-800 transition-colors"
                     >
                       {row.value}
                     </button>
@@ -342,9 +342,9 @@ export function MemberDetail({
                       className="flex items-center gap-1 group"
                       aria-label={`Toggle ${row.label} units`}
                     >
-                      <span className="text-sm font-extrabold text-slate-800 group-hover:text-blue-600 transition-colors">{row.value}</span>
+                      <span className="text-sm font-extrabold text-slate-800 group-hover:text-[#008751] transition-colors">{row.value}</span>
                       {row.badge && <GrowthWarningBadge reason={row.badge as 'stale' | 'growing' | 'both'} />}
-                      <ArrowLeftRight className="w-3 h-3 text-slate-300 group-hover:text-blue-400 transition-colors" />
+                      <ArrowLeftRight className="w-3 h-3 text-slate-300 group-hover:text-emerald-400 transition-colors" />
                     </button>
                   ) : (
                     <span className="text-sm font-extrabold text-slate-800">{row.value}</span>
@@ -357,7 +357,7 @@ export function MemberDetail({
             {onViewHistory && (
               <button
                 onClick={onViewHistory}
-                className="text-[10px] font-black text-blue-500 uppercase tracking-widest hover:text-blue-700 transition-colors mt-2"
+                className="text-[10px] font-black text-[#008751] uppercase tracking-widest hover:text-emerald-800 transition-colors mt-2"
               >
                 View History →
               </button>
@@ -370,10 +370,10 @@ export function MemberDetail({
         {/* ── Sizing ── */}
         <div className="mb-7">
           <div className="flex items-center justify-between mb-3">
-            <h2 className="text-lg font-black text-blue-700 tracking-tight">Sizing</h2>
+            <h2 className="text-lg font-black tracking-tight" style={{ color: '#008751' }}>Sizing</h2>
             <button
               onClick={onGetSizing}
-              className="text-[10px] font-black text-blue-600 uppercase tracking-widest hover:text-blue-700 transition-colors"
+              className="text-[10px] font-black text-[#008751] uppercase tracking-widest hover:text-emerald-800 transition-colors"
             >
               All Sports →
             </button>
@@ -390,7 +390,7 @@ export function MemberDetail({
                 </div>
                 <div className="flex flex-col flex-1 min-w-0">
                   <div className="flex items-center justify-between mb-1">
-                    <span className="text-[11px] text-blue-700 font-bold uppercase tracking-wide">
+                    <span className="text-[11px] text-emerald-700 font-bold uppercase tracking-wide">
                       {card.label}
                     </span>
                     {card.toggleKind && (
@@ -399,7 +399,7 @@ export function MemberDetail({
                           ? setLengthUnit(u => u === 'cm' ? 'in' : 'cm')
                           : cycleBootUnit()
                         }
-                        className="text-slate-300 hover:text-blue-400 transition-colors ml-1 flex-shrink-0"
+                        className="text-slate-300 hover:text-emerald-400 transition-colors ml-1 flex-shrink-0"
                         aria-label={`Toggle ${card.label} units`}
                       >
                         <ArrowLeftRight className="w-3 h-3" />
@@ -421,10 +421,10 @@ export function MemberDetail({
         {/* ── Gear Inventory ── */}
         <div>
           <div className="flex items-center justify-between mb-3">
-            <h2 className="text-lg font-black text-blue-700 tracking-tight">Gear Inventory</h2>
+            <h2 className="text-lg font-black tracking-tight" style={{ color: '#008751' }}>Gear Vault</h2>
             <button
               onClick={onAddGear}
-              className="text-blue-600 hover:text-blue-700 transition-colors"
+              className="bg-[#008751] p-1.5 rounded-xl text-white shadow-sm transition-all active:scale-95"
               aria-label="Add gear"
             >
               <PlusCircle className="w-6 h-6" />
@@ -468,7 +468,7 @@ export function MemberDetail({
                         </p>
                         {/* Photo indicator */}
                         {item.photos && item.photos.length > 0 && (
-                          <p className="text-[9px] text-blue-400 font-bold mt-0.5">
+                          <p className="text-[9px] text-emerald-500 font-bold mt-0.5">
                             {item.photos.length} photo{item.photos.length !== 1 ? 's' : ''}
                           </p>
                         )}
@@ -479,13 +479,13 @@ export function MemberDetail({
                     <div className="flex flex-col items-end gap-1.5 flex-shrink-0 ml-2">
                       <span className={`text-[9px] font-black px-2 py-0.5 rounded-md uppercase tracking-widest ${
                         isUpdate
-                          ? 'bg-red-100 text-red-600 animate-pulse'
-                          : 'bg-green-100 text-green-600'
+                          ? 'bg-orange-100 text-orange-600 animate-pulse'
+                          : 'bg-[#E3F9F1] text-[#008751]'
                       }`}>
                         {status}
                       </span>
                       <div className={`p-1 rounded-full ${
-                        isUpdate ? 'bg-red-50 text-red-500' : 'bg-blue-50 text-blue-500'
+                        isUpdate ? 'bg-orange-50 text-orange-500' : 'bg-[#E3F9F1] text-[#008751]'
                       }`}>
                         {isUpdate
                           ? <AlertCircle className="w-4 h-4" />

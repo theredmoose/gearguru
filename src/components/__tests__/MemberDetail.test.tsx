@@ -96,7 +96,7 @@ describe('MemberDetail', () => {
 
     it('renders Gear Inventory section heading', () => {
       render(<MemberDetail {...defaultProps} />);
-      expect(screen.getByRole('heading', { name: /gear inventory/i })).toBeInTheDocument();
+      expect(screen.getByRole('heading', { name: /gear vault/i })).toBeInTheDocument();
     });
 
     it('shows empty gear state when no gear items', () => {

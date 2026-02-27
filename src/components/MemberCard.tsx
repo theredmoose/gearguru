@@ -50,7 +50,7 @@ export function MemberCard({ member, onSelect, onEdit, onDelete }: MemberCardPro
     >
       <div className="flex items-center gap-3">
         {/* Avatar */}
-        <div className="w-11 h-11 rounded-full bg-blue-700 flex items-center justify-center flex-shrink-0">
+        <div className="w-11 h-11 rounded-full bg-[#008751] flex items-center justify-center flex-shrink-0">
           <span className="text-lg font-black text-white">
             {member.name.charAt(0).toUpperCase()}
           </span>
@@ -71,7 +71,7 @@ export function MemberCard({ member, onSelect, onEdit, onDelete }: MemberCardPro
       {/* Actions */}
       <div className="flex items-center gap-1">
         <button
-          className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-slate-100 transition-colors text-slate-400 hover:text-blue-600"
+          className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-slate-100 transition-colors text-slate-400 hover:text-[#008751]"
           onClick={handleEdit}
           aria-label="Edit member"
         >
