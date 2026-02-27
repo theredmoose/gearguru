@@ -35,7 +35,7 @@ describe('GearForm', () => {
     id: 'gear-1',
     userId: 'user-1',
     ownerId: 'member-1',
-    sport: 'nordic-classic',
+    sports: ['nordic-classic'],
     type: 'ski',
     brand: 'Fischer',
     model: 'RCS Skate',
@@ -75,7 +75,21 @@ describe('GearForm', () => {
 
     it('shows the Sport field', () => {
       render(<GearForm {...defaultProps} />);
-      expect(screen.getByLabelText('Sport')).toBeInTheDocument();
+      expect(screen.getByText('Sport')).toBeInTheDocument();
+    });
+
+    it('shows sport chip buttons for each sport', () => {
+      render(<GearForm {...defaultProps} />);
+      expect(screen.getByRole('button', { name: /^alpine$/i })).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: /^nordic classic$/i })).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: /^hockey$/i })).toBeInTheDocument();
+    });
+
+    it('pre-selects sports from item prop', () => {
+      const multiSportItem = { ...baseGearItem, sports: ['alpine', 'snowboard'] as import('../../types').Sport[] };
+      render(<GearForm {...defaultProps} item={multiSportItem} />);
+      expect(screen.getByRole('button', { name: /^alpine$/i })).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: /^snowboard$/i })).toBeInTheDocument();
     });
 
     it('shows the Type field', () => {
@@ -162,18 +176,21 @@ describe('GearForm', () => {
 
     it('hides ski specifications section when sport is changed to nordic', () => {
       render(<GearForm {...defaultProps} />);
-      fireEvent.change(screen.getByLabelText('Sport'), { target: { value: 'nordic-classic' } });
+      // Click the Alpine chip to deselect it (it's selected by default)
+      fireEvent.click(screen.getByRole('button', { name: /^alpine$/i }));
+      // Click Nordic Classic chip to select it
+      fireEvent.click(screen.getByRole('button', { name: /^nordic classic$/i }));
       expect(screen.queryByText('Ski Specifications')).not.toBeInTheDocument();
     });
 
     it('shows ski specifications when editing an alpine ski', () => {
-      const alpineSkiItem: GearItem = { ...baseGearItem, sport: 'alpine', type: 'ski' };
+      const alpineSkiItem: GearItem = { ...baseGearItem, sports: ['alpine'], type: 'ski' };
       render(<GearForm {...defaultProps} item={alpineSkiItem} />);
       expect(screen.getByText('Ski Specifications')).toBeInTheDocument();
     });
 
     it('does not show ski specifications for non-alpine sport', () => {
-      const nordicSkiItem: GearItem = { ...baseGearItem, sport: 'nordic-classic', type: 'ski' };
+      const nordicSkiItem: GearItem = { ...baseGearItem, sports: ['nordic-classic'], type: 'ski' };
       render(<GearForm {...defaultProps} item={nordicSkiItem} />);
       expect(screen.queryByText('Ski Specifications')).not.toBeInTheDocument();
     });
@@ -199,6 +216,18 @@ describe('GearForm', () => {
   // VALIDATION
   // ============================================
   describe('validation', () => {
+    it('shows error when no sport is selected on submit', async () => {
+      render(<GearForm {...defaultProps} />);
+      // Deselect default Alpine chip
+      fireEvent.click(screen.getByRole('button', { name: /^alpine$/i }));
+      fireEvent.change(screen.getByLabelText('Brand'), { target: { value: 'Atomic' } });
+      fireEvent.change(screen.getByLabelText('Model'), { target: { value: 'Redster' } });
+      fireEvent.change(screen.getByLabelText('Size'), { target: { value: '170' } });
+      fireEvent.click(screen.getByRole('button', { name: 'Add Gear' }));
+      expect(await screen.findByText('Select at least one sport.')).toBeInTheDocument();
+      expect(mockOnSubmit).not.toHaveBeenCalled();
+    });
+
     it('shows an error when submitting with empty brand', async () => {
       render(<GearForm {...defaultProps} />);
       // Use whitespace to pass HTML required constraint while failing JS .trim() validation
@@ -245,6 +274,7 @@ describe('GearForm', () => {
         expect(mockOnSubmit).toHaveBeenCalledWith(
           expect.objectContaining({
             ownerId: 'member-1',
+            sports: ['alpine'],
             brand: 'Atomic',
             model: 'Redster',
             size: '170',

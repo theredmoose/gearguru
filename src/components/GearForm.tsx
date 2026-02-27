@@ -55,7 +55,14 @@ export function GearForm({
   onSubmit,
   onCancel,
 }: GearFormProps) {
-  const [sport, setSport] = useState<Sport>(item?.sport ?? defaultSport ?? 'alpine');
+  const [selectedSports, setSelectedSports] = useState<Sport[]>(
+    item?.sports ?? (defaultSport ? [defaultSport] : ['alpine'])
+  );
+  const toggleSport = (sportId: Sport) => {
+    setSelectedSports((prev) =>
+      prev.includes(sportId) ? prev.filter((s) => s !== sportId) : [...prev, sportId]
+    );
+  };
   const [type, setType] = useState<GearType>(item?.type ?? 'ski');
   const [brand, setBrand] = useState(item?.brand ?? '');
   const [model, setModel] = useState(item?.model ?? '');
@@ -122,7 +129,7 @@ export function GearForm({
     setAnalysisNotes([]);
 
     try {
-      const result = await analyzeGearPhotos(photos, { sport, type });
+      const result = await analyzeGearPhotos(photos, { sport: selectedSports[0] ?? 'alpine', type });
 
       if (result.brand) setBrand(result.brand);
       if (result.model) setModel(result.model);
@@ -168,6 +175,11 @@ export function GearForm({
     e.preventDefault();
     setError(null);
 
+    if (selectedSports.length === 0) {
+      setError('Select at least one sport.');
+      return;
+    }
+
     if (!brand.trim() || !model.trim() || !size.trim()) {
       setError('Brand, model, and size are required.');
       return;
@@ -187,7 +199,7 @@ export function GearForm({
     try {
       let finalExtendedDetails: ExtendedGearDetails | undefined = extendedDetails;
 
-      if (type === 'ski' && sport === 'alpine') {
+      if (type === 'ski' && selectedSports.includes('alpine')) {
         const tipN = parseInt(profileTip, 10);
         const waistN = parseInt(profileWaist, 10);
         const tailN = parseInt(profileTail, 10);
@@ -218,7 +230,7 @@ export function GearForm({
 
       await onSubmit({
         ownerId,
-        sport,
+        sports: selectedSports,
         type,
         brand: brand.trim(),
         model: model.trim(),
@@ -239,7 +251,7 @@ export function GearForm({
     }
   };
 
-  const showAlpineSkiDetails = type === 'ski' && sport === 'alpine';
+  const showAlpineSkiDetails = type === 'ski' && selectedSports.includes('alpine');
 
   return (
     <div className="flex flex-col min-h-0 flex-1">
@@ -295,21 +307,30 @@ export function GearForm({
           <section>
             <h3 className={sectionTitleCls}>Gear Info</h3>
             <div className="flex flex-col gap-3">
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label htmlFor="sport" className={labelCls}>Sport</label>
-                  <select
-                    id="sport"
-                    className={inputCls}
-                    value={sport}
-                    onChange={(e) => setSport(e.target.value as Sport)}
-                  >
-                    {SPORTS.map((s) => (
-                      <option key={s.id} value={s.id}>{s.label}</option>
-                    ))}
-                  </select>
+              <div>
+                <label className={labelCls}>Sport</label>
+                <div className="flex flex-wrap gap-1.5 mt-1">
+                  {SPORTS.map((s) => {
+                    const active = selectedSports.includes(s.id);
+                    return (
+                      <button
+                        key={s.id}
+                        type="button"
+                        onClick={() => toggleSport(s.id)}
+                        className={`px-3 py-1.5 rounded-full text-xs font-black uppercase tracking-wide transition-colors ${
+                          active
+                            ? 'bg-[#008751] text-white'
+                            : 'bg-slate-100 text-slate-500 hover:bg-slate-200'
+                        }`}
+                      >
+                        {s.label}
+                      </button>
+                    );
+                  })}
                 </div>
+              </div>
 
+              <div className="grid grid-cols-2 gap-3">
                 <div>
                   <label htmlFor="type" className={labelCls}>Type</label>
                   <select
