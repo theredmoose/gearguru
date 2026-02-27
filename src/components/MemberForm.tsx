@@ -55,9 +55,17 @@ export function MemberForm({ member, onSubmit, onCancel }: MemberFormProps) {
       setError('Height must be greater than 0');
       return;
     }
+    if (measurements.height > 300) {
+      setError('Height must be 300 cm or less');
+      return;
+    }
 
     if (measurements.weight <= 0) {
       setError('Weight must be greater than 0');
+      return;
+    }
+    if (measurements.weight > 300) {
+      setError('Weight must be 300 kg or less');
       return;
     }
 
@@ -67,6 +75,30 @@ export function MemberForm({ member, onSubmit, onCancel }: MemberFormProps) {
     }
     if (measurements.footLengthRight > 0 && (measurements.footLengthRight < 12 || measurements.footLengthRight > 30)) {
       setError('Right foot length must be between 12 and 30 cm');
+      return;
+    }
+    if (measurements.footWidthLeft !== undefined && measurements.footWidthLeft > 15) {
+      setError('Left foot width must be 15 cm or less');
+      return;
+    }
+    if (measurements.footWidthRight !== undefined && measurements.footWidthRight > 15) {
+      setError('Right foot width must be 15 cm or less');
+      return;
+    }
+    if (measurements.usShoeSize !== undefined && measurements.usShoeSize > 25) {
+      setError('US shoe size must be 25 or less');
+      return;
+    }
+    if (measurements.euShoeSize !== undefined && measurements.euShoeSize > 60) {
+      setError('EU shoe size must be 60 or less');
+      return;
+    }
+    if (measurements.headCircumference !== undefined && (measurements.headCircumference < 40 || measurements.headCircumference > 70)) {
+      setError('Head circumference must be between 40 and 70 cm');
+      return;
+    }
+    if (measurements.handSize !== undefined && (measurements.handSize < 4 || measurements.handSize > 30)) {
+      setError('Hand size must be between 4 and 30 cm');
       return;
     }
 
@@ -116,6 +148,7 @@ export function MemberForm({ member, onSubmit, onCancel }: MemberFormProps) {
 
       <form
         onSubmit={handleSubmit}
+        noValidate
         className="flex flex-col flex-1 min-h-0"
       >
         {/* Scrollable fields */}
@@ -186,8 +219,8 @@ export function MemberForm({ member, onSubmit, onCancel }: MemberFormProps) {
                   onChange={(e) =>
                     updateMeasurement('height', parseFloat(e.target.value) || 0)
                   }
-                  placeholder="175"
                   min="0"
+                  max="300"
                   step="0.5"
                 />
               </div>
@@ -202,8 +235,8 @@ export function MemberForm({ member, onSubmit, onCancel }: MemberFormProps) {
                   onChange={(e) =>
                     updateMeasurement('weight', parseFloat(e.target.value) || 0)
                   }
-                  placeholder="70"
                   min="0"
+                  max="300"
                   step="0.5"
                 />
               </div>
@@ -224,7 +257,6 @@ export function MemberForm({ member, onSubmit, onCancel }: MemberFormProps) {
                   onChange={(e) =>
                     updateMeasurement('footLengthLeft', parseFloat(e.target.value) || 0)
                   }
-                  placeholder="27.0"
                   min="12"
                   max="30"
                   step="0.1"
@@ -241,7 +273,6 @@ export function MemberForm({ member, onSubmit, onCancel }: MemberFormProps) {
                   onChange={(e) =>
                     updateMeasurement('footLengthRight', parseFloat(e.target.value) || 0)
                   }
-                  placeholder="27.0"
                   min="12"
                   max="30"
                   step="0.1"
@@ -261,8 +292,8 @@ export function MemberForm({ member, onSubmit, onCancel }: MemberFormProps) {
                       e.target.value === '' ? undefined : parseFloat(e.target.value)
                     )
                   }
-                  placeholder="10.0"
                   min="0"
+                  max="15"
                   step="0.1"
                 />
               </div>
@@ -280,8 +311,8 @@ export function MemberForm({ member, onSubmit, onCancel }: MemberFormProps) {
                       e.target.value === '' ? undefined : parseFloat(e.target.value)
                     )
                   }
-                  placeholder="10.0"
                   min="0"
+                  max="15"
                   step="0.1"
                 />
               </div>
@@ -305,8 +336,8 @@ export function MemberForm({ member, onSubmit, onCancel }: MemberFormProps) {
                       e.target.value === '' ? undefined : parseFloat(e.target.value)
                     )
                   }
-                  placeholder="10"
                   min="0"
+                  max="25"
                   step="0.5"
                 />
               </div>
@@ -324,8 +355,8 @@ export function MemberForm({ member, onSubmit, onCancel }: MemberFormProps) {
                       e.target.value === '' ? undefined : parseFloat(e.target.value)
                     )
                   }
-                  placeholder="43"
                   min="0"
+                  max="60"
                   step="1"
                 />
               </div>
@@ -349,7 +380,6 @@ export function MemberForm({ member, onSubmit, onCancel }: MemberFormProps) {
                       e.target.value === '' ? undefined : parseFloat(e.target.value)
                     )
                   }
-                  placeholder="57"
                   min="40"
                   max="70"
                   step="0.5"
@@ -369,8 +399,7 @@ export function MemberForm({ member, onSubmit, onCancel }: MemberFormProps) {
                       e.target.value === '' ? undefined : parseFloat(e.target.value)
                     )
                   }
-                  placeholder="19"
-                  min="10"
+                  min="4"
                   max="30"
                   step="0.5"
                 />
