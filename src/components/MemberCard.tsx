@@ -45,13 +45,13 @@ export function MemberCard({ member, onSelect, onEdit, onDelete }: MemberCardPro
 
   return (
     <div
-      className="bg-white border border-slate-200 rounded-2xl p-4 flex items-center justify-between shadow-sm hover:shadow-md active:scale-[0.98] transition-all cursor-pointer mb-3"
+      className="bg-white border border-slate-200 rounded-3xl p-4 flex items-center justify-between shadow-sm hover:shadow-md active:scale-[0.98] transition-all cursor-pointer mb-3"
       onClick={() => onSelect(member)}
     >
       <div className="flex items-center gap-3">
         {/* Avatar */}
-        <div className="w-11 h-11 rounded-full bg-blue-700 flex items-center justify-center flex-shrink-0">
-          <span className="text-lg font-black text-white">
+        <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-emerald-50 to-slate-100 border border-slate-100 flex items-center justify-center flex-shrink-0">
+          <span className="text-2xl font-black text-[#008751] select-none">
             {member.name.charAt(0).toUpperCase()}
           </span>
         </div>
@@ -71,7 +71,7 @@ export function MemberCard({ member, onSelect, onEdit, onDelete }: MemberCardPro
       {/* Actions */}
       <div className="flex items-center gap-1">
         <button
-          className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-slate-100 transition-colors text-slate-400 hover:text-blue-600"
+          className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-slate-100 transition-colors text-slate-400 hover:text-[#008751]"
           onClick={handleEdit}
           aria-label="Edit member"
         >

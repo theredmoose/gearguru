@@ -57,8 +57,7 @@ describe('App Integration', () => {
   describe('home view', () => {
     it('renders the app header', () => {
       render(<App />);
-      expect(screen.getByText('Gear Guru')).toBeInTheDocument();
-      expect(screen.getByText(/sports equipment sizing/i)).toBeInTheDocument();
+      expect(screen.getByText(/gear/i, { selector: 'h1' })).toBeInTheDocument();
     });
 
     it('shows empty state when no members', () => {
@@ -83,7 +82,7 @@ describe('App Integration', () => {
       render(<App />);
       fireEvent.click(screen.getByText(/add family member/i));
       fireEvent.click(screen.getByText('Cancel'));
-      expect(screen.getByText('Gear Guru')).toBeInTheDocument();
+      expect(screen.getByText(/gear/i, { selector: 'h1' })).toBeInTheDocument();
     });
   });
 
@@ -175,7 +174,7 @@ describe('App auth states', () => {
 
     it('shows Gear Guru title and loading indicator', () => {
       render(<App />);
-      expect(screen.getByText('Gear Guru')).toBeInTheDocument();
+      expect(screen.getByText(/gear/i, { selector: 'h1' })).toBeInTheDocument();
       expect(screen.getByText('Loading...')).toBeInTheDocument();
     });
   });
@@ -382,7 +381,7 @@ describe('App member operations', () => {
     render(<App />);
     fireEvent.click(screen.getByText('Jane Smith'));
     fireEvent.click(screen.getByRole('button', { name: /back/i }));
-    expect(screen.getByText('Gear Guru')).toBeInTheDocument();
+    expect(screen.getByText(/gear/i, { selector: 'h1' })).toBeInTheDocument();
   });
 
   it('shows sport sizing from detail view', () => {

@@ -252,27 +252,28 @@ function App() {
       default: // 'family'
         return (
           <div className="flex flex-col min-h-0 flex-1">
-            {/* Blue app header */}
-            <div className="px-6 py-4 bg-blue-700 border-b border-blue-800 shadow-sm flex items-center justify-between">
-              <div>
-                <h1 className="text-lg font-black text-white tracking-tight">Gear Guru</h1>
-                <p className="text-blue-200 text-xs">Sports equipment sizing</p>
-              </div>
-              <div className="flex items-center gap-3">
-                <span className="text-blue-200 text-xs truncate max-w-[100px]">
-                  {user.displayName || user.email}
-                </span>
+            {/* App header */}
+            <div className="px-6 bg-white border-b border-slate-100 shadow-sm">
+              {/* spacing row above */}
+              <div className="h-5" />
+              {/* centered logo row */}
+              <div className="flex items-center justify-center relative">
+                <h1 className="text-xl font-black text-slate-900 tracking-tighter uppercase text-center">
+                  Gear <span style={{ color: '#008751' }}>Guru</span>
+                </h1>
                 <button
                   onClick={() => setView('settings')}
-                  className="p-1.5 hover:bg-blue-600 rounded-full transition-colors"
+                  className="absolute right-0 p-3 bg-slate-50 border border-slate-100 rounded-2xl text-emerald-700 shadow-sm hover:bg-white transition-all"
                   aria-label="Open settings"
                 >
-                  <Settings className="w-5 h-5 text-white" />
+                  <Settings className="w-5 h-5" />
                 </button>
               </div>
+              {/* spacing row below */}
+              <div className="h-5" />
             </div>
 
-            <div className="flex-1 overflow-y-auto bg-white px-6 py-6">
+            <div className="flex-1 overflow-y-auto bg-[#F8FAFC] px-6 py-6">
               {loading && <p className="loading">Loading...</p>}
               {error && <p className="error-state">{getOperationErrorMessage(error, 'load')}</p>}
 

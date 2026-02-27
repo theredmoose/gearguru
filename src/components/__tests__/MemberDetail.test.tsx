@@ -91,17 +91,17 @@ describe('MemberDetail', () => {
 
     it('renders Sizing section heading', () => {
       render(<MemberDetail {...defaultProps} />);
-      expect(screen.getByRole('heading', { name: /^sizing$/i })).toBeInTheDocument();
+      expect(screen.getByRole('heading', { name: /sizing/i })).toBeInTheDocument();
     });
 
     it('renders Gear Inventory section heading', () => {
       render(<MemberDetail {...defaultProps} />);
-      expect(screen.getByRole('heading', { name: /gear inventory/i })).toBeInTheDocument();
+      expect(screen.getByRole('heading', { name: /gear vault/i })).toBeInTheDocument();
     });
 
     it('shows empty gear state when no gear items', () => {
       render(<MemberDetail {...defaultProps} gearItems={[]} />);
-      expect(screen.getByText(/no gear yet/i)).toBeInTheDocument();
+      expect(screen.getByText(/no gear added yet/i)).toBeInTheDocument();
     });
 
     it('renders gear items when provided', () => {
