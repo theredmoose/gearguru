@@ -10,6 +10,10 @@ const defaultSettings: AppSettings = {
   skiLengthUnit: 'cm',
   defaultSport: 'alpine',
   display: { showFoot: true, showHand: true, separateFeetHands: false },
+  sizingModel: 'generic',
+  sizingDisplay: 'range',
+  bootUnit: 'mp',
+  notificationsEnabled: true,
 };
 
 function makeUser(overrides: Partial<User> = {}): User {
@@ -208,6 +212,34 @@ describe('SettingsScreen', () => {
       render(<SettingsScreen {...defaultProps} />);
       fireEvent.click(screen.getByRole('button', { name: /sign out/i }));
       expect(defaultProps.onSignOut).toHaveBeenCalled();
+    });
+  });
+
+  describe('notifications section', () => {
+    it('renders the Notifications section heading', () => {
+      render(<SettingsScreen {...defaultProps} />);
+      expect(screen.getByText('Notifications')).toBeInTheDocument();
+    });
+
+    it('gear notifications checkbox is checked when notificationsEnabled is true', () => {
+      render(<SettingsScreen {...defaultProps} />);
+      expect(screen.getByRole('checkbox', { name: /enable gear notifications/i })).toBeChecked();
+    });
+
+    it('gear notifications checkbox is unchecked when notificationsEnabled is false', () => {
+      render(
+        <SettingsScreen
+          {...defaultProps}
+          settings={{ ...defaultSettings, notificationsEnabled: false }}
+        />
+      );
+      expect(screen.getByRole('checkbox', { name: /enable gear notifications/i })).not.toBeChecked();
+    });
+
+    it('calls onUpdateSettings when notifications toggle changes', () => {
+      render(<SettingsScreen {...defaultProps} />);
+      fireEvent.click(screen.getByRole('checkbox', { name: /enable gear notifications/i }));
+      expect(defaultProps.onUpdateSettings).toHaveBeenCalledWith({ notificationsEnabled: false });
     });
   });
 

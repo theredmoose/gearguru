@@ -29,9 +29,11 @@ import {
   SettingsScreen,
   MeasurementHistoryScreen,
   EditMeasurementEntryScreen,
+  NotificationsPanel,
+  NotificationsScreen,
 } from './components';
 import type { TopLevelTab } from './components';
-import { useFamilyMembers, useAuth, useGearItems, useSettings } from './hooks';
+import { useFamilyMembers, useAuth, useGearItems, useSettings, useNotifications } from './hooks';
 import type { FamilyMember, GearItem, Sport, MeasurementEntry } from './types';
 
 type View =
@@ -46,7 +48,8 @@ type View =
   | 'edit-gear'
   | 'settings'
   | 'measurement-history'
-  | 'edit-measurement-entry';
+  | 'edit-measurement-entry'
+  | 'notifications';
 
 function App() {
   const {
@@ -69,6 +72,8 @@ function App() {
   const { items: gearItems, addItem: addGearItem, updateItem: updateGearItem, deleteItem: deleteGearItem } =
     useGearItems(user?.uid ?? null);
   const { settings, updateSettings, resetSettings } = useSettings();
+  const { activeNotifications, dismissedNotifications, dismiss: dismissNotification, undismiss: undismissNotification } =
+    useNotifications(user?.uid ?? null, members, gearItems, settings.notificationsEnabled);
 
   const [view, setView] = useState<View>('home');
   const [activeTab, setActiveTab] = useState<TopLevelTab>('family');
@@ -273,6 +278,12 @@ function App() {
               <div className="h-5" />
             </div>
 
+            <NotificationsPanel
+              notifications={activeNotifications}
+              onDismiss={dismissNotification}
+              onViewDismissed={() => setView('notifications')}
+            />
+
             <div className="flex-1 overflow-y-auto bg-[#F8FAFC] px-5 py-5">
               {loading && <p className="loading">Loading...</p>}
               {error && <p className="error-state">{getOperationErrorMessage(error, 'load')}</p>}
@@ -322,6 +333,16 @@ function App() {
   };
 
   const renderView = () => {
+    if (view === 'notifications') {
+      return (
+        <NotificationsScreen
+          notifications={dismissedNotifications}
+          onUndismiss={undismissNotification}
+          onBack={() => setView('home')}
+        />
+      );
+    }
+
     if (view === 'settings') {
       return (
         <SettingsScreen

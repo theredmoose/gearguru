@@ -14,6 +14,7 @@ const DEFAULT: AppSettings = {
   sizingModel: 'generic',
   sizingDisplay: 'range',
   bootUnit: 'mp',
+  notificationsEnabled: true,
 };
 
 // localStorage mock

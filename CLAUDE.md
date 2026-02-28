@@ -75,3 +75,9 @@ Types: `Add`, `Fix`, `Update`, `Refactor`, `Remove`, `Move`
 - All new features must include tests
 - All existing tests must pass before merging
 - Run `npm test` to execute the test suite
+
+### PR Review Checklist
+When preparing or reviewing a PR, always recommend whether any new settings should be tracked:
+- If the feature introduces user-configurable behaviour, add a field to `AppSettings` (persisted via `useSettings` / localStorage) and expose a toggle in `SettingsScreen`.
+- Add `notificationsEnabled: true` (or equivalent default) to `DEFAULT_SETTINGS` so the field is backwards-compatible with existing stored settings.
+- Note in the PR description which, if any, new settings were added.

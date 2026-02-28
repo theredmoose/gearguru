@@ -351,6 +351,7 @@ export interface AppSettings {
   sizingDisplay: SizingDisplay;
   bootUnit: BootUnit; // preferred unit shown in boot sizing cards
   defaultDIN?: number; // pre-fills the DIN setting field when adding alpine skis
+  notificationsEnabled: boolean;
 }
 
 export const DEFAULT_SETTINGS: AppSettings = {
@@ -366,4 +367,21 @@ export const DEFAULT_SETTINGS: AppSettings = {
   sizingModel: 'generic',
   sizingDisplay: 'range',
   bootUnit: 'mp',
+  notificationsEnabled: true,
 };
+
+// ============================================
+// NOTIFICATION TYPES
+// ============================================
+
+export type NotificationType = 'replace' | 'service' | 'old-gear';
+
+export interface AppNotification {
+  id: string;           // deterministic: e.g. "worn-{gearItemId}", "old-{gearItemId}"
+  type: NotificationType;
+  title: string;
+  body: string;
+  gearItemId?: string;
+  memberId?: string;
+  createdAt: string;    // ISO date string
+}
