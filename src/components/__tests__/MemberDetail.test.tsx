@@ -4,6 +4,14 @@ import { MemberDetail } from '../MemberDetail';
 import { FAMILY_MEMBERS, createFamilyMember } from '@tests/fixtures/familyMembers';
 import type { GearItem, FamilyMember, AppSettings } from '../../types';
 
+// Mock GearLoadoutPanel to avoid duplicate slot-label text (Skis, Boots, etc.)
+// that conflicts with sizing card labels, and to restore the avatar initial.
+vi.mock('../GearLoadoutPanel', () => ({
+  GearLoadoutPanel: ({ member }: { member: { name: string } }) => (
+    <div data-testid="gear-loadout-panel">{member.name.charAt(0)}</div>
+  ),
+}));
+
 // Minimal valid GearItem factory
 function makeGearItem(overrides: Partial<GearItem> = {}): GearItem {
   return {

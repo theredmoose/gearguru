@@ -358,7 +358,7 @@ function App() {
           onEdit={() => setView('edit')}
           onGetSizing={() => setView('sizing')}
           onOpenConverter={() => setView('converter')}
-          onAddGear={() => handleAddGearFromSizing('alpine')}
+          onAddGear={handleAddGearFromSizing}
           onEditGear={handleEditGear}
           onViewHistory={() => setView('measurement-history')}
         />

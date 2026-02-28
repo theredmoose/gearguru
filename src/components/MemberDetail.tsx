@@ -3,6 +3,7 @@ import { Settings, PlusCircle, ChevronDown, CheckCircle2, AlertCircle, ArrowLeft
 import type { FamilyMember, GearItem, Sport, SkillLevel, AppSettings, BootUnit } from '../types';
 import { ScreenHeader } from './ScreenHeader';
 import { GearTypeIcon } from './GearIcons';
+import { GearLoadoutPanel } from './GearLoadoutPanel';
 import { GrowthWarningBadge } from './GrowthWarningBadge';
 import { getShoeSizesFromFootLength } from '../services/shoeSize';
 import { shouldWarnGrowth, isMeasurementStale, analyzeGrowthTrend } from '../services/growthAnalysis';
@@ -26,7 +27,7 @@ interface MemberDetailProps {
   onEdit: () => void;
   onGetSizing: () => void;
   onOpenConverter: () => void;
-  onAddGear: () => void;
+  onAddGear: (sport: Sport) => void;
   onEditGear: (item: GearItem) => void;
   onViewHistory?: () => void;
 }
@@ -199,6 +200,17 @@ export function MemberDetail({
     });
   }
 
+  const handleSlotTap = (slotType: import('../types').GearType) => {
+    const existing = gearItems.find(
+      (g) => g.type === slotType && g.sports.includes(selectedSport)
+    );
+    if (existing) {
+      onEditGear(existing);
+    } else {
+      onAddGear(selectedSport);
+    }
+  };
+
   const sizingCards = useMemo(
     () => getSizingCards(member, selectedSport, skillLevel, lengthUnit, bootUnit),
     [member, selectedSport, skillLevel, lengthUnit, bootUnit]
@@ -262,65 +274,68 @@ export function MemberDetail({
       <div className="flex-1 overflow-y-auto bg-[#F8FAFC] px-6 pt-6 pb-28">
 
         {/* ── Profile Card ── */}
-        <div className="bg-white rounded-3xl border border-slate-100 shadow-sm mb-5">
+        <div className="bg-white p-4 rounded-[2.5rem] shadow-[0_15px_35px_rgba(0,0,0,0.03)] border border-white mb-5 flex gap-4">
 
-          {/* Top strip: avatar + name */}
-          <div className="flex items-center gap-4 px-5 pt-5 pb-4 border-b border-slate-50">
-            <div className="w-[52px] h-[52px] rounded-2xl bg-gradient-to-br from-emerald-50 to-slate-100 border border-slate-100 flex items-center justify-center flex-shrink-0">
-              <span className="text-2xl font-black text-[#008751] select-none">
-                {member.name.charAt(0).toUpperCase()}
-              </span>
-            </div>
-            <div className="flex items-center gap-2">
-              <h2 className="text-2xl font-black text-slate-900 tracking-tight leading-none">
+          {/* Left column: interactive gear diagram */}
+          <div className="w-[46%] flex-shrink-0">
+            <GearLoadoutPanel
+              member={member}
+              sport={selectedSport}
+              gearItems={gearItems}
+              onSlotTap={handleSlotTap}
+              color="#008751"
+              showHeader={false}
+            />
+          </div>
+
+          {/* Right column: name + stats + history */}
+          <div className="flex-1 pt-1 min-w-0">
+            <div className="flex items-center gap-2 mb-3">
+              <h2 className="text-2xl font-black text-slate-900 tracking-tight leading-none truncate">
                 {member.name}
               </h2>
-              <div className="w-2 h-2 rounded-full bg-[#008751] shadow-[0_0_8px_rgba(0,135,81,0.4)] flex-shrink-0" />
+              <div className="w-2.5 h-2.5 rounded-full bg-[#008751] shadow-[0_0_10px_rgba(0,135,81,0.5)] flex-shrink-0" />
             </div>
-          </div>
 
-          {/* Stat rows */}
-          <div className="px-5 py-1">
-            {statRows.map((row) => (
-              <div key={row.label} className="flex items-center justify-between border-b border-slate-50 last:border-0 py-3">
-                <span className="text-xs text-slate-400 font-bold uppercase tracking-widest">
-                  {row.label}
-                </span>
-                {row.action ? (
-                  <button
-                    onClick={row.action}
-                    className="text-sm font-extrabold text-[#008751] hover:text-emerald-800 transition-colors"
-                  >
-                    {row.value}
-                  </button>
-                ) : row.onToggle ? (
-                  <button
-                    onClick={row.onToggle}
-                    className="flex items-center gap-1.5 group"
-                    aria-label={`Toggle ${row.label} units`}
-                  >
-                    <span className="text-sm font-black text-slate-800 group-hover:text-[#008751] transition-colors">{row.value}</span>
-                    {row.badge && <GrowthWarningBadge reason={row.badge as 'stale' | 'growing' | 'both'} />}
-                    <ArrowLeftRight className="w-3 h-3 text-slate-300 group-hover:text-emerald-400 transition-colors" />
-                  </button>
-                ) : (
-                  <span className="text-sm font-black text-slate-800">{row.value}</span>
-                )}
-              </div>
-            ))}
-          </div>
+            <div className="space-y-0.5 mb-3">
+              {statRows.map((row) => (
+                <div key={row.label} className="flex items-center justify-between border-b border-slate-50 py-2">
+                  <span className="text-xs text-slate-400 font-bold uppercase tracking-widest">
+                    {row.label}
+                  </span>
+                  {row.action ? (
+                    <button
+                      onClick={row.action}
+                      className="text-xs font-extrabold text-[#008751] hover:text-emerald-800 transition-colors"
+                    >
+                      {row.value}
+                    </button>
+                  ) : row.onToggle ? (
+                    <button
+                      onClick={row.onToggle}
+                      className="flex items-center gap-1 group"
+                      aria-label={`Toggle ${row.label} units`}
+                    >
+                      <span className="text-xs font-black text-slate-800 group-hover:text-[#008751] transition-colors">{row.value}</span>
+                      {row.badge && <GrowthWarningBadge reason={row.badge as 'stale' | 'growing' | 'both'} />}
+                      <ArrowLeftRight className="w-3 h-3 text-slate-300 group-hover:text-emerald-400 transition-colors" />
+                    </button>
+                  ) : (
+                    <span className="text-xs font-black text-slate-800">{row.value}</span>
+                  )}
+                </div>
+              ))}
+            </div>
 
-          {/* View History link */}
-          {onViewHistory && (
-            <div className="px-5 pb-4">
+            {onViewHistory && (
               <button
                 onClick={onViewHistory}
                 className="text-xs font-black text-[#008751] uppercase tracking-widest hover:text-emerald-800 transition-colors"
               >
                 View History →
               </button>
-            </div>
-          )}
+            )}
+          </div>
         </div>
 
         {/* ── Sport & Skill Level ── */}
@@ -419,7 +434,7 @@ export function MemberDetail({
               Gear <span style={{ color: '#1e3a32' }}>Vault</span>
             </h2>
             <button
-              onClick={onAddGear}
+              onClick={() => onAddGear(selectedSport)}
               className="bg-[#008751] p-2 rounded-xl text-white shadow-lg shadow-emerald-100 transition-all active:scale-90"
               aria-label="Add gear"
             >

@@ -6,6 +6,7 @@ interface GearLoadoutPanelProps {
   gearItems: GearItem[];
   onSlotTap: (slotType: GearType) => void;
   color: string;
+  showHeader?: boolean;
 }
 
 interface GearSlot {
@@ -137,6 +138,7 @@ export function GearLoadoutPanel({
   gearItems,
   onSlotTap,
   color,
+  showHeader = true,
 }: GearLoadoutPanelProps) {
   const slots = SPORT_SLOTS[sport];
 
@@ -153,9 +155,11 @@ export function GearLoadoutPanel({
 
   return (
     <div className="gear-loadout-panel">
-      <div className="loadout-header">
-        <span className="loadout-title">{member.name}'s Gear</span>
-      </div>
+      {showHeader && (
+        <div className="loadout-header">
+          <span className="loadout-title">{member.name}'s Gear</span>
+        </div>
+      )}
       <div className="loadout-silhouette">
         <svg viewBox="0 0 200 180" preserveAspectRatio="xMidYMid meet">
           {renderSilhouette()}
