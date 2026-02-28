@@ -36,9 +36,12 @@ const GEAR_TYPES: { id: GearType; label: string }[] = [
 const CONDITIONS = ['new', 'good', 'fair', 'worn'] as const;
 
 const STATUSES: { id: GearStatus; label: string }[] = [
-  { id: 'available', label: 'Available' },
-  { id: 'checked-out', label: 'Checked Out' },
-  { id: 'maintenance', label: 'In Maintenance' },
+  { id: 'active',       label: 'Active' },
+  { id: 'available',    label: 'Available' },
+  { id: 'outgrown',     label: 'Outgrown' },
+  { id: 'to-sell',      label: 'To Sell' },
+  { id: 'sold',         label: 'Sold' },
+  { id: 'needs-repair', label: 'Needs Repair' },
 ];
 
 // Shared input/label classes
@@ -78,7 +81,6 @@ export function GearForm({
   );
   const [status, setStatus] = useState<GearStatus>(item?.status ?? 'available');
   const [location, setLocation] = useState(item?.location ?? '');
-  const [checkedOutTo, setCheckedOutTo] = useState(item?.checkedOutTo ?? '');
 
   // Extended detail fields for alpine skis
   const [profileTip, setProfileTip] = useState(
@@ -239,8 +241,6 @@ export function GearForm({
         condition,
         status,
         location: location.trim() || undefined,
-        checkedOutTo: status === 'checked-out' ? checkedOutTo.trim() || undefined : undefined,
-        checkedOutDate: status === 'checked-out' ? new Date().toISOString() : undefined,
         notes: notes.trim() || undefined,
         photos: photos.length > 0 ? photos : undefined,
         extendedDetails: finalExtendedDetails,
@@ -463,19 +463,6 @@ export function GearForm({
                 />
               </div>
 
-              {status === 'checked-out' && (
-                <div>
-                  <label htmlFor="checkedOutTo" className={labelCls}>Checked Out To</label>
-                  <input
-                    id="checkedOutTo"
-                    type="text"
-                    className={inputCls}
-                    value={checkedOutTo}
-                    onChange={(e) => setCheckedOutTo(e.target.value)}
-                    placeholder="e.g., Friend's name, Rental shop"
-                  />
-                </div>
-              )}
             </div>
           </section>
 

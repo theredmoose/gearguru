@@ -99,7 +99,7 @@ export function GearCard({
           >
             {item.condition}
           </span>
-          {item.status && item.status !== 'available' && (
+          {item.status && !['active', 'available'].includes(item.status) && (
             <GearStatusBadge status={item.status} size="small" />
           )}
         </div>
@@ -140,13 +140,6 @@ export function GearCard({
             <MapPin className="w-3 h-3 text-slate-400" />
             <span className="text-[10px] text-slate-400 font-bold">{item.location}</span>
           </div>
-        )}
-
-        {/* Checkout */}
-        {item.status === 'checked-out' && item.checkedOutTo && (
-          <p className="text-[10px] text-orange-500 font-bold mt-0.5">
-            Out: {item.checkedOutTo}
-          </p>
         )}
 
         {/* Owner / Sport */}

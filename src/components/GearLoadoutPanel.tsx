@@ -66,10 +66,15 @@ function getSlotState(
 
 function getSlotColor(status?: GearStatus): string {
   switch (status) {
-    case 'checked-out':
+    case 'active':
+      return '#3b82f6';
+    case 'outgrown':
+    case 'to-sell':
+    case 'sold':
       return '#f97316';
-    case 'maintenance':
+    case 'needs-repair':
       return '#ef4444';
+    case 'available':
     default:
       return '#22c55e';
   }

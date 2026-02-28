@@ -116,6 +116,7 @@ export async function createFamilyMember(
   const timestamp = now();
   const docData = {
     ...removeUndefined(data),
+    familyId: data.userId, // familyId === userId for now; scaffolding for future multi-family
     createdAt: await toFirestoreTimestamp(timestamp),
     updatedAt: await toFirestoreTimestamp(timestamp),
   };
@@ -128,6 +129,7 @@ export async function createFamilyMember(
   return {
     id: docRef.id,
     ...data,
+    familyId: data.userId,
     createdAt: timestamp,
     updatedAt: timestamp,
   };
@@ -340,6 +342,7 @@ export async function createGearItem(
   // Build document explicitly to avoid any prototype chain issues
   const docData: DocumentData = {
     userId: data.userId,
+    familyId: data.userId, // familyId === userId for now; scaffolding for future multi-family
     ownerId: data.ownerId,
     sports: data.sports,
     type: data.type,
@@ -365,6 +368,7 @@ export async function createGearItem(
   return {
     id: docRef.id,
     ...data,
+    familyId: data.userId,
     createdAt: timestamp,
     updatedAt: timestamp,
   };
@@ -410,6 +414,59 @@ export async function deleteGearItem(id: string): Promise<void> {
 }
 
 // ============================================
+// REAL-TIME SUBSCRIPTIONS
+// ============================================
+
+export async function subscribeToFamilyMembers(
+  userId: string,
+  onData: (members: FamilyMember[]) => void,
+  onError: (err: Error) => void
+): Promise<() => void> {
+  const { collection, query, where, onSnapshot } = await import('firebase/firestore');
+  const db = await getDb();
+  const q = query(
+    collection(db, COLLECTIONS.FAMILY_MEMBERS),
+    where('userId', '==', userId)
+  );
+  const unsubscribe = onSnapshot(
+    q,
+    (snapshot) => {
+      const members = snapshot.docs
+        .map((doc) => docToFamilyMember(doc.id, doc.data()))
+        .sort((a, b) => a.name.localeCompare(b.name));
+      onData(members);
+    },
+    onError
+  );
+  return unsubscribe;
+}
+
+export async function subscribeToGearItems(
+  userId: string,
+  onData: (items: GearItem[]) => void,
+  onError: (err: Error) => void,
+  ownerId?: string
+): Promise<() => void> {
+  const { collection, query, where, onSnapshot } = await import('firebase/firestore');
+  const db = await getDb();
+  const constraints = ownerId
+    ? [where('userId', '==', userId), where('ownerId', '==', ownerId)]
+    : [where('userId', '==', userId)];
+  const q = query(collection(db, COLLECTIONS.GEAR_ITEMS), ...constraints);
+  const unsubscribe = onSnapshot(
+    q,
+    (snapshot) => {
+      const items = snapshot.docs
+        .map((doc) => docToGearItem(doc.id, doc.data()))
+        .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+      onData(items);
+    },
+    onError
+  );
+  return unsubscribe;
+}
+
+// ============================================
 // DOCUMENT CONVERTERS (exported for testing)
 // ============================================
 
@@ -417,6 +474,7 @@ export function docToFamilyMember(id: string, data: DocumentData): FamilyMember 
   return {
     id,
     userId: data.userId,
+    familyId: data.familyId ?? data.userId, // fall back to userId for legacy docs
     name: data.name,
     dateOfBirth: data.dateOfBirth,
     gender: data.gender,
@@ -431,9 +489,20 @@ export function docToFamilyMember(id: string, data: DocumentData): FamilyMember 
 export function docToGearItem(id: string, data: DocumentData): GearItem {
   // On-read migration: old docs have `sport` (string), new docs have `sports` (array)
   const sports: Sport[] = data.sports ?? (data.sport ? [data.sport as Sport] : []);
+
+  // On-read migration: map old GearStatus values to new PRD values
+  type LegacyStatus = 'checked-out' | 'maintenance' | undefined;
+  const migrateStatus = (raw: string | undefined): import('../types').GearStatus | undefined => {
+    if (raw === 'checked-out') return 'active';
+    if (raw === 'maintenance') return 'needs-repair';
+    if (!raw) return 'available';
+    return raw as import('../types').GearStatus;
+  };
+
   return {
     id,
     userId: data.userId,
+    familyId: data.familyId ?? data.userId, // fall back to userId for legacy docs
     ownerId: data.ownerId,
     sports,
     type: data.type,
@@ -442,7 +511,7 @@ export function docToGearItem(id: string, data: DocumentData): GearItem {
     size: data.size,
     year: data.year,
     condition: data.condition,
-    status: data.status,
+    status: migrateStatus(data.status as LegacyStatus | string),
     location: data.location,
     checkedOutTo: data.checkedOutTo,
     checkedOutDate: data.checkedOutDate,

@@ -347,33 +347,29 @@ describe('GearForm', () => {
   });
 
   // ============================================
-  // CHECKED OUT TO FIELD
+  // STATUS BUTTONS
   // ============================================
-  describe('checked out to field', () => {
-    it('shows "Checked Out To" field when status is checked-out', () => {
+  describe('status buttons', () => {
+    it('shows all 6 status options', () => {
       render(<GearForm {...defaultProps} />);
-      fireEvent.click(screen.getByRole('button', { name: /^checked out$/i }));
-      expect(screen.getByLabelText('Checked Out To')).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: /^active$/i })).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: /^available$/i })).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: /^outgrown$/i })).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: /^to sell$/i })).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: /^sold$/i })).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: /^needs repair$/i })).toBeInTheDocument();
     });
 
-    it('hides "Checked Out To" when status changes back to available', () => {
-      render(<GearForm {...defaultProps} />);
-      fireEvent.click(screen.getByRole('button', { name: /^checked out$/i }));
-      fireEvent.click(screen.getByRole('button', { name: /^available$/i }));
-      expect(screen.queryByLabelText('Checked Out To')).not.toBeInTheDocument();
-    });
-
-    it('includes checkedOutTo in submission when status is checked-out', async () => {
+    it('sets status to outgrown when that button clicked', async () => {
       render(<GearForm {...defaultProps} />);
       fireEvent.change(screen.getByLabelText('Brand'), { target: { value: 'Atomic' } });
       fireEvent.change(screen.getByLabelText('Model'), { target: { value: 'Redster' } });
       fireEvent.change(screen.getByLabelText('Size'), { target: { value: '170' } });
-      fireEvent.click(screen.getByRole('button', { name: /^checked out$/i }));
-      fireEvent.change(screen.getByLabelText('Checked Out To'), { target: { value: 'Bob' } });
+      fireEvent.click(screen.getByRole('button', { name: /^outgrown$/i }));
       fireEvent.click(screen.getByRole('button', { name: 'Add Gear' }));
       await waitFor(() =>
         expect(mockOnSubmit).toHaveBeenCalledWith(
-          expect.objectContaining({ status: 'checked-out', checkedOutTo: 'Bob' })
+          expect.objectContaining({ status: 'outgrown' })
         )
       );
     });
