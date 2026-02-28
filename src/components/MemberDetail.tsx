@@ -216,8 +216,16 @@ export function MemberDetail({
     [member, selectedSport, skillLevel, lengthUnit, bootUnit]
   );
 
+  const showFoot = settings?.display.showFoot ?? true;
+  const showHand = settings?.display.showHand ?? true;
+  const separateFeetHands = settings?.display.separateFeetHands ?? false;
+
   // Format shoe size for display
-  const shoeDisplay = footLength > 0 ? `${footLength} cm` : '—';
+  const shoeDisplay = footLength > 0
+    ? (separateFeetHands && m.footLengthLeft !== m.footLengthRight
+        ? `${m.footLengthLeft} / ${m.footLengthRight} cm`
+        : `${footLength} cm`)
+    : '—';
   // Hand size display
   const handDisplay = m.handSize ? `${m.handSize} cm` : '—';
 
@@ -236,9 +244,6 @@ export function MemberDetail({
   const weightDisplay = weightUnit === 'lbs'
     ? `${Math.round(m.weight * 2.2046)} lbs`
     : `${m.weight} kg`;
-
-  const showFoot = settings?.display.showFoot ?? true;
-  const showHand = settings?.display.showHand ?? true;
 
   const statRows = [
     { label: 'Age',    value: `${age} yrs` },

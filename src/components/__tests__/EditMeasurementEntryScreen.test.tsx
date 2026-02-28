@@ -28,12 +28,19 @@ const existingEntry = createMeasurementEntry({
   footLengthRight: 22.5,
 });
 
-function fillRequiredFields(
-  height = 142,
-  weight = 38,
-  footL = 22,
-  footR = 22.5
-) {
+function fillRequiredFields(height = 142, weight = 38, footLength = 22) {
+  fireEvent.change(screen.getByLabelText('Height (cm)'), {
+    target: { value: String(height) },
+  });
+  fireEvent.change(screen.getByLabelText('Weight (kg)'), {
+    target: { value: String(weight) },
+  });
+  fireEvent.change(screen.getByLabelText('Foot Length (cm)'), {
+    target: { value: String(footLength) },
+  });
+}
+
+function fillRequiredFieldsDual(height = 142, weight = 38, footL = 22, footR = 22.5) {
   fireEvent.change(screen.getByLabelText('Height (cm)'), {
     target: { value: String(height) },
   });
@@ -120,7 +127,7 @@ describe('EditMeasurementEntryScreen', () => {
         });
       });
 
-      it('shows error when left foot length is zero', async () => {
+      it('shows error when foot length is zero', async () => {
         render(<EditMeasurementEntryScreen {...defaultAddProps} />);
         fireEvent.change(screen.getByLabelText('Height (cm)'), {
           target: { value: '142' },
@@ -131,7 +138,7 @@ describe('EditMeasurementEntryScreen', () => {
         fireEvent.click(screen.getByRole('button', { name: /save/i }));
         await waitFor(() => {
           expect(
-            screen.getByText('Left foot length is required')
+            screen.getByText('Foot length is required')
           ).toBeInTheDocument();
         });
       });
@@ -151,9 +158,9 @@ describe('EditMeasurementEntryScreen', () => {
         expect(addMeasurementEntry).not.toHaveBeenCalled();
       });
 
-      it('shows error when left foot length exceeds 30 cm', async () => {
-        render(<EditMeasurementEntryScreen {...defaultAddProps} />);
-        fillRequiredFields(142, 38, 31, 22.5);
+      it('shows error when left foot length exceeds 30 cm (dual mode)', async () => {
+        render(<EditMeasurementEntryScreen {...defaultAddProps} separateFeetHands />);
+        fillRequiredFieldsDual(142, 38, 31, 22.5);
         fireEvent.click(screen.getByRole('button', { name: /save/i }));
         await waitFor(() => {
           expect(screen.getByText('Left foot length must be 30 cm or less')).toBeInTheDocument();
@@ -161,9 +168,9 @@ describe('EditMeasurementEntryScreen', () => {
         expect(addMeasurementEntry).not.toHaveBeenCalled();
       });
 
-      it('shows error when right foot length exceeds 30 cm', async () => {
-        render(<EditMeasurementEntryScreen {...defaultAddProps} />);
-        fillRequiredFields(142, 38, 22, 31);
+      it('shows error when right foot length exceeds 30 cm (dual mode)', async () => {
+        render(<EditMeasurementEntryScreen {...defaultAddProps} separateFeetHands />);
+        fillRequiredFieldsDual(142, 38, 22, 31);
         fireEvent.click(screen.getByRole('button', { name: /save/i }));
         await waitFor(() => {
           expect(screen.getByText('Right foot length must be 30 cm or less')).toBeInTheDocument();
@@ -172,8 +179,8 @@ describe('EditMeasurementEntryScreen', () => {
       });
 
       it('shows error when foot width exceeds 15 cm', async () => {
-        render(<EditMeasurementEntryScreen {...defaultAddProps} />);
-        fillRequiredFields();
+        render(<EditMeasurementEntryScreen {...defaultAddProps} separateFeetHands />);
+        fillRequiredFieldsDual();
         fireEvent.change(screen.getByLabelText('Foot W L (cm)'), { target: { value: '16' } });
         fireEvent.click(screen.getByRole('button', { name: /save/i }));
         await waitFor(() => {
@@ -278,8 +285,8 @@ describe('EditMeasurementEntryScreen', () => {
         expect(addMeasurementEntry).not.toHaveBeenCalled();
       });
 
-      it('shows error when right foot length is zero', async () => {
-        render(<EditMeasurementEntryScreen {...defaultAddProps} />);
+      it('shows error when right foot length is zero (dual mode)', async () => {
+        render(<EditMeasurementEntryScreen {...defaultAddProps} separateFeetHands />);
         fireEvent.change(screen.getByLabelText('Height (cm)'), {
           target: { value: '142' },
         });
@@ -301,7 +308,7 @@ describe('EditMeasurementEntryScreen', () => {
     // ── Successful submission ───────────────────────────────────────
     it('calls addMeasurementEntry with required fields and calls onSaved', async () => {
       render(<EditMeasurementEntryScreen {...defaultAddProps} />);
-      fillRequiredFields(142, 38, 22, 22.5);
+      fillRequiredFields(142, 38, 22);
       fireEvent.click(screen.getByRole('button', { name: /save/i }));
       await waitFor(() => {
         expect(addMeasurementEntry).toHaveBeenCalledWith(
@@ -310,7 +317,7 @@ describe('EditMeasurementEntryScreen', () => {
             height: 142,
             weight: 38,
             footLengthLeft: 22,
-            footLengthRight: 22.5,
+            footLengthRight: 22,
           })
         );
         expect(defaultAddProps.onSaved).toHaveBeenCalled();
@@ -346,9 +353,9 @@ describe('EditMeasurementEntryScreen', () => {
       });
     });
 
-    it('includes foot width and shoe sizes when provided', async () => {
-      render(<EditMeasurementEntryScreen {...defaultAddProps} />);
-      fillRequiredFields();
+    it('includes foot width and shoe sizes when provided (dual mode)', async () => {
+      render(<EditMeasurementEntryScreen {...defaultAddProps} separateFeetHands />);
+      fillRequiredFieldsDual();
       fireEvent.change(screen.getByLabelText('Foot W L (cm)'), {
         target: { value: '9.5' },
       });
@@ -422,12 +429,20 @@ describe('EditMeasurementEntryScreen', () => {
       expect(screen.getByText('Edit Measurement')).toBeInTheDocument();
     });
 
-    it('pre-fills all fields from the entry', () => {
+    it('pre-fills all fields from the entry (single mode uses max foot length)', () => {
       render(
         <EditMeasurementEntryScreen {...defaultAddProps} entry={existingEntry} />
       );
       expect(screen.getByLabelText('Height (cm)')).toHaveValue(142);
       expect(screen.getByLabelText('Weight (kg)')).toHaveValue(38);
+      // Single mode: shows max(22, 22.5) = 22.5
+      expect(screen.getByLabelText('Foot Length (cm)')).toHaveValue(22.5);
+    });
+
+    it('pre-fills L/R foot fields in dual mode', () => {
+      render(
+        <EditMeasurementEntryScreen {...defaultAddProps} entry={existingEntry} separateFeetHands />
+      );
       expect(screen.getByLabelText('Foot L (cm)')).toHaveValue(22);
       expect(screen.getByLabelText('Foot R (cm)')).toHaveValue(22.5);
     });

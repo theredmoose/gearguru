@@ -10,7 +10,7 @@ const DEFAULT: AppSettings = {
   weightUnit: 'kg',
   skiLengthUnit: 'cm',
   defaultSport: 'alpine',
-  display: { showFoot: true, showHand: true },
+  display: { showFoot: true, showHand: true, separateFeetHands: false },
   sizingModel: 'generic',
   sizingDisplay: 'range',
   bootUnit: 'mp',

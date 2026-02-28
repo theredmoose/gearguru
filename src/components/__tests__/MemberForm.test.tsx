@@ -137,7 +137,7 @@ describe('MemberForm', () => {
     };
 
     it('shows error when left foot width exceeds 15 cm', async () => {
-      render(<MemberForm {...defaultProps} />);
+      render(<MemberForm {...defaultProps} separateFeetHands />);
       fillBasicValid();
       fireEvent.change(screen.getByLabelText(/left width/i), { target: { value: '16' } });
       fireEvent.click(screen.getByRole('button', { name: /add member/i }));
@@ -146,7 +146,7 @@ describe('MemberForm', () => {
     });
 
     it('shows error when right foot width exceeds 15 cm', async () => {
-      render(<MemberForm {...defaultProps} />);
+      render(<MemberForm {...defaultProps} separateFeetHands />);
       fillBasicValid();
       fireEvent.change(screen.getByLabelText(/right width/i), { target: { value: '16' } });
       fireEvent.click(screen.getByRole('button', { name: /add member/i }));
@@ -196,7 +196,7 @@ describe('MemberForm', () => {
   // ============================================
   describe('submission', () => {
     it('calls onSubmit with form data on valid submission', async () => {
-      render(<MemberForm {...defaultProps} />);
+      render(<MemberForm {...defaultProps} separateFeetHands />);
 
       fireEvent.change(screen.getByLabelText(/name/i), { target: { value: 'John Doe' } });
       fireEvent.change(screen.getByLabelText(/date of birth/i), {
@@ -249,6 +249,64 @@ describe('MemberForm', () => {
       render(<MemberForm {...defaultProps} />);
       fireEvent.click(screen.getByRole('button', { name: /^female$/i }));
       expect(screen.getByRole('button', { name: /^female$/i })).toHaveAttribute('aria-pressed', 'true');
+    });
+  });
+
+  // ============================================
+  // SEPARATE FEET/HANDS TOGGLE
+  // ============================================
+  describe('foot/hand mode', () => {
+    it('shows single Foot Length field by default', () => {
+      render(<MemberForm {...defaultProps} />);
+      expect(screen.getByLabelText(/^foot length \(cm\)$/i)).toBeInTheDocument();
+      expect(screen.queryByLabelText(/left foot/i)).not.toBeInTheDocument();
+      expect(screen.queryByLabelText(/right foot/i)).not.toBeInTheDocument();
+    });
+
+    it('shows Left Foot and Right Foot fields when separateFeetHands is true', () => {
+      render(<MemberForm {...defaultProps} separateFeetHands />);
+      expect(screen.getByLabelText(/left foot/i)).toBeInTheDocument();
+      expect(screen.getByLabelText(/right foot/i)).toBeInTheDocument();
+      expect(screen.queryByLabelText(/^foot length \(cm\)$/i)).not.toBeInTheDocument();
+    });
+
+    it('saves single foot value to both footLengthLeft and footLengthRight', async () => {
+      render(<MemberForm {...defaultProps} />);
+      fireEvent.change(screen.getByLabelText(/name/i), { target: { value: 'Jane' } });
+      fireEvent.change(screen.getByLabelText(/date of birth/i), { target: { value: '1990-01-01' } });
+      fireEvent.change(screen.getByLabelText(/height \(cm\)/i), { target: { value: '170' } });
+      fireEvent.change(screen.getByLabelText(/weight \(kg\)/i), { target: { value: '65' } });
+      fireEvent.change(screen.getByLabelText(/^foot length \(cm\)$/i), { target: { value: '26' } });
+      fireEvent.click(screen.getByRole('button', { name: /add member/i }));
+      await waitFor(() => {
+        expect(defaultProps.onSubmit).toHaveBeenCalledWith(
+          expect.objectContaining({
+            measurements: expect.objectContaining({
+              footLengthLeft: 26,
+              footLengthRight: 26,
+            }),
+          })
+        );
+      });
+    });
+
+    it('pre-fills single foot field with the larger foot when editing', () => {
+      const member = { ...FAMILY_MEMBERS.john, measurements: { ...FAMILY_MEMBERS.john.measurements, footLengthLeft: 26.5, footLengthRight: 27 } };
+      render(<MemberForm {...defaultProps} member={member} />);
+      expect(screen.getByLabelText(/^foot length \(cm\)$/i)).toHaveValue(27);
+    });
+
+    it('shows single Hand Size field by default', () => {
+      render(<MemberForm {...defaultProps} />);
+      expect(screen.getByLabelText(/^hand size \(cm\)$/i)).toBeInTheDocument();
+      expect(screen.queryByLabelText(/left hand/i)).not.toBeInTheDocument();
+    });
+
+    it('shows Left Hand and Right Hand fields when separateFeetHands is true', () => {
+      render(<MemberForm {...defaultProps} separateFeetHands />);
+      expect(screen.getByLabelText(/left hand/i)).toBeInTheDocument();
+      expect(screen.getByLabelText(/right hand/i)).toBeInTheDocument();
+      expect(screen.queryByLabelText(/^hand size \(cm\)$/i)).not.toBeInTheDocument();
     });
   });
 });

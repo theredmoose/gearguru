@@ -342,6 +342,7 @@ function App() {
           member={view === 'edit' ? selectedMember ?? undefined : undefined}
           onSubmit={view === 'edit' ? handleUpdateMember : handleAddMember}
           onCancel={() => setView(selectedMember ? 'detail' : 'home')}
+          separateFeetHands={settings.display.separateFeetHands}
         />
       );
     }
@@ -393,6 +394,7 @@ function App() {
             setSelectedMember(updatedMember);
             setView('measurement-history');
           }}
+          separateFeetHands={settings.display.separateFeetHands}
         />
       );
     }
