@@ -88,13 +88,16 @@ describe('GearForm', () => {
     it('pre-selects sports from item prop', () => {
       const multiSportItem = { ...baseGearItem, sports: ['alpine', 'snowboard'] as import('../../types').Sport[] };
       render(<GearForm {...defaultProps} item={multiSportItem} />);
-      expect(screen.getByRole('button', { name: /^alpine$/i })).toBeInTheDocument();
-      expect(screen.getByRole('button', { name: /^snowboard$/i })).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: /^alpine$/i })).toHaveAttribute('aria-pressed', 'true');
+      // Snowboard appears in both sport chips and gear type chips; verify at least one is selected
+      const snowboardBtns = screen.getAllByRole('button', { name: /^snowboard$/i });
+      expect(snowboardBtns.some(b => b.getAttribute('aria-pressed') === 'true')).toBe(true);
     });
 
     it('shows the Type field', () => {
       render(<GearForm {...defaultProps} />);
-      expect(screen.getByLabelText('Type')).toBeInTheDocument();
+      // Type is now a pill button group; default selection is Skis
+      expect(screen.getByRole('button', { name: /^skis$/i })).toBeInTheDocument();
     });
 
     it('shows the Brand field', () => {
@@ -114,12 +117,14 @@ describe('GearForm', () => {
 
     it('shows the Condition field', () => {
       render(<GearForm {...defaultProps} />);
-      expect(screen.getByLabelText('Condition')).toBeInTheDocument();
+      // Condition is now a pill button group; default selection is Good
+      expect(screen.getByRole('button', { name: /^good$/i })).toBeInTheDocument();
     });
 
     it('shows the Status field', () => {
       render(<GearForm {...defaultProps} />);
-      expect(screen.getByLabelText('Status')).toBeInTheDocument();
+      // Status is now a pill button group; default selection is Available
+      expect(screen.getByRole('button', { name: /^available$/i })).toBeInTheDocument();
     });
 
     it('shows the Year optional field', () => {
@@ -170,7 +175,7 @@ describe('GearForm', () => {
 
     it('hides ski specifications section when type is changed to boot', () => {
       render(<GearForm {...defaultProps} />);
-      fireEvent.change(screen.getByLabelText('Type'), { target: { value: 'boot' } });
+      fireEvent.click(screen.getByRole('button', { name: /^boots$/i }));
       expect(screen.queryByText('Ski Specifications')).not.toBeInTheDocument();
     });
 
@@ -347,14 +352,14 @@ describe('GearForm', () => {
   describe('checked out to field', () => {
     it('shows "Checked Out To" field when status is checked-out', () => {
       render(<GearForm {...defaultProps} />);
-      fireEvent.change(screen.getByLabelText('Status'), { target: { value: 'checked-out' } });
+      fireEvent.click(screen.getByRole('button', { name: /^checked out$/i }));
       expect(screen.getByLabelText('Checked Out To')).toBeInTheDocument();
     });
 
     it('hides "Checked Out To" when status changes back to available', () => {
       render(<GearForm {...defaultProps} />);
-      fireEvent.change(screen.getByLabelText('Status'), { target: { value: 'checked-out' } });
-      fireEvent.change(screen.getByLabelText('Status'), { target: { value: 'available' } });
+      fireEvent.click(screen.getByRole('button', { name: /^checked out$/i }));
+      fireEvent.click(screen.getByRole('button', { name: /^available$/i }));
       expect(screen.queryByLabelText('Checked Out To')).not.toBeInTheDocument();
     });
 
@@ -363,7 +368,7 @@ describe('GearForm', () => {
       fireEvent.change(screen.getByLabelText('Brand'), { target: { value: 'Atomic' } });
       fireEvent.change(screen.getByLabelText('Model'), { target: { value: 'Redster' } });
       fireEvent.change(screen.getByLabelText('Size'), { target: { value: '170' } });
-      fireEvent.change(screen.getByLabelText('Status'), { target: { value: 'checked-out' } });
+      fireEvent.click(screen.getByRole('button', { name: /^checked out$/i }));
       fireEvent.change(screen.getByLabelText('Checked Out To'), { target: { value: 'Bob' } });
       fireEvent.click(screen.getByRole('button', { name: 'Add Gear' }));
       await waitFor(() =>

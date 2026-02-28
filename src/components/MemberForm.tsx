@@ -20,8 +20,9 @@ const emptyMeasurements: Measurements = {
 
 // Reusable input class
 const inputCls =
-  'w-full border border-slate-200 rounded-xl px-3 py-2.5 text-sm text-slate-800 bg-white focus:outline-none focus:ring-2 focus:ring-blue-400 placeholder:text-slate-300';
-const labelCls = 'block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1';
+  'w-full border border-slate-200 rounded-xl px-3 py-2.5 text-sm text-slate-800 bg-white focus:outline-none focus:ring-2 focus:ring-[#008751] placeholder:text-slate-300';
+const labelCls = 'block text-xs font-black text-slate-500 uppercase tracking-widest mb-1';
+const sectionTitleCls = 'block text-xs font-black text-slate-400 uppercase tracking-widest pb-2 mb-3 border-b border-slate-100';
 
 export function MemberForm({ member, onSubmit, onCancel }: MemberFormProps) {
   const [name, setName] = useState(member?.name ?? '');
@@ -161,7 +162,7 @@ export function MemberForm({ member, onSubmit, onCancel }: MemberFormProps) {
 
           {/* Basic Info */}
           <section>
-            <h3 className={labelCls}>Basic Info</h3>
+            <h3 className={sectionTitleCls}>Basic Info</h3>
             <div className="flex flex-col gap-3">
               <div>
                 <label htmlFor="name" className={labelCls}>Name</label>
@@ -188,26 +189,31 @@ export function MemberForm({ member, onSubmit, onCancel }: MemberFormProps) {
               </div>
 
               <div>
-                <label htmlFor="gender" className={labelCls}>Gender</label>
-                <select
-                  id="gender"
-                  className={inputCls}
-                  value={gender}
-                  onChange={(e) =>
-                    setGender(e.target.value as 'male' | 'female' | 'other')
-                  }
-                >
-                  <option value="male">Male</option>
-                  <option value="female">Female</option>
-                  <option value="other">Other</option>
-                </select>
+                <label className={labelCls}>Gender</label>
+                <div className="flex gap-2 mt-1">
+                  {(['male', 'female', 'other'] as const).map((g) => (
+                    <button
+                      key={g}
+                      type="button"
+                      aria-pressed={gender === g}
+                      onClick={() => setGender(g)}
+                      className={`flex-1 py-2.5 text-xs font-black uppercase tracking-wide transition-colors min-h-[44px] ${
+                        gender === g
+                          ? 'bg-[#008751] text-white'
+                          : 'bg-slate-100 text-slate-500 hover:bg-slate-200'
+                      }`}
+                    >
+                      {g.charAt(0).toUpperCase() + g.slice(1)}
+                    </button>
+                  ))}
+                </div>
               </div>
             </div>
           </section>
 
           {/* Body Measurements */}
           <section>
-            <h3 className={labelCls}>Body Measurements</h3>
+            <h3 className={sectionTitleCls}>Body Measurements</h3>
             <div className="grid grid-cols-2 gap-3">
               <div>
                 <label htmlFor="height" className={labelCls}>Height (cm)</label>
@@ -245,7 +251,7 @@ export function MemberForm({ member, onSubmit, onCancel }: MemberFormProps) {
 
           {/* Foot Measurements */}
           <section>
-            <h3 className={labelCls}>Foot Measurements</h3>
+            <h3 className={sectionTitleCls}>Foot Measurements</h3>
             <div className="grid grid-cols-2 gap-3">
               <div>
                 <label htmlFor="footLeft" className={labelCls}>Left Foot (cm)</label>
@@ -321,7 +327,7 @@ export function MemberForm({ member, onSubmit, onCancel }: MemberFormProps) {
 
           {/* Shoe Sizes */}
           <section>
-            <h3 className={labelCls}>Shoe Sizes (Optional)</h3>
+            <h3 className={sectionTitleCls}>Shoe Sizes (Optional)</h3>
             <div className="grid grid-cols-2 gap-3">
               <div>
                 <label htmlFor="usShoe" className={labelCls}>US Size</label>
@@ -365,7 +371,7 @@ export function MemberForm({ member, onSubmit, onCancel }: MemberFormProps) {
 
           {/* Head & Hand */}
           <section>
-            <h3 className={labelCls}>Head & Hand (Optional)</h3>
+            <h3 className={sectionTitleCls}>Head & Hand (Optional)</h3>
             <div className="grid grid-cols-2 gap-3">
               <div>
                 <label htmlFor="headCircumference" className={labelCls}>Head Circumference (cm)</label>

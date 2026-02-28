@@ -242,13 +242,13 @@ describe('MemberForm', () => {
   describe('gender selection', () => {
     it('defaults to male', () => {
       render(<MemberForm {...defaultProps} />);
-      expect(screen.getByLabelText(/gender/i)).toHaveValue('male');
+      expect(screen.getByRole('button', { name: /^male$/i })).toHaveAttribute('aria-pressed', 'true');
     });
 
     it('allows changing gender', () => {
       render(<MemberForm {...defaultProps} />);
-      fireEvent.change(screen.getByLabelText(/gender/i), { target: { value: 'female' } });
-      expect(screen.getByLabelText(/gender/i)).toHaveValue('female');
+      fireEvent.click(screen.getByRole('button', { name: /^female$/i }));
+      expect(screen.getByRole('button', { name: /^female$/i })).toHaveAttribute('aria-pressed', 'true');
     });
   });
 });
