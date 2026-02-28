@@ -57,9 +57,18 @@ vi.mock('../../hooks', () => ({
       sizingModel: 'generic',
       sizingDisplay: 'range',
       bootUnit: 'mp',
+      notificationsEnabled: true,
     },
     updateSettings: vi.fn(),
     resetSettings: vi.fn(),
+  })),
+  useNotifications: vi.fn(() => ({
+    activeNotifications: [],
+    dismissedNotifications: [],
+    dismissNotification: vi.fn(),
+    undismissNotification: vi.fn(),
+    loading: false,
+    error: null,
   })),
 }));
 
