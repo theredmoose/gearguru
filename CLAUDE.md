@@ -13,13 +13,62 @@ Gear Guru is a personal sports equipment sizing database and calculator for trac
 
 The application manages personal measurements (height, weight, foot dimensions, etc.) and uses sizing formulas from various manufacturer charts to recommend appropriate equipment sizes.
 
+## Tech Stack
+
+- **Framework**: React 18 + TypeScript
+- **Build Tool**: Vite (dev server at `http://localhost:5173`)
+- **Styling**: Tailwind CSS v4
+- **Backend/DB**: Firebase Firestore + Firebase Hosting
+- **AI Integration**: Anthropic SDK (`@anthropic-ai/sdk`)
+- **Routing**: React Router DOM v7
+- **Testing**: Vitest + React Testing Library (unit), Playwright (e2e)
+- **Node.js**: 20+, **npm**: 10+
+
+## Commands
+
+```bash
+npm run dev            # Start dev server (localhost:5173)
+npm run build          # tsc + Vite production build
+npm run preview        # Preview production build locally
+npm run lint           # ESLint
+npm test               # Vitest in watch mode
+npm run test:run       # Vitest run once (CI)
+npm run test:coverage  # Coverage report
+npm run test:e2e       # Playwright e2e tests
+firebase deploy --only hosting   # Deploy to Firebase Hosting
+firebase deploy --only firestore:rules  # Deploy security rules
+```
+
+## Project Structure
+
+```
+src/
+├── components/   # Reusable React components
+├── screens/      # Top-level screen components
+├── services/     # Business logic (sizing calculations, conversions)
+├── hooks/        # React hooks (Firebase integration)
+├── types/        # TypeScript type definitions
+├── config/       # Firebase configuration
+├── constants/    # Shared constants
+└── utils/        # Utility functions
+tests/            # Vitest unit tests
+e2e/              # Playwright e2e tests (auth.spec.ts)
+docs/             # PRD, testing docs
+```
+
+## Environment Setup
+
+Requires `.env.local` with Firebase credentials (copy from `.env.example`):
+```
+VITE_FIREBASE_API_KEY=...
+VITE_FIREBASE_AUTH_DOMAIN=...
+VITE_FIREBASE_PROJECT_ID=...
+```
+
 ## Project Status
 
-This project is in the requirements/planning phase. The requirements specification is in `docs/requirements/Gear Guru.xlsx` which contains:
-- Data entry forms for family member measurements
-- Lookup tables for equipment sizing from various vendors
-- Sizing calculation formulas and conversion charts
-- Existing gear inventory tracking
+The app is fully implemented and deployed at https://gearguru-b3bc8.web.app.
+The requirements specification at `docs/requirements/Gear Guru.xlsx` serves as the source of truth for sizing formulas and lookup tables.
 
 ## Key Domain Concepts
 
