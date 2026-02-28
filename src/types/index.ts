@@ -5,6 +5,7 @@
 export interface FamilyMember {
   id: string;
   userId: string; // Firebase Auth user ID
+  familyId?: string; // Scaffolding for future multi-family sharing (currently === userId)
   name: string;
   dateOfBirth: string; // ISO date string
   gender: 'male' | 'female' | 'other';
@@ -34,7 +35,9 @@ export interface Measurements {
   armLength?: number; // shoulder to wrist, for poles
   inseam?: number; // for stance width calculations
   headCircumference?: number; // cm, for helmet sizing
-  handSize?: number; // cm, wrist to fingertip
+  handSize?: number; // cm, wrist to fingertip (single-foot mode; fallback)
+  handSizeLeft?: number; // cm (separate L/R mode)
+  handSizeRight?: number; // cm (separate L/R mode)
 
   // Last measured date
   measuredAt: string;
@@ -55,6 +58,8 @@ export interface MeasurementEntry {
   inseam?: number;
   headCircumference?: number;
   handSize?: number;
+  handSizeLeft?: number;
+  handSizeRight?: number;
 }
 
 // ============================================
@@ -242,11 +247,12 @@ export type ExtendedGearDetails =
 // GEAR INVENTORY
 // ============================================
 
-export type GearStatus = 'available' | 'checked-out' | 'maintenance';
+export type GearStatus = 'active' | 'available' | 'outgrown' | 'to-sell' | 'sold' | 'needs-repair';
 
 export interface GearItem {
   id: string;
   userId: string; // Firebase Auth user ID
+  familyId?: string; // Scaffolding for future multi-family sharing (currently === userId)
   ownerId: string; // FamilyMember id
   sports: Sport[];  // required, min 1
   type: GearType;
@@ -332,6 +338,7 @@ export type BootUnit = 'mp' | 'eu' | 'us-men' | 'us-women';
 export interface DisplaySettings {
   showFoot: boolean;
   showHand: boolean;
+  separateFeetHands: boolean;
 }
 
 export interface AppSettings {
@@ -354,6 +361,7 @@ export const DEFAULT_SETTINGS: AppSettings = {
   display: {
     showFoot: true,
     showHand: true,
+    separateFeetHands: false,
   },
   sizingModel: 'generic',
   sizingDisplay: 'range',

@@ -36,16 +36,19 @@ const GEAR_TYPES: { id: GearType; label: string }[] = [
 const CONDITIONS = ['new', 'good', 'fair', 'worn'] as const;
 
 const STATUSES: { id: GearStatus; label: string }[] = [
-  { id: 'available', label: 'Available' },
-  { id: 'checked-out', label: 'Checked Out' },
-  { id: 'maintenance', label: 'In Maintenance' },
+  { id: 'active',       label: 'Active' },
+  { id: 'available',    label: 'Available' },
+  { id: 'outgrown',     label: 'Outgrown' },
+  { id: 'to-sell',      label: 'To Sell' },
+  { id: 'sold',         label: 'Sold' },
+  { id: 'needs-repair', label: 'Needs Repair' },
 ];
 
 // Shared input/label classes
 const inputCls =
-  'w-full border border-slate-200 rounded-xl px-3 py-2.5 text-sm text-slate-800 bg-white focus:outline-none focus:ring-2 focus:ring-blue-400 placeholder:text-slate-300';
-const labelCls = 'block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1';
-const sectionTitleCls = 'text-[10px] font-black text-slate-500 uppercase tracking-widest mb-3';
+  'w-full border border-slate-200 rounded-xl px-3 py-2.5 text-sm text-slate-800 bg-white focus:outline-none focus:ring-2 focus:ring-[#008751] placeholder:text-slate-300';
+const labelCls = 'block text-xs font-black text-slate-500 uppercase tracking-widest mb-1';
+const sectionTitleCls = 'text-xs font-black text-slate-400 uppercase tracking-widest pb-2 mb-3 border-b border-slate-100';
 
 export function GearForm({
   item,
@@ -78,7 +81,6 @@ export function GearForm({
   );
   const [status, setStatus] = useState<GearStatus>(item?.status ?? 'available');
   const [location, setLocation] = useState(item?.location ?? '');
-  const [checkedOutTo, setCheckedOutTo] = useState(item?.checkedOutTo ?? '');
 
   // Extended detail fields for alpine skis
   const [profileTip, setProfileTip] = useState(
@@ -239,8 +241,6 @@ export function GearForm({
         condition,
         status,
         location: location.trim() || undefined,
-        checkedOutTo: status === 'checked-out' ? checkedOutTo.trim() || undefined : undefined,
-        checkedOutDate: status === 'checked-out' ? new Date().toISOString() : undefined,
         notes: notes.trim() || undefined,
         photos: photos.length > 0 ? photos : undefined,
         extendedDetails: finalExtendedDetails,
@@ -316,6 +316,7 @@ export function GearForm({
                       <button
                         key={s.id}
                         type="button"
+                        aria-pressed={active}
                         onClick={() => toggleSport(s.id)}
                         className={`px-3 py-1.5 rounded-full text-xs font-black uppercase tracking-wide transition-colors ${
                           active
@@ -330,19 +331,24 @@ export function GearForm({
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label htmlFor="type" className={labelCls}>Type</label>
-                  <select
-                    id="type"
-                    className={inputCls}
-                    value={type}
-                    onChange={(e) => setType(e.target.value as GearType)}
-                  >
-                    {GEAR_TYPES.map((t) => (
-                      <option key={t.id} value={t.id}>{t.label}</option>
-                    ))}
-                  </select>
+              <div>
+                <label className={labelCls}>Type</label>
+                <div className="flex flex-wrap gap-1.5 mt-1">
+                  {GEAR_TYPES.map((t) => (
+                    <button
+                      key={t.id}
+                      type="button"
+                      aria-pressed={type === t.id}
+                      onClick={() => setType(t.id)}
+                      className={`px-3 py-1.5 text-xs font-black uppercase tracking-wide transition-colors min-h-[36px] ${
+                        type === t.id
+                          ? 'bg-[#008751] text-white'
+                          : 'bg-slate-100 text-slate-500 hover:bg-slate-200'
+                      }`}
+                    >
+                      {t.label}
+                    </button>
+                  ))}
                 </div>
               </div>
 
@@ -403,35 +409,45 @@ export function GearForm({
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label htmlFor="condition" className={labelCls}>Condition</label>
-                  <select
-                    id="condition"
-                    className={inputCls}
-                    value={condition}
-                    onChange={(e) => setCondition(e.target.value as typeof condition)}
-                  >
-                    {CONDITIONS.map((c) => (
-                      <option key={c} value={c}>
-                        {c.charAt(0).toUpperCase() + c.slice(1)}
-                      </option>
-                    ))}
-                  </select>
+              <div>
+                <label className={labelCls}>Condition</label>
+                <div className="flex gap-1.5 mt-1">
+                  {CONDITIONS.map((c) => (
+                    <button
+                      key={c}
+                      type="button"
+                      aria-pressed={condition === c}
+                      onClick={() => setCondition(c)}
+                      className={`flex-1 py-2 text-xs font-black uppercase tracking-wide transition-colors min-h-[36px] ${
+                        condition === c
+                          ? 'bg-[#008751] text-white'
+                          : 'bg-slate-100 text-slate-500 hover:bg-slate-200'
+                      }`}
+                    >
+                      {c.charAt(0).toUpperCase() + c.slice(1)}
+                    </button>
+                  ))}
                 </div>
+              </div>
 
-                <div>
-                  <label htmlFor="status" className={labelCls}>Status</label>
-                  <select
-                    id="status"
-                    className={inputCls}
-                    value={status}
-                    onChange={(e) => setStatus(e.target.value as GearStatus)}
-                  >
-                    {STATUSES.map((s) => (
-                      <option key={s.id} value={s.id}>{s.label}</option>
-                    ))}
-                  </select>
+              <div>
+                <label className={labelCls}>Status</label>
+                <div className="flex gap-1.5 mt-1">
+                  {STATUSES.map((s) => (
+                    <button
+                      key={s.id}
+                      type="button"
+                      aria-pressed={status === s.id}
+                      onClick={() => setStatus(s.id)}
+                      className={`flex-1 py-2 text-xs font-black uppercase tracking-wide transition-colors min-h-[36px] leading-tight text-center ${
+                        status === s.id
+                          ? 'bg-[#008751] text-white'
+                          : 'bg-slate-100 text-slate-500 hover:bg-slate-200'
+                      }`}
+                    >
+                      {s.label}
+                    </button>
+                  ))}
                 </div>
               </div>
 
@@ -447,19 +463,6 @@ export function GearForm({
                 />
               </div>
 
-              {status === 'checked-out' && (
-                <div>
-                  <label htmlFor="checkedOutTo" className={labelCls}>Checked Out To</label>
-                  <input
-                    id="checkedOutTo"
-                    type="text"
-                    className={inputCls}
-                    value={checkedOutTo}
-                    onChange={(e) => setCheckedOutTo(e.target.value)}
-                    placeholder="e.g., Friend's name, Rental shop"
-                  />
-                </div>
-              )}
             </div>
           </section>
 
@@ -516,7 +519,7 @@ export function GearForm({
                   />
                 </div>
 
-                <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Bindings</p>
+                <p className="text-xs font-black text-slate-400 uppercase tracking-widest pb-1 border-b border-slate-100 mb-1">Bindings</p>
                 <div className="grid grid-cols-2 gap-3">
                   <div>
                     <label htmlFor="bindingBrand" className={labelCls}>Binding Brand</label>
@@ -574,7 +577,7 @@ export function GearForm({
                     min="1"
                     max="14"
                   />
-                  <p className="text-[10px] text-slate-400 mt-1">
+                  <p className="text-xs text-slate-400 mt-1">
                     The release value set by your technician. Verify with a certified shop.
                   </p>
                 </div>

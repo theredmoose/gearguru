@@ -28,7 +28,7 @@ export function BottomNav({ activeTab, onChange }: BottomNavProps) {
             }`}
           >
             <Icon className="w-6 h-6" />
-            <span className="text-[10px] font-black uppercase tracking-tighter">{label}</span>
+            <span className="text-xs font-black uppercase tracking-tighter">{label}</span>
           </button>
         );
       })}

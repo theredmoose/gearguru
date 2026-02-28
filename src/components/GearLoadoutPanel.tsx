@@ -6,6 +6,7 @@ interface GearLoadoutPanelProps {
   gearItems: GearItem[];
   onSlotTap: (slotType: GearType) => void;
   color: string;
+  showHeader?: boolean;
 }
 
 interface GearSlot {
@@ -65,10 +66,15 @@ function getSlotState(
 
 function getSlotColor(status?: GearStatus): string {
   switch (status) {
-    case 'checked-out':
+    case 'active':
+      return '#3b82f6';
+    case 'outgrown':
+    case 'to-sell':
+    case 'sold':
       return '#f97316';
-    case 'maintenance':
+    case 'needs-repair':
       return '#ef4444';
+    case 'available':
     default:
       return '#22c55e';
   }
@@ -137,6 +143,7 @@ export function GearLoadoutPanel({
   gearItems,
   onSlotTap,
   color,
+  showHeader = true,
 }: GearLoadoutPanelProps) {
   const slots = SPORT_SLOTS[sport];
 
@@ -153,9 +160,11 @@ export function GearLoadoutPanel({
 
   return (
     <div className="gear-loadout-panel">
-      <div className="loadout-header">
-        <span className="loadout-title">{member.name}'s Gear</span>
-      </div>
+      {showHeader && (
+        <div className="loadout-header">
+          <span className="loadout-title">{member.name}'s Gear</span>
+        </div>
+      )}
       <div className="loadout-silhouette">
         <svg viewBox="0 0 200 180" preserveAspectRatio="xMidYMid meet">
           {renderSilhouette()}

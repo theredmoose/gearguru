@@ -273,36 +273,48 @@ function App() {
               <div className="h-5" />
             </div>
 
-            <div className="flex-1 overflow-y-auto bg-[#F8FAFC] px-6 py-6">
+            <div className="flex-1 overflow-y-auto bg-[#F8FAFC] px-5 py-5">
               {loading && <p className="loading">Loading...</p>}
               {error && <p className="error-state">{getOperationErrorMessage(error, 'load')}</p>}
 
               {!loading && !error && members.length === 0 && (
-                <p className="empty-state">
-                  No family members yet. Add someone to get started with equipment sizing.
-                </p>
-              )}
-
-              {!loading && members.length > 0 && (
-                <div className="member-list mb-4">
-                  {members.map((member) => (
-                    <MemberCard
-                      key={member.id}
-                      member={member}
-                      onSelect={handleSelectMember}
-                      onEdit={handleEditMember}
-                      onDelete={handleDeleteMember}
-                    />
-                  ))}
+                <div className="flex flex-col items-center justify-center py-14 text-center">
+                  <div className="w-16 h-16 rounded-2xl bg-emerald-50 border border-emerald-100 flex items-center justify-center mb-4">
+                    <span className="text-3xl">⛷️</span>
+                  </div>
+                  <p className="text-base font-black text-slate-800 mb-1">No family members yet</p>
+                  <p className="text-sm text-slate-400 mb-6">Add someone to start tracking gear sizes</p>
+                  <button
+                    className="btn btn-primary"
+                    onClick={() => { setSelectedMember(null); setView('add'); }}
+                  >
+                    + Add Family Member
+                  </button>
                 </div>
               )}
 
-              <button
-                className="btn btn-primary"
-                onClick={() => { setSelectedMember(null); setView('add'); }}
-              >
-                + Add Family Member
-              </button>
+              {!loading && members.length > 0 && (
+                <>
+                  <p className="text-xs font-black text-slate-400 uppercase tracking-widest mb-3">Your Family</p>
+                  <div className="flex flex-col gap-2 mb-5">
+                    {members.map((member) => (
+                      <MemberCard
+                        key={member.id}
+                        member={member}
+                        onSelect={handleSelectMember}
+                        onEdit={handleEditMember}
+                        onDelete={handleDeleteMember}
+                      />
+                    ))}
+                  </div>
+                  <button
+                    className="w-full flex items-center justify-center gap-2 py-3.5 border-2 border-dashed border-slate-200 rounded-2xl text-sm font-bold text-slate-400 hover:border-emerald-300 hover:text-emerald-600 transition-all"
+                    onClick={() => { setSelectedMember(null); setView('add'); }}
+                  >
+                    <span className="text-base leading-none">+</span> Add Family Member
+                  </button>
+                </>
+              )}
             </div>
           </div>
         );
@@ -330,6 +342,7 @@ function App() {
           member={view === 'edit' ? selectedMember ?? undefined : undefined}
           onSubmit={view === 'edit' ? handleUpdateMember : handleAddMember}
           onCancel={() => setView(selectedMember ? 'detail' : 'home')}
+          separateFeetHands={settings.display.separateFeetHands}
         />
       );
     }
@@ -346,7 +359,7 @@ function App() {
           onEdit={() => setView('edit')}
           onGetSizing={() => setView('sizing')}
           onOpenConverter={() => setView('converter')}
-          onAddGear={() => handleAddGearFromSizing('alpine')}
+          onAddGear={handleAddGearFromSizing}
           onEditGear={handleEditGear}
           onViewHistory={() => setView('measurement-history')}
         />
@@ -381,6 +394,7 @@ function App() {
             setSelectedMember(updatedMember);
             setView('measurement-history');
           }}
+          separateFeetHands={settings.display.separateFeetHands}
         />
       );
     }

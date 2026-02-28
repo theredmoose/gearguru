@@ -9,6 +9,7 @@ interface EditMeasurementEntryScreenProps {
   entry: MeasurementEntry | null;
   onBack: () => void;
   onSaved: (updatedMember: FamilyMember) => void;
+  separateFeetHands?: boolean;
 }
 
 const inputCls =
@@ -26,6 +27,7 @@ export function EditMeasurementEntryScreen({
   entry,
   onBack,
   onSaved,
+  separateFeetHands = false,
 }: EditMeasurementEntryScreenProps) {
   const isNew = entry === null;
 
@@ -34,8 +36,10 @@ export function EditMeasurementEntryScreen({
   );
   const [height, setHeight] = useState(entry?.height ?? 0);
   const [weight, setWeight] = useState(entry?.weight ?? 0);
+  const initSingleFoot = entry ? Math.max(entry.footLengthLeft, entry.footLengthRight) : 0;
   const [footLengthLeft, setFootLengthLeft] = useState(entry?.footLengthLeft ?? 0);
   const [footLengthRight, setFootLengthRight] = useState(entry?.footLengthRight ?? 0);
+  const [footLengthSingle, setFootLengthSingle] = useState(initSingleFoot);
   const [footWidthLeft, setFootWidthLeft] = useState(entry?.footWidthLeft ?? '');
   const [footWidthRight, setFootWidthRight] = useState(entry?.footWidthRight ?? '');
   const [usShoeSize, setUsShoeSize] = useState(entry?.usShoeSize ?? '');
@@ -59,10 +63,15 @@ export function EditMeasurementEntryScreen({
     if (height > 300) { setError('Height must be 300 cm or less'); return; }
     if (weight <= 0) { setError('Weight must be greater than 0'); return; }
     if (weight > 300) { setError('Weight must be 300 kg or less'); return; }
-    if (footLengthLeft <= 0) { setError('Left foot length is required'); return; }
-    if (footLengthLeft > 30) { setError('Left foot length must be 30 cm or less'); return; }
-    if (footLengthRight <= 0) { setError('Right foot length is required'); return; }
-    if (footLengthRight > 30) { setError('Right foot length must be 30 cm or less'); return; }
+    if (separateFeetHands) {
+      if (footLengthLeft <= 0) { setError('Left foot length is required'); return; }
+      if (footLengthLeft > 30) { setError('Left foot length must be 30 cm or less'); return; }
+      if (footLengthRight <= 0) { setError('Right foot length is required'); return; }
+      if (footLengthRight > 30) { setError('Right foot length must be 30 cm or less'); return; }
+    } else {
+      if (footLengthSingle <= 0) { setError('Foot length is required'); return; }
+      if (footLengthSingle > 30) { setError('Foot length must be 30 cm or less'); return; }
+    }
     if (footWidthLeft !== '' && Number(footWidthLeft) > 15) { setError('Left foot width must be 15 cm or less'); return; }
     if (footWidthRight !== '' && Number(footWidthRight) > 15) { setError('Right foot width must be 15 cm or less'); return; }
     if (usShoeSize !== '' && Number(usShoeSize) > 25) { setError('US shoe size must be 25 or less'); return; }
@@ -75,12 +84,15 @@ export function EditMeasurementEntryScreen({
 
     const recordedAtIso = new Date(recordedAt + 'T12:00:00').toISOString();
 
+    const resolvedLeft = separateFeetHands ? footLengthLeft : footLengthSingle;
+    const resolvedRight = separateFeetHands ? footLengthRight : footLengthSingle;
+
     const updates: Partial<Omit<MeasurementEntry, 'id'>> = {
       recordedAt: recordedAtIso,
       height,
       weight,
-      footLengthLeft,
-      footLengthRight,
+      footLengthLeft: resolvedLeft,
+      footLengthRight: resolvedRight,
       ...(footWidthLeft !== '' && { footWidthLeft: Number(footWidthLeft) }),
       ...(footWidthRight !== '' && { footWidthRight: Number(footWidthRight) }),
       ...(usShoeSize !== '' && { usShoeSize: Number(usShoeSize) }),
@@ -99,8 +111,8 @@ export function EditMeasurementEntryScreen({
           recordedAt: recordedAtIso,
           height,
           weight,
-          footLengthLeft,
-          footLengthRight,
+          footLengthLeft: resolvedLeft,
+          footLengthRight: resolvedRight,
           ...(footWidthLeft !== '' && { footWidthLeft: Number(footWidthLeft) }),
           ...(footWidthRight !== '' && { footWidthRight: Number(footWidthRight) }),
           ...(usShoeSize !== '' && { usShoeSize: Number(usShoeSize) }),
@@ -182,66 +194,102 @@ export function EditMeasurementEntryScreen({
           </div>
 
           {/* Foot lengths */}
-          <div className="grid grid-cols-2 gap-3">
+          {separateFeetHands ? (
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <label className={labelCls} htmlFor="em-foot-left">Foot L (cm)</label>
+                <input
+                  id="em-foot-left"
+                  type="number"
+                  className={inputCls}
+                  value={footLengthLeft || ''}
+                  onChange={(e) => setFootLengthLeft(parseFloat(e.target.value) || 0)}
+                  min="12"
+                  max="30"
+                  step="0.1"
+                />
+              </div>
+              <div>
+                <label className={labelCls} htmlFor="em-foot-right">Foot R (cm)</label>
+                <input
+                  id="em-foot-right"
+                  type="number"
+                  className={inputCls}
+                  value={footLengthRight || ''}
+                  onChange={(e) => setFootLengthRight(parseFloat(e.target.value) || 0)}
+                  min="12"
+                  max="30"
+                  step="0.1"
+                />
+              </div>
+            </div>
+          ) : (
             <div>
-              <label className={labelCls} htmlFor="em-foot-left">Foot L (cm)</label>
+              <label className={labelCls} htmlFor="em-foot-length">Foot Length (cm)</label>
               <input
-                id="em-foot-left"
+                id="em-foot-length"
                 type="number"
                 className={inputCls}
-                value={footLengthLeft || ''}
-                onChange={(e) => setFootLengthLeft(parseFloat(e.target.value) || 0)}
+                value={footLengthSingle || ''}
+                onChange={(e) => setFootLengthSingle(parseFloat(e.target.value) || 0)}
                 min="12"
                 max="30"
                 step="0.1"
               />
             </div>
-            <div>
-              <label className={labelCls} htmlFor="em-foot-right">Foot R (cm)</label>
-              <input
-                id="em-foot-right"
-                type="number"
-                className={inputCls}
-                value={footLengthRight || ''}
-                onChange={(e) => setFootLengthRight(parseFloat(e.target.value) || 0)}
-                min="12"
-                max="30"
-                step="0.1"
-              />
-            </div>
-          </div>
+          )}
 
-          {/* Optional fields */}
-          <div className="grid grid-cols-2 gap-3">
+          {/* Foot widths */}
+          {separateFeetHands ? (
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <label className={labelCls} htmlFor="em-foot-width-left">Foot W L (cm)</label>
+                <input
+                  id="em-foot-width-left"
+                  type="number"
+                  className={inputCls}
+                  value={footWidthLeft}
+                  onChange={(e) => setFootWidthLeft(e.target.value)}
+                  placeholder="optional"
+                  min="0"
+                  max="15"
+                  step="0.1"
+                />
+              </div>
+              <div>
+                <label className={labelCls} htmlFor="em-foot-width-right">Foot W R (cm)</label>
+                <input
+                  id="em-foot-width-right"
+                  type="number"
+                  className={inputCls}
+                  value={footWidthRight}
+                  onChange={(e) => setFootWidthRight(e.target.value)}
+                  placeholder="optional"
+                  min="0"
+                  max="15"
+                  step="0.1"
+                />
+              </div>
+            </div>
+          ) : (
             <div>
-              <label className={labelCls} htmlFor="em-foot-width-left">Foot W L (cm)</label>
+              <label className={labelCls} htmlFor="em-foot-width">Foot Width (cm)</label>
               <input
-                id="em-foot-width-left"
+                id="em-foot-width"
                 type="number"
                 className={inputCls}
                 value={footWidthLeft}
-                onChange={(e) => setFootWidthLeft(e.target.value)}
+                onChange={(e) => {
+                  setFootWidthLeft(e.target.value);
+                  setFootWidthRight(e.target.value);
+                }}
                 placeholder="optional"
                 min="0"
                 max="15"
                 step="0.1"
               />
             </div>
-            <div>
-              <label className={labelCls} htmlFor="em-foot-width-right">Foot W R (cm)</label>
-              <input
-                id="em-foot-width-right"
-                type="number"
-                className={inputCls}
-                value={footWidthRight}
-                onChange={(e) => setFootWidthRight(e.target.value)}
-                placeholder="optional"
-                min="0"
-                max="15"
-                step="0.1"
-              />
-            </div>
-          </div>
+          )}
 
           <div className="grid grid-cols-2 gap-3">
             <div>

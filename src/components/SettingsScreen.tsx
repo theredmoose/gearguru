@@ -179,6 +179,23 @@ export function SettingsScreen({
               </label>
             </div>
 
+            <div className={rowCls}>
+              <div>
+                <p className={labelCls}>Separate Left / Right Measurements</p>
+                <p className={subLabelCls}>Show separate L/R fields for foot and hand</p>
+              </div>
+              <label className="relative inline-flex items-center cursor-pointer" aria-label="Toggle separate left/right measurements">
+                <input
+                  type="checkbox"
+                  className="sr-only peer"
+                  checked={settings.display.separateFeetHands}
+                  onChange={e => onUpdateSettings({ display: { ...settings.display, separateFeetHands: e.target.checked } })}
+                  aria-label="Separate left/right measurements"
+                />
+                <div className="w-10 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#008751]" />
+              </label>
+            </div>
+
           </div>
         </section>
 

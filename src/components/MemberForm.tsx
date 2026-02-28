@@ -8,6 +8,7 @@ interface MemberFormProps {
     data: Omit<FamilyMember, 'id' | 'userId' | 'createdAt' | 'updatedAt'>
   ) => Promise<void>;
   onCancel: () => void;
+  separateFeetHands?: boolean;
 }
 
 const emptyMeasurements: Measurements = {
@@ -20,10 +21,11 @@ const emptyMeasurements: Measurements = {
 
 // Reusable input class
 const inputCls =
-  'w-full border border-slate-200 rounded-xl px-3 py-2.5 text-sm text-slate-800 bg-white focus:outline-none focus:ring-2 focus:ring-blue-400 placeholder:text-slate-300';
-const labelCls = 'block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1';
+  'w-full border border-slate-200 rounded-xl px-3 py-2.5 text-sm text-slate-800 bg-white focus:outline-none focus:ring-2 focus:ring-[#008751] placeholder:text-slate-300';
+const labelCls = 'block text-xs font-black text-slate-500 uppercase tracking-widest mb-1';
+const sectionTitleCls = 'block text-xs font-black text-slate-400 uppercase tracking-widest pb-2 mb-3 border-b border-slate-100';
 
-export function MemberForm({ member, onSubmit, onCancel }: MemberFormProps) {
+export function MemberForm({ member, onSubmit, onCancel, separateFeetHands = false }: MemberFormProps) {
   const [name, setName] = useState(member?.name ?? '');
   const [dateOfBirth, setDateOfBirth] = useState(member?.dateOfBirth ?? '');
   const [gender, setGender] = useState<'male' | 'female' | 'other'>(
@@ -161,7 +163,7 @@ export function MemberForm({ member, onSubmit, onCancel }: MemberFormProps) {
 
           {/* Basic Info */}
           <section>
-            <h3 className={labelCls}>Basic Info</h3>
+            <h3 className={sectionTitleCls}>Basic Info</h3>
             <div className="flex flex-col gap-3">
               <div>
                 <label htmlFor="name" className={labelCls}>Name</label>
@@ -188,26 +190,31 @@ export function MemberForm({ member, onSubmit, onCancel }: MemberFormProps) {
               </div>
 
               <div>
-                <label htmlFor="gender" className={labelCls}>Gender</label>
-                <select
-                  id="gender"
-                  className={inputCls}
-                  value={gender}
-                  onChange={(e) =>
-                    setGender(e.target.value as 'male' | 'female' | 'other')
-                  }
-                >
-                  <option value="male">Male</option>
-                  <option value="female">Female</option>
-                  <option value="other">Other</option>
-                </select>
+                <label className={labelCls}>Gender</label>
+                <div className="flex gap-2 mt-1">
+                  {(['male', 'female', 'other'] as const).map((g) => (
+                    <button
+                      key={g}
+                      type="button"
+                      aria-pressed={gender === g}
+                      onClick={() => setGender(g)}
+                      className={`flex-1 py-2.5 text-xs font-black uppercase tracking-wide transition-colors min-h-[44px] ${
+                        gender === g
+                          ? 'bg-[#008751] text-white'
+                          : 'bg-slate-100 text-slate-500 hover:bg-slate-200'
+                      }`}
+                    >
+                      {g.charAt(0).toUpperCase() + g.slice(1)}
+                    </button>
+                  ))}
+                </div>
               </div>
             </div>
           </section>
 
           {/* Body Measurements */}
           <section>
-            <h3 className={labelCls}>Body Measurements</h3>
+            <h3 className={sectionTitleCls}>Body Measurements</h3>
             <div className="grid grid-cols-2 gap-3">
               <div>
                 <label htmlFor="height" className={labelCls}>Height (cm)</label>
@@ -245,83 +252,123 @@ export function MemberForm({ member, onSubmit, onCancel }: MemberFormProps) {
 
           {/* Foot Measurements */}
           <section>
-            <h3 className={labelCls}>Foot Measurements</h3>
+            <h3 className={sectionTitleCls}>Foot Measurements</h3>
             <div className="grid grid-cols-2 gap-3">
-              <div>
-                <label htmlFor="footLeft" className={labelCls}>Left Foot (cm)</label>
-                <input
-                  id="footLeft"
-                  type="number"
-                  className={inputCls}
-                  value={measurements.footLengthLeft || ''}
-                  onChange={(e) =>
-                    updateMeasurement('footLengthLeft', parseFloat(e.target.value) || 0)
-                  }
-                  min="12"
-                  max="30"
-                  step="0.1"
-                />
-              </div>
+              {separateFeetHands ? (
+                <>
+                  <div>
+                    <label htmlFor="footLeft" className={labelCls}>Left Foot (cm)</label>
+                    <input
+                      id="footLeft"
+                      type="number"
+                      className={inputCls}
+                      value={measurements.footLengthLeft || ''}
+                      onChange={(e) =>
+                        updateMeasurement('footLengthLeft', parseFloat(e.target.value) || 0)
+                      }
+                      min="12"
+                      max="30"
+                      step="0.1"
+                    />
+                  </div>
 
-              <div>
-                <label htmlFor="footRight" className={labelCls}>Right Foot (cm)</label>
-                <input
-                  id="footRight"
-                  type="number"
-                  className={inputCls}
-                  value={measurements.footLengthRight || ''}
-                  onChange={(e) =>
-                    updateMeasurement('footLengthRight', parseFloat(e.target.value) || 0)
-                  }
-                  min="12"
-                  max="30"
-                  step="0.1"
-                />
-              </div>
+                  <div>
+                    <label htmlFor="footRight" className={labelCls}>Right Foot (cm)</label>
+                    <input
+                      id="footRight"
+                      type="number"
+                      className={inputCls}
+                      value={measurements.footLengthRight || ''}
+                      onChange={(e) =>
+                        updateMeasurement('footLengthRight', parseFloat(e.target.value) || 0)
+                      }
+                      min="12"
+                      max="30"
+                      step="0.1"
+                    />
+                  </div>
 
-              <div>
-                <label htmlFor="footWidthLeft" className={labelCls}>Left Width (cm)</label>
-                <input
-                  id="footWidthLeft"
-                  type="number"
-                  className={inputCls}
-                  value={measurements.footWidthLeft || ''}
-                  onChange={(e) =>
-                    updateMeasurement(
-                      'footWidthLeft',
-                      e.target.value === '' ? undefined : parseFloat(e.target.value)
-                    )
-                  }
-                  min="0"
-                  max="15"
-                  step="0.1"
-                />
-              </div>
+                  <div>
+                    <label htmlFor="footWidthLeft" className={labelCls}>Left Width (cm)</label>
+                    <input
+                      id="footWidthLeft"
+                      type="number"
+                      className={inputCls}
+                      value={measurements.footWidthLeft || ''}
+                      onChange={(e) =>
+                        updateMeasurement(
+                          'footWidthLeft',
+                          e.target.value === '' ? undefined : parseFloat(e.target.value)
+                        )
+                      }
+                      min="0"
+                      max="15"
+                      step="0.1"
+                    />
+                  </div>
 
-              <div>
-                <label htmlFor="footWidthRight" className={labelCls}>Right Width (cm)</label>
-                <input
-                  id="footWidthRight"
-                  type="number"
-                  className={inputCls}
-                  value={measurements.footWidthRight || ''}
-                  onChange={(e) =>
-                    updateMeasurement(
-                      'footWidthRight',
-                      e.target.value === '' ? undefined : parseFloat(e.target.value)
-                    )
-                  }
-                  min="0"
-                  max="15"
-                  step="0.1"
-                />
-              </div>
+                  <div>
+                    <label htmlFor="footWidthRight" className={labelCls}>Right Width (cm)</label>
+                    <input
+                      id="footWidthRight"
+                      type="number"
+                      className={inputCls}
+                      value={measurements.footWidthRight || ''}
+                      onChange={(e) =>
+                        updateMeasurement(
+                          'footWidthRight',
+                          e.target.value === '' ? undefined : parseFloat(e.target.value)
+                        )
+                      }
+                      min="0"
+                      max="15"
+                      step="0.1"
+                    />
+                  </div>
+                </>
+              ) : (
+                <>
+                  <div>
+                    <label htmlFor="footLength" className={labelCls}>Foot Length (cm)</label>
+                    <input
+                      id="footLength"
+                      type="number"
+                      className={inputCls}
+                      value={Math.max(measurements.footLengthLeft, measurements.footLengthRight) || ''}
+                      onChange={(e) => {
+                        const val = parseFloat(e.target.value) || 0;
+                        setMeasurements((prev) => ({ ...prev, footLengthLeft: val, footLengthRight: val }));
+                      }}
+                      min="12"
+                      max="30"
+                      step="0.1"
+                    />
+                  </div>
+
+                  <div>
+                    <label htmlFor="footWidth" className={labelCls}>Foot Width (cm)</label>
+                    <input
+                      id="footWidth"
+                      type="number"
+                      className={inputCls}
+                      value={measurements.footWidthLeft || ''}
+                      onChange={(e) => {
+                        const val = e.target.value === '' ? undefined : parseFloat(e.target.value);
+                        setMeasurements((prev) => ({ ...prev, footWidthLeft: val, footWidthRight: val }));
+                      }}
+                      min="0"
+                      max="15"
+                      step="0.1"
+                    />
+                  </div>
+                </>
+              )}
             </div>
           </section>
 
           {/* Shoe Sizes */}
           <section>
-            <h3 className={labelCls}>Shoe Sizes (Optional)</h3>
+            <h3 className={sectionTitleCls}>Shoe Sizes (Optional)</h3>
             <div className="grid grid-cols-2 gap-3">
               <div>
                 <label htmlFor="usShoe" className={labelCls}>US Size</label>
@@ -365,7 +412,7 @@ export function MemberForm({ member, onSubmit, onCancel }: MemberFormProps) {
 
           {/* Head & Hand */}
           <section>
-            <h3 className={labelCls}>Head & Hand (Optional)</h3>
+            <h3 className={sectionTitleCls}>Head & Hand (Optional)</h3>
             <div className="grid grid-cols-2 gap-3">
               <div>
                 <label htmlFor="headCircumference" className={labelCls}>Head Circumference (cm)</label>
@@ -386,24 +433,65 @@ export function MemberForm({ member, onSubmit, onCancel }: MemberFormProps) {
                 />
               </div>
 
-              <div>
-                <label htmlFor="handSize" className={labelCls}>Hand Size (cm)</label>
-                <input
-                  id="handSize"
-                  type="number"
-                  className={inputCls}
-                  value={measurements.handSize || ''}
-                  onChange={(e) =>
-                    updateMeasurement(
-                      'handSize',
-                      e.target.value === '' ? undefined : parseFloat(e.target.value)
-                    )
-                  }
-                  min="4"
-                  max="30"
-                  step="0.5"
-                />
-              </div>
+              {separateFeetHands ? (
+                <>
+                  <div>
+                    <label htmlFor="handSizeLeft" className={labelCls}>Left Hand (cm)</label>
+                    <input
+                      id="handSizeLeft"
+                      type="number"
+                      className={inputCls}
+                      value={measurements.handSizeLeft || ''}
+                      onChange={(e) =>
+                        updateMeasurement(
+                          'handSizeLeft',
+                          e.target.value === '' ? undefined : parseFloat(e.target.value)
+                        )
+                      }
+                      min="4"
+                      max="30"
+                      step="0.5"
+                    />
+                  </div>
+                  <div>
+                    <label htmlFor="handSizeRight" className={labelCls}>Right Hand (cm)</label>
+                    <input
+                      id="handSizeRight"
+                      type="number"
+                      className={inputCls}
+                      value={measurements.handSizeRight || ''}
+                      onChange={(e) =>
+                        updateMeasurement(
+                          'handSizeRight',
+                          e.target.value === '' ? undefined : parseFloat(e.target.value)
+                        )
+                      }
+                      min="4"
+                      max="30"
+                      step="0.5"
+                    />
+                  </div>
+                </>
+              ) : (
+                <div>
+                  <label htmlFor="handSize" className={labelCls}>Hand Size (cm)</label>
+                  <input
+                    id="handSize"
+                    type="number"
+                    className={inputCls}
+                    value={measurements.handSize || ''}
+                    onChange={(e) =>
+                      updateMeasurement(
+                        'handSize',
+                        e.target.value === '' ? undefined : parseFloat(e.target.value)
+                      )
+                    }
+                    min="4"
+                    max="30"
+                    step="0.5"
+                  />
+                </div>
+              )}
             </div>
           </section>
         </div>

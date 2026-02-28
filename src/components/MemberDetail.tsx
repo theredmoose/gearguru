@@ -3,6 +3,7 @@ import { Settings, PlusCircle, ChevronDown, CheckCircle2, AlertCircle, ArrowLeft
 import type { FamilyMember, GearItem, Sport, SkillLevel, AppSettings, BootUnit } from '../types';
 import { ScreenHeader } from './ScreenHeader';
 import { GearTypeIcon } from './GearIcons';
+import { GearLoadoutPanel } from './GearLoadoutPanel';
 import { GrowthWarningBadge } from './GrowthWarningBadge';
 import { getShoeSizesFromFootLength } from '../services/shoeSize';
 import { shouldWarnGrowth, isMeasurementStale, analyzeGrowthTrend } from '../services/growthAnalysis';
@@ -26,7 +27,7 @@ interface MemberDetailProps {
   onEdit: () => void;
   onGetSizing: () => void;
   onOpenConverter: () => void;
-  onAddGear: () => void;
+  onAddGear: (sport: Sport) => void;
   onEditGear: (item: GearItem) => void;
   onViewHistory?: () => void;
 }
@@ -199,13 +200,32 @@ export function MemberDetail({
     });
   }
 
+  const handleSlotTap = (slotType: import('../types').GearType) => {
+    const existing = gearItems.find(
+      (g) => g.type === slotType && g.sports.includes(selectedSport)
+    );
+    if (existing) {
+      onEditGear(existing);
+    } else {
+      onAddGear(selectedSport);
+    }
+  };
+
   const sizingCards = useMemo(
     () => getSizingCards(member, selectedSport, skillLevel, lengthUnit, bootUnit),
     [member, selectedSport, skillLevel, lengthUnit, bootUnit]
   );
 
+  const showFoot = settings?.display.showFoot ?? true;
+  const showHand = settings?.display.showHand ?? true;
+  const separateFeetHands = settings?.display.separateFeetHands ?? false;
+
   // Format shoe size for display
-  const shoeDisplay = footLength > 0 ? `${footLength} cm` : '—';
+  const shoeDisplay = footLength > 0
+    ? (separateFeetHands && m.footLengthLeft !== m.footLengthRight
+        ? `${m.footLengthLeft} / ${m.footLengthRight} cm`
+        : `${footLength} cm`)
+    : '—';
   // Hand size display
   const handDisplay = m.handSize ? `${m.handSize} cm` : '—';
 
@@ -224,9 +244,6 @@ export function MemberDetail({
   const weightDisplay = weightUnit === 'lbs'
     ? `${Math.round(m.weight * 2.2046)} lbs`
     : `${m.weight} kg`;
-
-  const showFoot = settings?.display.showFoot ?? true;
-  const showHand = settings?.display.showHand ?? true;
 
   const statRows = [
     { label: 'Age',    value: `${age} yrs` },
@@ -262,21 +279,24 @@ export function MemberDetail({
       <div className="flex-1 overflow-y-auto bg-[#F8FAFC] px-6 pt-6 pb-28">
 
         {/* ── Profile Card ── */}
-        <div className="bg-white p-4 rounded-[2.5rem] shadow-[0_15px_35px_rgba(0,0,0,0.03)] border border-white mb-5 flex gap-5">
+        <div className="bg-white p-4 rounded-[2.5rem] shadow-[0_15px_35px_rgba(0,0,0,0.03)] border border-white mb-5 flex gap-4">
 
-          {/* Left column: avatar */}
-          <div className="w-1/2 flex flex-col">
-            <div className="aspect-[3/4] bg-gradient-to-br from-emerald-50 to-slate-100 rounded-[2rem] border-2 border-white flex items-center justify-center overflow-hidden">
-              <span className="text-6xl font-black text-[#008751] select-none">
-                {member.name.charAt(0).toUpperCase()}
-              </span>
-            </div>
+          {/* Left column: interactive gear diagram */}
+          <div className="w-[46%] flex-shrink-0">
+            <GearLoadoutPanel
+              member={member}
+              sport={selectedSport}
+              gearItems={gearItems}
+              onSlotTap={handleSlotTap}
+              color="#008751"
+              showHeader={false}
+            />
           </div>
 
-          {/* Right column: name + stat rows + skill level */}
-          <div className="w-1/2 pt-1">
-            <div className="flex items-center gap-2 mb-2">
-              <h2 className="text-2xl font-black text-slate-900 tracking-tight leading-none">
+          {/* Right column: name + stats + history */}
+          <div className="flex-1 pt-1 min-w-0">
+            <div className="flex items-center gap-2 mb-3">
+              <h2 className="text-2xl font-black text-slate-900 tracking-tight leading-none truncate">
                 {member.name}
               </h2>
               <div className="w-2.5 h-2.5 rounded-full bg-[#008751] shadow-[0_0_10px_rgba(0,135,81,0.5)] flex-shrink-0" />
@@ -284,8 +304,8 @@ export function MemberDetail({
 
             <div className="space-y-0.5 mb-3">
               {statRows.map((row) => (
-                <div key={row.label} className="flex items-center justify-between border-b border-slate-50 py-2.5">
-                  <span className="text-[11px] text-slate-400 font-bold uppercase tracking-widest">
+                <div key={row.label} className="flex items-center justify-between border-b border-slate-50 py-2">
+                  <span className="text-xs text-slate-400 font-bold uppercase tracking-widest">
                     {row.label}
                   </span>
                   {row.action ? (
@@ -312,23 +332,21 @@ export function MemberDetail({
               ))}
             </div>
 
-            {/* View History link */}
             {onViewHistory && (
               <button
                 onClick={onViewHistory}
-                className="text-[11px] font-black text-[#008751] uppercase tracking-widest hover:text-emerald-800 transition-colors block mb-3"
+                className="text-xs font-black text-[#008751] uppercase tracking-widest hover:text-emerald-800 transition-colors"
               >
                 View History →
               </button>
             )}
-
           </div>
         </div>
 
         {/* ── Sport & Skill Level ── */}
         <div className="flex gap-3 mb-4">
           <div className="flex-1 relative">
-            <label className="text-[11px] text-emerald-700 font-black uppercase tracking-widest block mb-1 ml-1">Sport</label>
+            <label className="text-xs text-emerald-700 font-black uppercase tracking-widest block mb-1 ml-1">Sport</label>
             <select
               value={selectedSport}
               onChange={(e) => {
@@ -345,7 +363,7 @@ export function MemberDetail({
             <ChevronDown className="absolute right-3 bottom-3 w-3 h-3 text-emerald-400 pointer-events-none" />
           </div>
           <div className="flex-1 relative">
-            <label className="text-[11px] text-emerald-700 font-black uppercase tracking-widest block mb-1 ml-1">Skill Level</label>
+            <label className="text-xs text-emerald-700 font-black uppercase tracking-widest block mb-1 ml-1">Skill Level</label>
             <select
               value={skillLevel}
               onChange={(e) => setSkillLevel(e.target.value as SkillLevel)}
@@ -367,7 +385,7 @@ export function MemberDetail({
             </h2>
             <button
               onClick={onGetSizing}
-              className="text-[10px] font-black text-[#008751] uppercase tracking-widest hover:text-emerald-800 transition-colors"
+              className="text-xs font-black text-[#008751] uppercase tracking-widest hover:text-emerald-800 transition-colors"
             >
               All Sports →
             </button>
@@ -384,7 +402,7 @@ export function MemberDetail({
                 </div>
                 <div className="flex flex-col flex-1 min-w-0">
                   <div className="flex items-center justify-between mb-1.5">
-                    <span className="text-[10px] text-emerald-700 font-black uppercase tracking-widest">
+                    <span className="text-xs text-emerald-700 font-black uppercase tracking-widest">
                       {card.label}
                     </span>
                     {card.toggleKind && (
@@ -403,8 +421,8 @@ export function MemberDetail({
                   <div className="space-y-1">
                     {card.items.map((item, i) => (
                       <div key={i} className="flex justify-between items-baseline gap-1 w-full">
-                        <span className="text-[10px] font-bold text-slate-400 truncate min-w-0">{item.label}</span>
-                        <span className="text-[10px] font-black text-slate-900 whitespace-nowrap">{item.value}</span>
+                        <span className="text-xs font-bold text-slate-400 truncate min-w-0">{item.label}</span>
+                        <span className="text-sm font-black text-slate-900 whitespace-nowrap">{item.value}</span>
                       </div>
                     ))}
                   </div>
@@ -421,7 +439,7 @@ export function MemberDetail({
               Gear <span style={{ color: '#1e3a32' }}>Vault</span>
             </h2>
             <button
-              onClick={onAddGear}
+              onClick={() => onAddGear(selectedSport)}
               className="bg-[#008751] p-2 rounded-xl text-white shadow-lg shadow-emerald-100 transition-all active:scale-90"
               aria-label="Add gear"
             >
@@ -468,11 +486,11 @@ export function MemberDetail({
                         <p className="text-sm font-black text-slate-900 leading-tight truncate mb-0.5">
                           {item.brand} {item.model}
                         </p>
-                        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest leading-tight">
+                        <p className="text-xs font-bold text-slate-400 uppercase tracking-widest leading-tight">
                           {spec}
                         </p>
                         {item.photos && item.photos.length > 0 && (
-                          <p className="text-[9px] text-emerald-500 font-bold mt-0.5">
+                          <p className="text-xs text-emerald-500 font-bold mt-0.5">
                             {item.photos.length} photo{item.photos.length !== 1 ? 's' : ''}
                           </p>
                         )}
@@ -481,7 +499,7 @@ export function MemberDetail({
 
                     {/* Status */}
                     <div className="flex flex-col items-end gap-1.5 flex-shrink-0 ml-2">
-                      <div className={`text-[8px] font-black px-2.5 py-1 rounded-lg uppercase tracking-widest ${
+                      <div className={`text-xs font-black px-2.5 py-1 rounded-lg uppercase tracking-widest ${
                         isUpdate ? 'bg-orange-100 text-orange-600 animate-pulse' : 'bg-[#E3F9F1] text-[#008751]'
                       }`}>
                         {status}

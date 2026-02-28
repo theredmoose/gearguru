@@ -9,7 +9,7 @@ const defaultSettings: AppSettings = {
   weightUnit: 'kg',
   skiLengthUnit: 'cm',
   defaultSport: 'alpine',
-  display: { showFoot: true, showHand: true },
+  display: { showFoot: true, showHand: true, separateFeetHands: false },
 };
 
 function makeUser(overrides: Partial<User> = {}): User {
@@ -127,7 +127,7 @@ describe('SettingsScreen', () => {
     });
 
     it('foot length checkbox reflects showFoot setting (unchecked)', () => {
-      render(<SettingsScreen {...defaultProps} settings={{ ...defaultSettings, display: { showFoot: false, showHand: true } }} />);
+      render(<SettingsScreen {...defaultProps} settings={{ ...defaultSettings, display: { showFoot: false, showHand: true, separateFeetHands: false } }} />);
       expect(screen.getByRole('checkbox', { name: /show foot length/i })).not.toBeChecked();
     });
 
@@ -135,7 +135,7 @@ describe('SettingsScreen', () => {
       render(<SettingsScreen {...defaultProps} />);
       fireEvent.click(screen.getByRole('checkbox', { name: /show foot length/i }));
       expect(defaultProps.onUpdateSettings).toHaveBeenCalledWith({
-        display: { showFoot: false, showHand: true },
+        display: { showFoot: false, showHand: true, separateFeetHands: false },
       });
     });
 
@@ -143,7 +143,30 @@ describe('SettingsScreen', () => {
       render(<SettingsScreen {...defaultProps} />);
       fireEvent.click(screen.getByRole('checkbox', { name: /show hand size/i }));
       expect(defaultProps.onUpdateSettings).toHaveBeenCalledWith({
-        display: { showFoot: true, showHand: false },
+        display: { showFoot: true, showHand: false, separateFeetHands: false },
+      });
+    });
+
+    it('renders the Separate L/R Measurements toggle', () => {
+      render(<SettingsScreen {...defaultProps} />);
+      expect(screen.getByRole('checkbox', { name: /separate left.*right measurements/i })).toBeInTheDocument();
+    });
+
+    it('separate L/R toggle is unchecked when separateFeetHands is false', () => {
+      render(<SettingsScreen {...defaultProps} />);
+      expect(screen.getByRole('checkbox', { name: /separate left.*right measurements/i })).not.toBeChecked();
+    });
+
+    it('separate L/R toggle is checked when separateFeetHands is true', () => {
+      render(<SettingsScreen {...defaultProps} settings={{ ...defaultSettings, display: { showFoot: true, showHand: true, separateFeetHands: true } }} />);
+      expect(screen.getByRole('checkbox', { name: /separate left.*right measurements/i })).toBeChecked();
+    });
+
+    it('calls onUpdateSettings with separateFeetHands true when toggled on', () => {
+      render(<SettingsScreen {...defaultProps} />);
+      fireEvent.click(screen.getByRole('checkbox', { name: /separate left.*right measurements/i }));
+      expect(defaultProps.onUpdateSettings).toHaveBeenCalledWith({
+        display: { showFoot: true, showHand: true, separateFeetHands: true },
       });
     });
   });

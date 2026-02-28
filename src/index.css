@@ -802,7 +802,7 @@ label {
 }
 
 .shoe-size-label {
-  font-size: 0.625rem;
+  font-size: 0.75rem;
   color: var(--color-text-muted);
   text-transform: uppercase;
 }
@@ -864,7 +864,7 @@ label {
 }
 
 .sport-tab-label {
-  font-size: 0.625rem;
+  font-size: 0.75rem;
   font-weight: 500;
   color: var(--color-text-muted);
   white-space: nowrap;
@@ -1508,7 +1508,7 @@ label {
 }
 
 .photo-placeholder-label {
-  font-size: 0.625rem;
+  font-size: 0.75rem;
   font-weight: 500;
   color: var(--color-text-muted);
   text-transform: uppercase;
@@ -1801,7 +1801,7 @@ textarea:focus {
 }
 
 .gear-status-badge--small {
-  font-size: 0.5rem;
+  font-size: 0.625rem;
   padding: 1px 4px;
 }
 
@@ -1906,14 +1906,14 @@ textarea:focus {
 }
 
 .legend-label {
-  font-size: 0.625rem;
+  font-size: 0.75rem;
   font-weight: 600;
   color: var(--color-text-muted);
   text-transform: uppercase;
 }
 
 .legend-info {
-  font-size: 0.625rem;
+  font-size: 0.75rem;
   color: var(--color-text);
   white-space: nowrap;
   overflow: hidden;

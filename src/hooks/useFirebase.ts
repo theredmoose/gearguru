@@ -20,7 +20,6 @@ interface UseFamilyMembersReturn {
   members: FamilyMember[];
   loading: boolean;
   error: Error | null;
-  refresh: () => Promise<void>;
   addMember: (
     data: Omit<FamilyMember, 'id' | 'createdAt' | 'updatedAt'>
   ) => Promise<FamilyMember>;
@@ -40,37 +39,38 @@ export function useFamilyMembers(userId: string | null): UseFamilyMembersReturn 
     error: null,
   });
 
-  const refresh = useCallback(async () => {
+  useEffect(() => {
     if (!userId) {
       setState({ data: [], loading: false, error: null });
       return;
     }
-    setState((prev) => ({ ...prev, loading: true, error: null }));
-    try {
-      const members = await firebaseService.getAllFamilyMembers(userId);
-      setState({ data: members, loading: false, error: null });
-    } catch (err) {
-      setState({
-        data: null,
-        loading: false,
-        error: err instanceof Error ? err : new Error('Unknown error'),
-      });
-    }
-  }, [userId]);
+    setState((prev) => ({ ...prev, loading: true }));
+    let unsubscribe: (() => void) | undefined;
+    let active = true;
 
-  useEffect(() => {
-    refresh();
-  }, [refresh]);
+    firebaseService.subscribeToFamilyMembers(
+      userId,
+      (members) => {
+        if (active) setState({ data: members, loading: false, error: null });
+      },
+      (err) => {
+        if (active) setState({ data: null, loading: false, error: err });
+      }
+    ).then((unsub) => {
+      if (!active) { unsub(); return; }
+      unsubscribe = unsub;
+    });
+
+    return () => {
+      active = false;
+      unsubscribe?.();
+    };
+  }, [userId]);
 
   const addMember = useCallback(
     async (data: Omit<FamilyMember, 'id' | 'createdAt' | 'updatedAt'>) => {
       try {
-        const member = await firebaseService.createFamilyMember(data);
-        setState((prev) => ({
-          ...prev,
-          data: prev.data ? [...prev.data, member] : [member],
-        }));
-        return member;
+        return await firebaseService.createFamilyMember(data);
       } catch (err) {
         console.error('[GearGuru] addMember failed', err);
         throw err;
@@ -86,12 +86,6 @@ export function useFamilyMembers(userId: string | null): UseFamilyMembersReturn 
     ) => {
       try {
         await firebaseService.updateFamilyMember(id, data);
-        setState((prev) => ({
-          ...prev,
-          data: prev.data
-            ? prev.data.map((m) => (m.id === id ? { ...m, ...data } : m))
-            : null,
-        }));
       } catch (err) {
         console.error('[GearGuru] updateMember failed', err);
         throw err;
@@ -104,12 +98,6 @@ export function useFamilyMembers(userId: string | null): UseFamilyMembersReturn 
     async (id: string, measurements: Measurements) => {
       try {
         await firebaseService.updateMeasurements(id, measurements);
-        setState((prev) => ({
-          ...prev,
-          data: prev.data
-            ? prev.data.map((m) => (m.id === id ? { ...m, measurements } : m))
-            : null,
-        }));
       } catch (err) {
         console.error('[GearGuru] updateMeasurements failed', err);
         throw err;
@@ -122,12 +110,6 @@ export function useFamilyMembers(userId: string | null): UseFamilyMembersReturn 
     async (id: string, skillLevels: Partial<Record<Sport, SkillLevel>>) => {
       try {
         await firebaseService.updateSkillLevels(id, skillLevels);
-        setState((prev) => ({
-          ...prev,
-          data: prev.data
-            ? prev.data.map((m) => (m.id === id ? { ...m, skillLevels } : m))
-            : null,
-        }));
       } catch (err) {
         console.error('[GearGuru] updateSkillLevels failed', err);
         throw err;
@@ -139,10 +121,6 @@ export function useFamilyMembers(userId: string | null): UseFamilyMembersReturn 
   const deleteMember = useCallback(async (id: string) => {
     try {
       await firebaseService.deleteFamilyMember(id);
-      setState((prev) => ({
-        ...prev,
-        data: prev.data ? prev.data.filter((m) => m.id !== id) : null,
-      }));
     } catch (err) {
       console.error('[GearGuru] deleteMember failed', err);
       throw err;
@@ -153,7 +131,6 @@ export function useFamilyMembers(userId: string | null): UseFamilyMembersReturn 
     members: state.data ?? [],
     loading: state.loading,
     error: state.error,
-    refresh,
     addMember,
     updateMember,
     updateMeasurements,
@@ -219,7 +196,6 @@ interface UseGearItemsReturn {
   items: GearItem[];
   loading: boolean;
   error: Error | null;
-  refresh: () => Promise<void>;
   addItem: (
     data: Omit<GearItem, 'id' | 'createdAt' | 'updatedAt'>
   ) => Promise<GearItem>;
@@ -237,39 +213,39 @@ export function useGearItems(userId: string | null, ownerId?: string): UseGearIt
     error: null,
   });
 
-  const refresh = useCallback(async () => {
+  useEffect(() => {
     if (!userId) {
       setState({ data: [], loading: false, error: null });
       return;
     }
-    setState((prev) => ({ ...prev, loading: true, error: null }));
-    try {
-      const items = ownerId
-        ? await firebaseService.getGearItemsByOwner(userId, ownerId)
-        : await firebaseService.getAllGearItems(userId);
-      setState({ data: items, loading: false, error: null });
-    } catch (err) {
-      setState({
-        data: null,
-        loading: false,
-        error: err instanceof Error ? err : new Error('Unknown error'),
-      });
-    }
-  }, [userId, ownerId]);
+    setState((prev) => ({ ...prev, loading: true }));
+    let unsubscribe: (() => void) | undefined;
+    let active = true;
 
-  useEffect(() => {
-    refresh();
-  }, [refresh]);
+    firebaseService.subscribeToGearItems(
+      userId,
+      (items) => {
+        if (active) setState({ data: items, loading: false, error: null });
+      },
+      (err) => {
+        if (active) setState({ data: null, loading: false, error: err });
+      },
+      ownerId
+    ).then((unsub) => {
+      if (!active) { unsub(); return; }
+      unsubscribe = unsub;
+    });
+
+    return () => {
+      active = false;
+      unsubscribe?.();
+    };
+  }, [userId, ownerId]);
 
   const addItem = useCallback(
     async (data: Omit<GearItem, 'id' | 'createdAt' | 'updatedAt'>) => {
       try {
-        const item = await firebaseService.createGearItem(data);
-        setState((prev) => ({
-          ...prev,
-          data: prev.data ? [item, ...prev.data] : [item],
-        }));
-        return item;
+        return await firebaseService.createGearItem(data);
       } catch (err) {
         console.error('[GearGuru] addItem failed', err);
         throw err;
@@ -285,12 +261,6 @@ export function useGearItems(userId: string | null, ownerId?: string): UseGearIt
     ) => {
       try {
         await firebaseService.updateGearItem(id, data);
-        setState((prev) => ({
-          ...prev,
-          data: prev.data
-            ? prev.data.map((i) => (i.id === id ? { ...i, ...data } : i))
-            : null,
-        }));
       } catch (err) {
         console.error('[GearGuru] updateItem failed', err);
         throw err;
@@ -302,10 +272,6 @@ export function useGearItems(userId: string | null, ownerId?: string): UseGearIt
   const deleteItem = useCallback(async (id: string) => {
     try {
       await firebaseService.deleteGearItem(id);
-      setState((prev) => ({
-        ...prev,
-        data: prev.data ? prev.data.filter((i) => i.id !== id) : null,
-      }));
     } catch (err) {
       console.error('[GearGuru] deleteItem failed', err);
       throw err;
@@ -316,7 +282,6 @@ export function useGearItems(userId: string | null, ownerId?: string): UseGearIt
     items: state.data ?? [],
     loading: state.loading,
     error: state.error,
-    refresh,
     addItem,
     updateItem,
     deleteItem,
