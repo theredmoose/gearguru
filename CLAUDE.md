@@ -47,8 +47,25 @@ Always create a new branch for changes. Use standard naming conventions:
 - `update/` - updates to existing functionality (e.g., `update/member-form-validation`)
 - `refactor/` - code refactoring (e.g., `refactor/services-cleanup`)
 
+### Worktrees (Required)
+All feature work **must** be done in a git worktree — never directly on a checked-out branch in the main working directory. This project is developed across multiple concurrent CLI sessions, and shared working directory state (HEAD, stash, uncommitted files) causes conflicts between sessions.
+
+```bash
+# Start new feature work
+git worktree add .worktrees/<branch-name> -b <branch-name>
+cd .worktrees/<branch-name>
+
+# List active worktrees
+git worktree list
+
+# Remove after merging
+git worktree remove .worktrees/<branch-name>
+```
+
+Worktrees live in `.worktrees/` (gitignored). Each has its own working directory and index, so concurrent sessions cannot interfere.
+
 ### Workflow
-1. **Create a feature branch** from `main` before making changes
+1. **Create a worktree** from `main` for every branch before making changes
 2. **Run all tests** before committing (`npm test`)
 3. **Ensure tests pass** - do not commit with failing tests
 4. **Write descriptive commit messages** explaining the "why" not just the "what"
