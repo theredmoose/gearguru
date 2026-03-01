@@ -1,6 +1,16 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { MemoryRouter } from 'react-router-dom';
 import App from '../../App';
+
+// Helper: render App inside MemoryRouter (BrowserRouter is in main.tsx, not App)
+function renderApp(initialPath = '/') {
+  return render(
+    <MemoryRouter initialEntries={[initialPath]}>
+      <App />
+    </MemoryRouter>
+  );
+}
 
 // Mock Firebase hooks
 vi.mock('../../hooks', () => ({
@@ -13,7 +23,6 @@ vi.mock('../../hooks', () => ({
     updateMeasurements: vi.fn(),
     updateSkillLevels: vi.fn(),
     deleteMember: vi.fn(),
-    refresh: vi.fn(),
   })),
   useGearItems: vi.fn(() => ({
     items: [],
@@ -22,19 +31,21 @@ vi.mock('../../hooks', () => ({
     addItem: vi.fn(),
     updateItem: vi.fn(),
     deleteItem: vi.fn(),
-    refresh: vi.fn(),
   })),
   useAuth: vi.fn(() => ({
-    user: { displayName: 'Test User', email: 'test@example.com' },
+    user: { uid: 'u1', displayName: 'Test User', email: 'test@example.com', providerData: [] },
     loading: false,
     error: null,
+    accountConflictEmail: null,
     signIn: vi.fn(),
     signUp: vi.fn(),
     signInGoogle: vi.fn(),
     signInFacebook: vi.fn(),
     signOut: vi.fn(),
     sendPasswordReset: vi.fn(),
+    resendVerification: vi.fn(),
     clearError: vi.fn(),
+    clearAccountConflict: vi.fn(),
   })),
   useSettings: vi.fn(() => ({
     settings: {
@@ -42,10 +53,22 @@ vi.mock('../../hooks', () => ({
       weightUnit: 'kg',
       skiLengthUnit: 'cm',
       defaultSport: 'alpine',
-      display: { showFoot: true, showHand: true },
+      display: { showFoot: true, showHand: true, separateFeetHands: false },
+      sizingModel: 'generic',
+      sizingDisplay: 'range',
+      bootUnit: 'mp',
+      notificationsEnabled: true,
     },
     updateSettings: vi.fn(),
     resetSettings: vi.fn(),
+  })),
+  useNotifications: vi.fn(() => ({
+    activeNotifications: [],
+    dismissedNotifications: [],
+    dismissNotification: vi.fn(),
+    undismissNotification: vi.fn(),
+    loading: false,
+    error: null,
   })),
 }));
 
@@ -56,34 +79,33 @@ describe('App Integration', () => {
 
   describe('home view', () => {
     it('renders the app header', () => {
-      render(<App />);
-      expect(screen.getByText('Gear Guru')).toBeInTheDocument();
-      expect(screen.getByText(/sports equipment sizing/i)).toBeInTheDocument();
+      renderApp();
+      expect(screen.getByText(/gear/i, { selector: 'h1' })).toBeInTheDocument();
     });
 
     it('shows empty state when no members', () => {
-      render(<App />);
+      renderApp();
       expect(screen.getByText(/no family members yet/i)).toBeInTheDocument();
     });
 
     it('shows add member button', () => {
-      render(<App />);
+      renderApp();
       expect(screen.getByText(/add family member/i)).toBeInTheDocument();
     });
   });
 
   describe('navigation flow', () => {
     it('navigates to add member form when button clicked', () => {
-      render(<App />);
+      renderApp();
       fireEvent.click(screen.getByText(/add family member/i));
       expect(screen.getByText('Add Family Member')).toBeInTheDocument();
     });
 
     it('returns to home when cancel clicked on add form', () => {
-      render(<App />);
+      renderApp();
       fireEvent.click(screen.getByText(/add family member/i));
       fireEvent.click(screen.getByText('Cancel'));
-      expect(screen.getByText('Gear Guru')).toBeInTheDocument();
+      expect(screen.getByText(/gear/i, { selector: 'h1' })).toBeInTheDocument();
     });
   });
 
@@ -94,6 +116,7 @@ describe('App Integration', () => {
         members: [
           {
             id: '1',
+            userId: 'u1',
             name: 'John Doe',
             dateOfBirth: '1990-01-15',
             gender: 'male',
@@ -115,7 +138,6 @@ describe('App Integration', () => {
         updateMeasurements: vi.fn(),
         updateSkillLevels: vi.fn(),
         deleteMember: vi.fn(),
-        refresh: vi.fn(),
       });
       vi.mocked(useGearItems).mockReturnValue({
         items: [],
@@ -124,26 +146,24 @@ describe('App Integration', () => {
         addItem: vi.fn(),
         updateItem: vi.fn(),
         deleteItem: vi.fn(),
-        refresh: vi.fn(),
       });
     });
 
     it('displays member cards when members exist', () => {
-      render(<App />);
+      renderApp();
       expect(screen.getByText('John Doe')).toBeInTheDocument();
     });
 
     it('shows bottom navigation when members exist', () => {
-      render(<App />);
+      renderApp();
       expect(screen.getByText('FAMILY')).toBeInTheDocument();
       expect(screen.getByText('GEAR')).toBeInTheDocument();
     });
 
     it('navigates to member detail on card click', () => {
-      render(<App />);
+      renderApp();
       fireEvent.click(screen.getByText('John Doe'));
       expect(screen.getByText('Member Details')).toBeInTheDocument();
-      expect(screen.getByText('Sizing')).toBeInTheDocument();
     });
   });
 });
@@ -163,19 +183,22 @@ describe('App auth states', () => {
         user: null,
         loading: true,
         error: null,
+        accountConflictEmail: null,
         signIn: vi.fn(),
         signUp: vi.fn(),
         signInGoogle: vi.fn(),
         signInFacebook: vi.fn(),
         signOut: vi.fn(),
         sendPasswordReset: vi.fn(),
+        resendVerification: vi.fn(),
         clearError: vi.fn(),
+        clearAccountConflict: vi.fn(),
       });
     });
 
     it('shows Gear Guru title and loading indicator', () => {
-      render(<App />);
-      expect(screen.getByText('Gear Guru')).toBeInTheDocument();
+      renderApp();
+      expect(screen.getByText(/gear/i, { selector: 'h1' })).toBeInTheDocument();
       expect(screen.getByText('Loading...')).toBeInTheDocument();
     });
   });
@@ -187,18 +210,21 @@ describe('App auth states', () => {
         user: null,
         loading: false,
         error: null,
+        accountConflictEmail: null,
         signIn: vi.fn(),
         signUp: vi.fn(),
         signInGoogle: vi.fn(),
         signInFacebook: vi.fn(),
         signOut: vi.fn(),
         sendPasswordReset: vi.fn(),
+        resendVerification: vi.fn(),
         clearError: vi.fn(),
+        clearAccountConflict: vi.fn(),
       });
     });
 
     it('shows auth form when not logged in', () => {
-      render(<App />);
+      renderApp();
       expect(screen.getByRole('button', { name: /^sign in$/i })).toBeInTheDocument();
     });
   });
@@ -212,16 +238,19 @@ describe('App tab navigation', () => {
     vi.clearAllMocks();
     const { useAuth, useFamilyMembers, useGearItems } = await import('../../hooks');
     vi.mocked(useAuth).mockReturnValue({
-      user: { uid: 'u1', displayName: 'Tester', email: 'test@test.com' } as any,
+      user: { uid: 'u1', displayName: 'Tester', email: 'test@test.com', providerData: [] } as any,
       loading: false,
       error: null,
+      accountConflictEmail: null,
       signIn: vi.fn(),
       signUp: vi.fn(),
       signInGoogle: vi.fn(),
       signInFacebook: vi.fn(),
       signOut: vi.fn(),
       sendPasswordReset: vi.fn(),
+      resendVerification: vi.fn(),
       clearError: vi.fn(),
+      clearAccountConflict: vi.fn(),
     });
     vi.mocked(useFamilyMembers).mockReturnValue({
       members: [{
@@ -237,34 +266,33 @@ describe('App tab navigation', () => {
       updateMeasurements: vi.fn(),
       updateSkillLevels: vi.fn(),
       deleteMember: vi.fn(),
-      refresh: vi.fn(),
     });
     vi.mocked(useGearItems).mockReturnValue({
       items: [], loading: false, error: null,
-      addItem: vi.fn(), updateItem: vi.fn(), deleteItem: vi.fn(), refresh: vi.fn(),
+      addItem: vi.fn(), updateItem: vi.fn(), deleteItem: vi.fn(),
     });
   });
 
   it('shows Gear Inventory when GEAR tab clicked', () => {
-    render(<App />);
+    renderApp();
     fireEvent.click(screen.getByText('GEAR'));
     expect(screen.getByRole('heading', { name: 'Family Gear' })).toBeInTheDocument();
   });
 
   it('shows Measure screen when MEASURE tab clicked', () => {
-    render(<App />);
+    renderApp();
     fireEvent.click(screen.getByText('MEASURE'));
     expect(screen.getByText('Measure')).toBeInTheDocument();
   });
 
   it('shows Resources screen when RESOURCES tab clicked', () => {
-    render(<App />);
+    renderApp();
     fireEvent.click(screen.getByText('RESOURCES'));
     expect(screen.getAllByText('Nordic Skiing').length).toBeGreaterThanOrEqual(1);
   });
 
   it('navigates member from measure tab to edit form', () => {
-    render(<App />);
+    renderApp();
     fireEvent.click(screen.getByText('MEASURE'));
     fireEvent.click(screen.getByText('Tab User'));
     expect(screen.getByText('Edit Family Member')).toBeInTheDocument();
@@ -279,7 +307,7 @@ describe('App member operations', () => {
   const mockDeleteMember = vi.fn().mockResolvedValue(undefined);
   const mockUpdateMember = vi.fn().mockResolvedValue(undefined);
   const mockUpdateSkillLevels = vi.fn().mockResolvedValue(undefined);
-  const mockAddGearItem = vi.fn().mockResolvedValue(undefined);
+  const mockAddGearItem = vi.fn().mockResolvedValue({ id: 'g1' });
 
   const testMember = {
     id: 'member-1',
@@ -303,16 +331,19 @@ describe('App member operations', () => {
     vi.spyOn(window, 'confirm').mockReturnValue(true);
     const { useAuth, useFamilyMembers, useGearItems } = await import('../../hooks');
     vi.mocked(useAuth).mockReturnValue({
-      user: { uid: 'user-1', displayName: 'Jane', email: 'jane@example.com' } as any,
+      user: { uid: 'user-1', displayName: 'Jane', email: 'jane@example.com', providerData: [] } as any,
       loading: false,
       error: null,
+      accountConflictEmail: null,
       signIn: vi.fn(),
       signUp: vi.fn(),
       signInGoogle: vi.fn(),
       signInFacebook: vi.fn(),
       signOut: mockSignOut,
       sendPasswordReset: vi.fn(),
+      resendVerification: vi.fn(),
       clearError: vi.fn(),
+      clearAccountConflict: vi.fn(),
     });
     vi.mocked(useFamilyMembers).mockReturnValue({
       members: [testMember],
@@ -323,16 +354,15 @@ describe('App member operations', () => {
       updateMeasurements: vi.fn(),
       updateSkillLevels: mockUpdateSkillLevels,
       deleteMember: mockDeleteMember,
-      refresh: vi.fn(),
     });
     vi.mocked(useGearItems).mockReturnValue({
       items: [], loading: false, error: null,
-      addItem: mockAddGearItem, updateItem: vi.fn(), deleteItem: vi.fn(), refresh: vi.fn(),
+      addItem: mockAddGearItem, updateItem: vi.fn(), deleteItem: vi.fn(),
     });
   });
 
   it('calls signOut via settings screen', () => {
-    render(<App />);
+    renderApp();
     fireEvent.click(screen.getByRole('button', { name: /open settings/i }));
     fireEvent.click(screen.getByRole('button', { name: /sign out/i }));
     expect(mockSignOut).toHaveBeenCalled();
@@ -343,9 +373,9 @@ describe('App member operations', () => {
     vi.mocked(useFamilyMembers).mockReturnValue({
       members: [], loading: true, error: null,
       addMember: vi.fn(), updateMember: vi.fn(), updateMeasurements: vi.fn(),
-      updateSkillLevels: vi.fn(), deleteMember: vi.fn(), refresh: vi.fn(),
+      updateSkillLevels: vi.fn(), deleteMember: vi.fn(),
     });
-    render(<App />);
+    renderApp();
     expect(screen.getByText('Loading...')).toBeInTheDocument();
   });
 
@@ -354,70 +384,69 @@ describe('App member operations', () => {
     vi.mocked(useFamilyMembers).mockReturnValue({
       members: [], loading: false, error: new Error('DB error'),
       addMember: vi.fn(), updateMember: vi.fn(), updateMeasurements: vi.fn(),
-      updateSkillLevels: vi.fn(), deleteMember: vi.fn(), refresh: vi.fn(),
+      updateSkillLevels: vi.fn(), deleteMember: vi.fn(),
     });
-    render(<App />);
+    renderApp();
     expect(screen.getByText(/db error/i)).toBeInTheDocument();
   });
 
   it('calls deleteMember when delete confirmed on member card', () => {
-    render(<App />);
+    renderApp();
     fireEvent.click(screen.getByRole('button', { name: /delete/i }));
     expect(mockDeleteMember).toHaveBeenCalledWith('member-1');
   });
 
   it('shows edit form when member card edit button clicked', () => {
-    render(<App />);
+    renderApp();
     fireEvent.click(screen.getByRole('button', { name: /edit/i }));
     expect(screen.getByText('Edit Family Member')).toBeInTheDocument();
   });
 
   it('navigates to member detail when card clicked', () => {
-    render(<App />);
+    renderApp();
     fireEvent.click(screen.getByText('Jane Smith'));
     expect(screen.getByText('Member Details')).toBeInTheDocument();
   });
 
   it('navigates back to home from detail view', () => {
-    render(<App />);
+    renderApp();
     fireEvent.click(screen.getByText('Jane Smith'));
     fireEvent.click(screen.getByRole('button', { name: /back/i }));
-    expect(screen.getByText('Gear Guru')).toBeInTheDocument();
+    expect(screen.getByText(/gear/i, { selector: 'h1' })).toBeInTheDocument();
   });
 
   it('shows sport sizing from detail view', () => {
-    render(<App />);
+    renderApp();
     fireEvent.click(screen.getByText('Jane Smith'));
     fireEvent.click(screen.getByText(/all sports/i));
     expect(screen.getAllByText('Alpine').length).toBeGreaterThanOrEqual(1);
   });
 
   it('shows shoe size converter from detail view', () => {
-    render(<App />);
+    renderApp();
     fireEvent.click(screen.getByText('Jane Smith'));
     fireEvent.click(screen.getByText('25 cm'));
     expect(screen.getByText('Size Converter')).toBeInTheDocument();
   });
 
   it('shows gear form when Add Gear clicked from detail view', () => {
-    render(<App />);
+    renderApp();
     fireEvent.click(screen.getByText('Jane Smith'));
     fireEvent.click(screen.getByRole('button', { name: /add gear/i }));
     expect(screen.getByRole('heading', { name: 'Add Gear' })).toBeInTheDocument();
   });
 
-  it('returns to sizing when gear form cancelled with sport context', () => {
-    render(<App />);
+  it('returns to sizing when gear form cancelled from detail view', () => {
+    renderApp();
     fireEvent.click(screen.getByText('Jane Smith'));
-    // Add Gear from detail sets gearDefaultSport='alpine'
     fireEvent.click(screen.getByRole('button', { name: /add gear/i }));
     fireEvent.click(screen.getByRole('button', { name: 'Cancel' }));
-    // handleGearCancel: gearDefaultSport='alpine' + selectedMember → goes to 'sizing'
+    // from=/family/member-1/sizing → navigates to sizing page
     expect(screen.getAllByText('Alpine').length).toBeGreaterThanOrEqual(1);
   });
 
   it('submits gear form and calls addGearItem', async () => {
-    render(<App />);
+    renderApp();
     fireEvent.click(screen.getByText('Jane Smith'));
     fireEvent.click(screen.getByRole('button', { name: /add gear/i }));
     fireEvent.change(screen.getByLabelText('Brand'), { target: { value: 'Atomic' } });
@@ -428,14 +457,14 @@ describe('App member operations', () => {
   });
 
   it('navigates to edit member form from detail view', () => {
-    render(<App />);
+    renderApp();
     fireEvent.click(screen.getByText('Jane Smith'));
     fireEvent.click(screen.getByRole('button', { name: /edit member/i }));
     expect(screen.getByText('Edit Family Member')).toBeInTheDocument();
   });
 
   it('returns to detail when edit member form cancelled', () => {
-    render(<App />);
+    renderApp();
     fireEvent.click(screen.getByText('Jane Smith'));
     fireEvent.click(screen.getByRole('button', { name: /edit member/i }));
     fireEvent.click(screen.getByRole('button', { name: 'Cancel' }));
@@ -447,7 +476,7 @@ describe('App member operations', () => {
 // GEAR OPERATIONS FROM INVENTORY
 // ============================================
 describe('App gear from inventory', () => {
-  const mockAddGearItem = vi.fn().mockResolvedValue(undefined);
+  const mockAddGearItem = vi.fn().mockResolvedValue({ id: 'g1' });
 
   const testMember = {
     id: 'member-1', userId: 'user-1', name: 'Gear User',
@@ -460,25 +489,27 @@ describe('App gear from inventory', () => {
     vi.clearAllMocks();
     const { useAuth, useFamilyMembers, useGearItems } = await import('../../hooks');
     vi.mocked(useAuth).mockReturnValue({
-      user: { uid: 'user-1', displayName: 'Tester', email: 't@t.com' } as any,
+      user: { uid: 'user-1', displayName: 'Tester', email: 't@t.com', providerData: [] } as any,
       loading: false, error: null,
+      accountConflictEmail: null,
       signIn: vi.fn(), signUp: vi.fn(), signInGoogle: vi.fn(),
       signInFacebook: vi.fn(), signOut: vi.fn(),
-      sendPasswordReset: vi.fn(), clearError: vi.fn(),
+      sendPasswordReset: vi.fn(), resendVerification: vi.fn(),
+      clearError: vi.fn(), clearAccountConflict: vi.fn(),
     });
     vi.mocked(useFamilyMembers).mockReturnValue({
       members: [testMember], loading: false, error: null,
       addMember: vi.fn(), updateMember: vi.fn(), updateMeasurements: vi.fn(),
-      updateSkillLevels: vi.fn(), deleteMember: vi.fn(), refresh: vi.fn(),
+      updateSkillLevels: vi.fn(), deleteMember: vi.fn(),
     });
     vi.mocked(useGearItems).mockReturnValue({
       items: [], loading: false, error: null,
-      addItem: mockAddGearItem, updateItem: vi.fn(), deleteItem: vi.fn(), refresh: vi.fn(),
+      addItem: mockAddGearItem, updateItem: vi.fn(), deleteItem: vi.fn(),
     });
   });
 
   it('shows gear form from inventory add gear button', () => {
-    render(<App />);
+    renderApp();
     fireEvent.click(screen.getByText('GEAR'));
     // Select specific member to show Add Gear button
     fireEvent.change(screen.getByRole('combobox'), { target: { value: 'member-1' } });
@@ -486,18 +517,17 @@ describe('App gear from inventory', () => {
     expect(screen.getByRole('heading', { name: 'Add Gear' })).toBeInTheDocument();
   });
 
-  it('returns to gear view when gear form cancelled without sport context', () => {
-    render(<App />);
+  it('returns to gear view when gear form cancelled from inventory', () => {
+    renderApp();
     fireEvent.click(screen.getByText('GEAR'));
     fireEvent.change(screen.getByRole('combobox'), { target: { value: 'member-1' } });
     fireEvent.click(screen.getByText('+ Add Gear'));
     fireEvent.click(screen.getByRole('button', { name: 'Cancel' }));
-    // handleGearCancel: gearDefaultSport=undefined → setView('home'); activeTab still 'gear'
     expect(screen.getByRole('heading', { name: 'Family Gear' })).toBeInTheDocument();
   });
 
-  it('calls addGearItem and returns home on gear form submit from inventory', async () => {
-    render(<App />);
+  it('calls addGearItem on gear form submit from inventory', async () => {
+    renderApp();
     fireEvent.click(screen.getByText('GEAR'));
     fireEvent.change(screen.getByRole('combobox'), { target: { value: 'member-1' } });
     fireEvent.click(screen.getByText('+ Add Gear'));

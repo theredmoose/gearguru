@@ -1,4 +1,4 @@
-import { useState, FormEvent } from 'react';
+import { useState, useEffect, FormEvent } from 'react';
 
 interface AuthFormProps {
   onEmailSignIn: (email: string, password: string) => Promise<void>;
@@ -9,13 +9,15 @@ interface AuthFormProps {
   error: string | null;
   loading: boolean;
   onClearError: () => void;
+  accountConflictEmail?: string | null;
+  onClearAccountConflict?: () => void;
 }
 
 type AuthMode = 'signin' | 'signup' | 'reset';
 
 const inputCls =
-  'w-full border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-800 bg-white focus:outline-none focus:ring-2 focus:ring-blue-400 placeholder:text-slate-300 disabled:opacity-50';
-const labelCls = 'block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1.5';
+  'w-full border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-800 bg-white focus:outline-none focus:ring-2 focus:ring-emerald-400 placeholder:text-slate-300 disabled:opacity-50';
+const labelCls = 'block text-xs font-black text-emerald-700 uppercase tracking-widest mb-1.5';
 
 export function AuthForm({
   onEmailSignIn,
@@ -26,12 +28,23 @@ export function AuthForm({
   error,
   loading,
   onClearError,
+  accountConflictEmail,
+  onClearAccountConflict,
 }: AuthFormProps) {
   const [mode, setMode] = useState<AuthMode>('signin');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [displayName, setDisplayName] = useState('');
   const [resetSent, setResetSent] = useState(false);
+
+  // When a social sign-in detects an account conflict, pre-fill the email
+  // and switch to the email sign-in form so the user can sign in directly.
+  useEffect(() => {
+    if (accountConflictEmail) {
+      setEmail(accountConflictEmail);
+      setMode('signin');
+    }
+  }, [accountConflictEmail]);
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
@@ -67,18 +80,21 @@ export function AuthForm({
     setMode(newMode);
     setResetSent(false);
     onClearError();
+    onClearAccountConflict?.();
   };
 
   return (
-    <div className="min-h-dvh bg-gradient-to-b from-blue-700 to-blue-900 flex flex-col items-center justify-start pt-16 pb-8 px-6">
+    <div className="min-h-dvh bg-white flex flex-col items-center justify-center py-8 px-6">
       {/* Branding */}
-      <div className="mb-8 text-center">
-        <h1 className="text-3xl font-black text-white tracking-tight">Gear Guru</h1>
-        <p className="text-blue-200 text-sm font-bold mt-1">Sports Equipment Sizing</p>
+      <div className="mb-6 text-center">
+        <h1 className="text-3xl font-black text-[#008751] tracking-tight uppercase">
+          Gear <span className="text-[#1e3a32]">Guru</span>
+        </h1>
+        <p className="text-[#008751] text-xs font-bold uppercase tracking-widest mt-2">Family Gear Sizing</p>
       </div>
 
       {/* Card */}
-      <div className="w-full max-w-sm bg-white rounded-3xl shadow-2xl overflow-hidden">
+      <div className="w-full max-w-sm bg-white rounded-3xl border border-slate-100 shadow-lg overflow-hidden">
         {mode === 'reset' ? (
           <form onSubmit={handleSubmit} className="p-7 flex flex-col gap-5">
             <h2 className="text-lg font-black text-slate-800">Reset Password</h2>
@@ -121,7 +137,7 @@ export function AuthForm({
 
             <button
               type="button"
-              className="text-sm font-bold text-blue-600 hover:text-blue-800 transition-colors text-center"
+              className="text-sm font-bold text-[#008751] hover:text-emerald-800 transition-colors text-center"
               onClick={() => switchMode('signin')}
             >
               ← Back to Sign In
@@ -184,6 +200,15 @@ export function AuthForm({
               </div>
             )}
 
+            {accountConflictEmail && mode === 'signin' && (
+              <div className="bg-amber-50 border border-amber-200 text-amber-800 text-sm rounded-xl px-4 py-3">
+                <p className="font-bold mb-1">Sign in with your password</p>
+                <p className="font-semibold text-xs">
+                  This email already has an account. Enter your password below to sign in.
+                </p>
+              </div>
+            )}
+
             <button
               type="submit"
               className="w-full btn btn-primary"
@@ -199,7 +224,7 @@ export function AuthForm({
             {mode === 'signin' && (
               <button
                 type="button"
-                className="text-xs font-bold text-slate-400 hover:text-slate-600 transition-colors text-center -mt-2"
+                className="text-xs font-bold text-slate-400 hover:text-emerald-700 transition-colors text-center -mt-2"
                 onClick={() => switchMode('reset')}
               >
                 Forgot password?
@@ -209,7 +234,7 @@ export function AuthForm({
             {/* Divider */}
             <div className="flex items-center gap-3">
               <div className="flex-1 h-px bg-slate-100" />
-              <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">or</span>
+              <span className="text-xs font-black text-slate-400 uppercase tracking-widest">or</span>
               <div className="flex-1 h-px bg-slate-100" />
             </div>
 
@@ -250,7 +275,7 @@ export function AuthForm({
                   No account?{' '}
                   <button
                     type="button"
-                    className="text-blue-600 hover:text-blue-800 transition-colors font-black"
+                    className="text-[#008751] hover:text-emerald-800 transition-colors font-black"
                     onClick={() => switchMode('signup')}
                   >
                     Sign Up
@@ -261,7 +286,7 @@ export function AuthForm({
                   Have an account?{' '}
                   <button
                     type="button"
-                    className="text-blue-600 hover:text-blue-800 transition-colors font-black"
+                    className="text-[#008751] hover:text-emerald-800 transition-colors font-black"
                     onClick={() => switchMode('signin')}
                   >
                     Sign In

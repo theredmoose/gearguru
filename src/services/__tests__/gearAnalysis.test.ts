@@ -215,5 +215,130 @@ describe('gearAnalysis', () => {
       const result = await analyzeGearPhotos([mockPhoto]);
       expect(result.confidence).toBeLessThanOrEqual(0.5);
     });
+
+    it('returns nordic-classic ski details with skin grip', async () => {
+      const result = await analyzeGearPhotos([mockPhoto], {
+        sport: 'nordic-classic',
+        type: 'ski',
+      });
+      expect(result.extendedDetails?.type).toBe('nordicSki');
+      if (result.extendedDetails?.type === 'nordicSki') {
+        expect(result.extendedDetails.details.style).toBe('classic');
+        expect(result.extendedDetails.details.grip).toBe('skin');
+      }
+    });
+
+    it('returns lower confidence when photos have no recognisable content', async () => {
+      // No labelView or fullView photo — only "other" type
+      const otherPhoto: GearPhoto = {
+        id: 'photo-other',
+        type: 'other',
+        url: 'data:image/jpeg;base64,test',
+        createdAt: new Date().toISOString(),
+      };
+      const result = await analyzeGearPhotos([otherPhoto]);
+      // With no label/full view and no hints → Unknown branch → confidence ≤ 0.5
+      expect(result.confidence).toBeLessThanOrEqual(0.5);
+    });
+  });
+
+  // ============================================
+  // ANALYZE WITH CLAUDE (API key path)
+  // ============================================
+  describe('analyzeGearPhotos (with CLAUDE_API_KEY)', () => {
+    beforeEach(async () => {
+      vi.stubEnv('VITE_ANTHROPIC_API_KEY', 'sk-test-key');
+      vi.resetModules();
+    });
+
+    afterEach(() => {
+      vi.unstubAllEnvs();
+      vi.resetModules();
+      vi.restoreAllMocks();
+    });
+
+    it('calls the Anthropic API when key is present', async () => {
+      const mockResult = { brand: 'Atomic', model: 'Test', confidence: 0.9 };
+      const fetchMock = vi.fn().mockResolvedValue({
+        ok: true,
+        json: () =>
+          Promise.resolve({
+            content: [{ type: 'text', text: JSON.stringify(mockResult) }],
+          }),
+      });
+      vi.stubGlobal('fetch', fetchMock);
+
+      const { analyzeGearPhotos: analyzeWithKey } = await import('../gearAnalysis');
+      const photo: GearPhoto = {
+        id: 'p1',
+        type: 'labelView',
+        url: 'data:image/jpeg;base64,abc123',
+        createdAt: '',
+      };
+      const result = await analyzeWithKey([photo], { sport: 'alpine', type: 'ski' });
+
+      expect(fetchMock).toHaveBeenCalledOnce();
+      expect(result.brand).toBe('Atomic');
+    });
+
+    it('fills in sport/type hints when Claude omits them', async () => {
+      const mockResult = { confidence: 0.8 }; // no sport or type
+      vi.stubGlobal('fetch', vi.fn().mockResolvedValue({
+        ok: true,
+        json: () =>
+          Promise.resolve({
+            content: [{ type: 'text', text: JSON.stringify(mockResult) }],
+          }),
+      }));
+
+      const { analyzeGearPhotos: analyzeWithKey } = await import('../gearAnalysis');
+      const photo: GearPhoto = {
+        id: 'p2',
+        type: 'labelView',
+        url: 'data:image/jpeg;base64,abc123',
+        createdAt: '',
+      };
+      const result = await analyzeWithKey([photo], { sport: 'snowboard', type: 'snowboard' });
+
+      expect(result.sport).toBe('snowboard');
+      expect(result.type).toBe('snowboard');
+    });
+
+    it('falls back to mock when the API call fails', async () => {
+      vi.stubGlobal('fetch', vi.fn().mockResolvedValue({
+        ok: false,
+        status: 500,
+        statusText: 'Internal Server Error',
+      }));
+
+      const { analyzeGearPhotos: analyzeWithKey } = await import('../gearAnalysis');
+      const photo: GearPhoto = {
+        id: 'p3',
+        type: 'labelView',
+        url: 'data:image/jpeg;base64,abc123',
+        createdAt: '',
+      };
+      const result = await analyzeWithKey([photo], { sport: 'alpine', type: 'ski' });
+
+      expect(result.notes).toContain('AI analysis unavailable — showing demo data');
+      expect(result.brand).toBeDefined(); // mock result populated
+    });
+
+    it('returns low confidence when no base64 photos are provided (API key set)', async () => {
+      const fetchMock = vi.fn();
+      vi.stubGlobal('fetch', fetchMock);
+
+      const { analyzeGearPhotos: analyzeWithKey } = await import('../gearAnalysis');
+      const photo: GearPhoto = {
+        id: 'p4',
+        type: 'labelView',
+        url: 'https://example.com/photo.jpg', // not a data: URL → filtered out
+        createdAt: '',
+      };
+      const result = await analyzeWithKey([photo]);
+
+      expect(fetchMock).not.toHaveBeenCalled();
+      expect(result.confidence).toBe(0.1);
+    });
   });
 });

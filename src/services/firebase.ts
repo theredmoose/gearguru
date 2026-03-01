@@ -5,6 +5,7 @@ import type {
   GearItem,
   GearPhoto,
   Measurements,
+  MeasurementEntry,
   FirestoreTimestamp,
   Sport,
   SkillLevel,
@@ -17,6 +18,7 @@ import type {
 const COLLECTIONS = {
   FAMILY_MEMBERS: 'familyMembers',
   GEAR_ITEMS: 'gearItems',
+  NOTIFICATION_STATE: 'userNotificationState',
 } as const;
 
 // ============================================
@@ -29,7 +31,7 @@ async function toFirestoreTimestamp(isoString: string) {
 }
 
 export function fromFirestoreTimestamp(timestamp: FirestoreTimestamp): string {
-  return new Date(timestamp.seconds * 1000).toISOString();
+  return new Date(timestamp.seconds * 1000 + Math.round(timestamp.nanoseconds / 1e6)).toISOString();
 }
 
 function now(): string {
@@ -115,6 +117,7 @@ export async function createFamilyMember(
   const timestamp = now();
   const docData = {
     ...removeUndefined(data),
+    familyId: data.userId, // familyId === userId for now; scaffolding for future multi-family
     createdAt: await toFirestoreTimestamp(timestamp),
     updatedAt: await toFirestoreTimestamp(timestamp),
   };
@@ -127,6 +130,7 @@ export async function createFamilyMember(
   return {
     id: docRef.id,
     ...data,
+    familyId: data.userId,
     createdAt: timestamp,
     updatedAt: timestamp,
   };
@@ -149,14 +153,103 @@ export async function updateMeasurements(
   memberId: string,
   measurements: Measurements
 ): Promise<void> {
-  const { doc, updateDoc } = await import('firebase/firestore');
+  const { doc, getDoc, updateDoc } = await import('firebase/firestore');
   const db = await getDb();
   const docRef = doc(db, COLLECTIONS.FAMILY_MEMBERS, memberId);
+  const measuredAt = now();
+
+  // Build a new history entry from the incoming measurements
+  const newEntry: MeasurementEntry = {
+    id: crypto.randomUUID(),
+    recordedAt: measuredAt,
+    height: measurements.height,
+    weight: measurements.weight,
+    footLengthLeft: measurements.footLengthLeft,
+    footLengthRight: measurements.footLengthRight,
+    ...(measurements.footWidthLeft !== undefined && { footWidthLeft: measurements.footWidthLeft }),
+    ...(measurements.footWidthRight !== undefined && { footWidthRight: measurements.footWidthRight }),
+    ...(measurements.usShoeSize !== undefined && { usShoeSize: measurements.usShoeSize }),
+    ...(measurements.euShoeSize !== undefined && { euShoeSize: measurements.euShoeSize }),
+    ...(measurements.armLength !== undefined && { armLength: measurements.armLength }),
+    ...(measurements.inseam !== undefined && { inseam: measurements.inseam }),
+    ...(measurements.headCircumference !== undefined && { headCircumference: measurements.headCircumference }),
+    ...(measurements.handSize !== undefined && { handSize: measurements.handSize }),
+  };
+
+  // Read current history, prepend new entry, write back
+  const snapshot = await getDoc(docRef);
+  const existingHistory: MeasurementEntry[] = snapshot.exists()
+    ? (snapshot.data().measurementHistory ?? [])
+    : [];
+
   await updateDoc(docRef, {
     measurements: {
       ...measurements,
-      measuredAt: now(),
+      measuredAt,
     },
+    measurementHistory: [newEntry, ...existingHistory],
+    updatedAt: await toFirestoreTimestamp(measuredAt),
+  });
+}
+
+export async function addMeasurementEntry(
+  memberId: string,
+  entry: MeasurementEntry
+): Promise<void> {
+  const { doc, getDoc, updateDoc } = await import('firebase/firestore');
+  const db = await getDb();
+  const docRef = doc(db, COLLECTIONS.FAMILY_MEMBERS, memberId);
+
+  const snapshot = await getDoc(docRef);
+  const existing: MeasurementEntry[] = snapshot.exists()
+    ? (snapshot.data().measurementHistory ?? [])
+    : [];
+
+  await updateDoc(docRef, {
+    measurementHistory: [entry, ...existing],
+    updatedAt: await toFirestoreTimestamp(now()),
+  });
+}
+
+export async function updateMeasurementEntry(
+  memberId: string,
+  entryId: string,
+  updates: Partial<Omit<MeasurementEntry, 'id'>>
+): Promise<void> {
+  const { doc, getDoc, updateDoc } = await import('firebase/firestore');
+  const db = await getDb();
+  const docRef = doc(db, COLLECTIONS.FAMILY_MEMBERS, memberId);
+
+  const snapshot = await getDoc(docRef);
+  if (!snapshot.exists()) return;
+
+  const existing: MeasurementEntry[] = snapshot.data().measurementHistory ?? [];
+  const updated = existing.map((e) =>
+    e.id === entryId ? { ...e, ...updates } : e
+  );
+
+  await updateDoc(docRef, {
+    measurementHistory: updated,
+    updatedAt: await toFirestoreTimestamp(now()),
+  });
+}
+
+export async function deleteMeasurementEntry(
+  memberId: string,
+  entryId: string
+): Promise<void> {
+  const { doc, getDoc, updateDoc } = await import('firebase/firestore');
+  const db = await getDb();
+  const docRef = doc(db, COLLECTIONS.FAMILY_MEMBERS, memberId);
+
+  const snapshot = await getDoc(docRef);
+  if (!snapshot.exists()) return;
+
+  const existing: MeasurementEntry[] = snapshot.data().measurementHistory ?? [];
+  const filtered = existing.filter((e) => e.id !== entryId);
+
+  await updateDoc(docRef, {
+    measurementHistory: filtered,
     updatedAt: await toFirestoreTimestamp(now()),
   });
 }
@@ -250,8 +343,9 @@ export async function createGearItem(
   // Build document explicitly to avoid any prototype chain issues
   const docData: DocumentData = {
     userId: data.userId,
+    familyId: data.userId, // familyId === userId for now; scaffolding for future multi-family
     ownerId: data.ownerId,
-    sport: data.sport,
+    sports: data.sports,
     type: data.type,
     brand: data.brand,
     model: data.model,
@@ -275,6 +369,7 @@ export async function createGearItem(
   return {
     id: docRef.id,
     ...data,
+    familyId: data.userId,
     createdAt: timestamp,
     updatedAt: timestamp,
   };
@@ -294,7 +389,7 @@ export async function updateGearItem(
   // Add only the fields that are being updated
   if (data.userId !== undefined) updateData.userId = data.userId;
   if (data.ownerId !== undefined) updateData.ownerId = data.ownerId;
-  if (data.sport !== undefined) updateData.sport = data.sport;
+  if (data.sports !== undefined) updateData.sports = data.sports;
   if (data.type !== undefined) updateData.type = data.type;
   if (data.brand !== undefined) updateData.brand = data.brand;
   if (data.model !== undefined) updateData.model = data.model;
@@ -320,6 +415,106 @@ export async function deleteGearItem(id: string): Promise<void> {
 }
 
 // ============================================
+// REAL-TIME SUBSCRIPTIONS
+// ============================================
+
+export async function subscribeToFamilyMembers(
+  userId: string,
+  onData: (members: FamilyMember[]) => void,
+  onError: (err: Error) => void
+): Promise<() => void> {
+  const { collection, query, where, onSnapshot } = await import('firebase/firestore');
+  const db = await getDb();
+  const q = query(
+    collection(db, COLLECTIONS.FAMILY_MEMBERS),
+    where('userId', '==', userId)
+  );
+  const unsubscribe = onSnapshot(
+    q,
+    (snapshot) => {
+      const members = snapshot.docs
+        .map((doc) => docToFamilyMember(doc.id, doc.data()))
+        .sort((a, b) => a.name.localeCompare(b.name));
+      onData(members);
+    },
+    onError
+  );
+  return unsubscribe;
+}
+
+export async function subscribeToGearItems(
+  userId: string,
+  onData: (items: GearItem[]) => void,
+  onError: (err: Error) => void,
+  ownerId?: string
+): Promise<() => void> {
+  const { collection, query, where, onSnapshot } = await import('firebase/firestore');
+  const db = await getDb();
+  const constraints = ownerId
+    ? [where('userId', '==', userId), where('ownerId', '==', ownerId)]
+    : [where('userId', '==', userId)];
+  const q = query(collection(db, COLLECTIONS.GEAR_ITEMS), ...constraints);
+  const unsubscribe = onSnapshot(
+    q,
+    (snapshot) => {
+      const items = snapshot.docs
+        .map((doc) => docToGearItem(doc.id, doc.data()))
+        .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+      onData(items);
+    },
+    onError
+  );
+  return unsubscribe;
+}
+
+// ============================================
+// DOCUMENT CONVERTERS (exported for testing)
+// ============================================
+
+// ============================================
+// NOTIFICATION DISMISSALS
+// ============================================
+
+/**
+ * Returns the list of notification IDs the user has dismissed.
+ * All dismissed IDs live in a single document per user.
+ */
+export async function getDismissedNotificationIds(userId: string): Promise<string[]> {
+  const { doc, getDoc } = await import('firebase/firestore');
+  const db = await getDb();
+  const docRef = doc(db, COLLECTIONS.NOTIFICATION_STATE, userId);
+  const snapshot = await getDoc(docRef);
+  if (!snapshot.exists()) return [];
+  return (snapshot.data().dismissedIds ?? []) as string[];
+}
+
+/** Adds a notification ID to the user's dismissed list. */
+export async function dismissNotificationForUser(userId: string, notificationId: string): Promise<void> {
+  const { doc, getDoc, setDoc } = await import('firebase/firestore');
+  const db = await getDb();
+  const docRef = doc(db, COLLECTIONS.NOTIFICATION_STATE, userId);
+  const snapshot = await getDoc(docRef);
+  const existing: string[] = snapshot.exists() ? (snapshot.data().dismissedIds ?? []) : [];
+  if (!existing.includes(notificationId)) {
+    await setDoc(docRef, { dismissedIds: [...existing, notificationId], userId }, { merge: true });
+  }
+}
+
+/** Removes a notification ID from the user's dismissed list (restore). */
+export async function undismissNotificationForUser(userId: string, notificationId: string): Promise<void> {
+  const { doc, getDoc, setDoc } = await import('firebase/firestore');
+  const db = await getDb();
+  const docRef = doc(db, COLLECTIONS.NOTIFICATION_STATE, userId);
+  const snapshot = await getDoc(docRef);
+  if (!snapshot.exists()) return;
+  const existing: string[] = snapshot.data().dismissedIds ?? [];
+  await setDoc(docRef, {
+    dismissedIds: existing.filter((id) => id !== notificationId),
+    userId,
+  }, { merge: true });
+}
+
+// ============================================
 // DOCUMENT CONVERTERS (exported for testing)
 // ============================================
 
@@ -327,10 +522,12 @@ export function docToFamilyMember(id: string, data: DocumentData): FamilyMember 
   return {
     id,
     userId: data.userId,
+    familyId: data.familyId ?? data.userId, // fall back to userId for legacy docs
     name: data.name,
     dateOfBirth: data.dateOfBirth,
     gender: data.gender,
     measurements: data.measurements,
+    measurementHistory: data.measurementHistory ?? undefined,
     skillLevels: data.skillLevels,
     createdAt: fromFirestoreTimestamp(data.createdAt),
     updatedAt: fromFirestoreTimestamp(data.updatedAt),
@@ -338,18 +535,31 @@ export function docToFamilyMember(id: string, data: DocumentData): FamilyMember 
 }
 
 export function docToGearItem(id: string, data: DocumentData): GearItem {
+  // On-read migration: old docs have `sport` (string), new docs have `sports` (array)
+  const sports: Sport[] = data.sports ?? (data.sport ? [data.sport as Sport] : []);
+
+  // On-read migration: map old GearStatus values to new PRD values
+  type LegacyStatus = 'checked-out' | 'maintenance' | undefined;
+  const migrateStatus = (raw: string | undefined): import('../types').GearStatus | undefined => {
+    if (raw === 'checked-out') return 'active';
+    if (raw === 'maintenance') return 'needs-repair';
+    if (!raw) return 'available';
+    return raw as import('../types').GearStatus;
+  };
+
   return {
     id,
     userId: data.userId,
+    familyId: data.familyId ?? data.userId, // fall back to userId for legacy docs
     ownerId: data.ownerId,
-    sport: data.sport,
+    sports,
     type: data.type,
     brand: data.brand,
     model: data.model,
     size: data.size,
     year: data.year,
     condition: data.condition,
-    status: data.status,
+    status: migrateStatus(data.status as LegacyStatus | string),
     location: data.location,
     checkedOutTo: data.checkedOutTo,
     checkedOutDate: data.checkedOutDate,

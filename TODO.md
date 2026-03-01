@@ -13,13 +13,14 @@
 - [x] Skill level per sport
 - [x] List layout for gear types
 - [x] Separate settings section (DIN, Stance)
-- [x] 516 tests passing
+- [x] 686 tests passing (branch coverage 81.98%, above 80% threshold)
 - [x] CI/CD with GitHub Actions
 - [x] Deployed to Firebase Hosting
 - [x] Real gear photo analysis via Claude Vision API (with mock fallback)
 - [x] Fischer and Evosports Nordic sizing models with FA Value
 - [x] Range vs single size display toggle (per-session + default in Settings)
 - [x] Square UI (all rounded corners removed globally)
+- [x] Gear notifications — worn/fair/old-gear alerts on home screen with dismiss, view dismissed page, settings toggle (626 tests)
 
 ## Next Up
 - [x] Persist skill levels per member in database
@@ -28,17 +29,20 @@
 - [ ] Add data export (PDF/CSV)
 
 ## Future Enhancements
-- [ ] Growth tracking / size history
+- [x] Settings toggle: track foot and hand measurements as a single value or left/right separately — controls whether MemberForm and EditMeasurementEntryScreen show one field or paired L/R fields for foot length, foot width, and hand size
+
+- [x] Growth tracking / size history — measurement history with per-entry edit/delete, growth-trend analysis, ⚠ badge in MemberCard/MemberDetail/MeasureScreen
 - [ ] Hand-me-down suggestions between family members
 - [x] Brand-specific sizing charts — Fischer + Evosports Nordic models added; more manufacturers (Salomon, Atomic, Rossignol, K2) for Alpine/Snowboard
 - [ ] Add remaining manufacturer Alpine/Snowboard models (Salomon, Atomic, Rossignol, K2)
 - [ ] PWA support (offline, installable)
 - [ ] Dark mode
+- [ ] Personalized color theme — let users pick an accent color (or preset theme) in Settings, replacing the hardcoded green (#008751)
 - [ ] Multiple families / sharing
 - [ ] Age-specific sizing adjustments for children
 - [ ] Growth projections for kids (next season sizing)
-- [ ] Waist width recommendations for alpine skis
-- [ ] Binding safety check — warn when DIN setting is outside safe range for user's weight/skill
+- [x] Waist width recommendations for alpine skis — terrain selector (Groomed/All-Mountain/Powder) with mm ranges (PR #54)
+- [x] Binding safety check — inline green/amber/red badges in Gear Settings when stored DIN is outside safe range (PR #55)
 - [ ] Multi-brand sizing comparison view when adding gear
 - [ ] Equipment lifespan tracking based on condition progression
 - [ ] Stance width measurement guide (visual diagram)
@@ -47,11 +51,11 @@
 
 ## Technical Debt
 - [x] Code-split Firebase to reduce bundle size — chunks exceed 500KB after minification (currently 680KB), use dynamic imports
-- [ ] Add E2E tests with Playwright
-- [x] Increase test coverage to 80%+ for branches/functions — 88% stmts, 82% branches, 86% functions, 90% lines (516 tests)
-- [ ] Increase PhotoCapture test coverage (currently 38.2% — lowest in codebase)
-- [ ] Extract GEAR_TYPE_LABELS and SPORT_LABELS to a shared constants file (currently duplicated across GearCard, MemberDetail, SettingsScreen, etc.)
-- [ ] Add useMemo to MemberDetail sizingCards calculation (recalculates on every render)
+- [x] Add E2E tests with Playwright — 15 auth-page smoke tests (PR #53)
+- [x] Increase test coverage to 80%+ for branches/functions — 88% stmts, 82% branches, 86% functions, 90% lines (626 tests)
+- [x] Increase PhotoCapture test coverage — from 38.2% to 96.6% statements / 100% functions (PR #52)
+- [x] Extract GEAR_TYPE_LABELS and SPORT_LABELS to a shared constants file — moved to `src/constants/labels.ts` (PR #51)
+- [x] Add useMemo to MemberDetail sizingCards calculation (PR #51)
 
 ## Known Issues
 
@@ -71,8 +75,8 @@
 - [x] Zero foot measurements cause invalid shoe sizes — `MemberDetail.tsx` shows "N/A" message when footLength is 0
 - [x] No validation for negative/zero measurements — MemberForm now validates weight > 0
 - [x] Missing Firebase env var validation — `src/config/firebase.ts` now throws with clear error listing missing vars
-- [ ] No account linking flow — users get stuck signing in with Google after creating email account with same address
-- [ ] No offline error handling — Firebase operations show raw errors when offline
+- [x] No account linking flow — fixed: `auth/account-exists-with-different-credential` detected in `useAuth`; conflict email extracted and surfaced; `AuthForm` auto-switches to sign-in mode with email pre-filled and shows guidance banner
+- [x] No offline error handling — read errors in App.tsx now use `getOperationErrorMessage()` with `'load'` context; network/unavailable codes produce friendly messages
 - [x] Year field in GearForm accepts invalid values — added submit-time validation (1980–currentYear+1); HTML min/max updated to match
 - [x] GearForm numeric fields (tip/waist/tail profile) use parseFloat/parseInt without isNaN guard — fixed: profile only built when all three fields parse to valid integers
 - [x] Foot measurement bounds not validated — MemberForm now validates 12–30 cm range with error message; HTML min/max updated
@@ -82,12 +86,12 @@
 - [x] No date-of-birth bounds validation — MemberForm now rejects future dates and dates > 120 years ago
 - [x] nordic-combi in skillLevels but not in SPORTS array — `SportSizing.tsx` now omits nordic-combi when persisting skill levels
 - [x] US shoe size conversion inconsistency — `sizing.ts` now uses `getShoeSizesFromFootLength()` from shoeSize service
-- [ ] Potential undefined skillLevel access — `skillLevels[currentSport.id]` in SportSizing has no fallback
+- [x] Potential undefined skillLevel access — already handled: `skillLevels` state initialised for all 6 sports with `?? 'intermediate'` fallback on line 68 of SportSizing.tsx
 - [x] No loading state for gear operations — gear delete/submit in App.tsx show no loading indicators; mutations now catch errors and surface a dismissible toast
 - [x] Race condition in useAuth — `setLoading(false)` and `setError()` now guarded by mounted ref
-- [ ] No email verification on signup — email accounts created without verifying address
+- [x] No email verification on signup — fixed: `sendEmailVerification` called after email signup; amber banner shown to unverified users with "Resend email" button in `App.tsx`
 - [x] Hockey skate width thresholds (0.36, 0.40) hardcoded without source documentation — added Bauer/CCM fit guide comments to `determineSkateWidth()`
-- [ ] Firestore timestamp conversion drops nanoseconds (`firebase.ts:32`) — minor precision loss
+- [x] Firestore timestamp conversion drops nanoseconds — fixed: now includes `Math.round(nanoseconds / 1e6)` in milliseconds calculation
 
 ## Notes
 - App URL: https://gearguru-b3bc8.web.app

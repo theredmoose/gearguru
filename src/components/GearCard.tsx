@@ -2,6 +2,7 @@ import { Pencil, Trash2, MapPin } from 'lucide-react';
 import type { GearItem, FamilyMember } from '../types';
 import { GearStatusBadge } from './GearStatusBadge';
 import { GearTypeIcon } from './GearIcons';
+import { GEAR_TYPE_LABELS, SPORT_LABELS } from '../constants/labels';
 
 interface GearCardProps {
   item: GearItem;
@@ -10,26 +11,6 @@ interface GearCardProps {
   showOwner?: boolean;
   members?: FamilyMember[];
 }
-
-const GEAR_TYPE_LABELS: Record<string, string> = {
-  ski: 'Skis',
-  pole: 'Poles',
-  boot: 'Boots',
-  binding: 'Bindings',
-  snowboard: 'Snowboard',
-  skate: 'Skates',
-  helmet: 'Helmet',
-  other: 'Other',
-};
-
-const SPORT_LABELS: Record<string, string> = {
-  'nordic-classic': 'Nordic Classic',
-  'nordic-skate': 'Nordic Skate',
-  'nordic-combi': 'Nordic Combi',
-  alpine: 'Alpine',
-  snowboard: 'Snowboard',
-  hockey: 'Hockey',
-};
 
 const CONDITION_COLORS: Record<string, string> = {
   new:  '#22c55e',
@@ -83,7 +64,7 @@ export function GearCard({
 
   return (
     <div
-      className="gear-card bg-white border border-slate-200 rounded-2xl p-3.5 flex items-center gap-3 shadow-sm hover:shadow-md active:scale-[0.98] transition-all cursor-pointer mb-3"
+      className="gear-card bg-white border border-slate-200 rounded-3xl p-3.5 flex items-center gap-3 shadow-sm hover:shadow-md active:scale-[0.98] transition-all cursor-pointer mb-3"
       onClick={() => onEdit(item)}
     >
       {/* Icon tile or photo */}
@@ -118,7 +99,7 @@ export function GearCard({
           >
             {item.condition}
           </span>
-          {item.status && item.status !== 'available' && (
+          {item.status && !['active', 'available'].includes(item.status) && (
             <GearStatusBadge status={item.status} size="small" />
           )}
         </div>
@@ -161,24 +142,25 @@ export function GearCard({
           </div>
         )}
 
-        {/* Checkout */}
-        {item.status === 'checked-out' && item.checkedOutTo && (
-          <p className="text-[10px] text-orange-500 font-bold mt-0.5">
-            Out: {item.checkedOutTo}
-          </p>
-        )}
-
         {/* Owner / Sport */}
         {showOwner
           ? <p className="text-[10px] text-slate-400 font-bold mt-0.5">{ownerName}</p>
-          : <p className="text-[10px] text-slate-400 font-bold mt-0.5">{SPORT_LABELS[item.sport] ?? item.sport}</p>
+          : (
+            <div className="flex flex-wrap gap-1 mt-0.5">
+              {item.sports.map((s) => (
+                <span key={s} className="text-[9px] font-black px-1.5 py-0.5 rounded-md bg-slate-100 text-slate-500 uppercase tracking-wide">
+                  {SPORT_LABELS[s] ?? s}
+                </span>
+              ))}
+            </div>
+          )
         }
       </div>
 
       {/* Actions */}
       <div className="flex flex-col gap-1 flex-shrink-0">
         <button
-          className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-slate-100 transition-colors text-slate-400 hover:text-blue-600"
+          className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-slate-100 transition-colors text-slate-400 hover:text-[#008751]"
           onClick={handleEdit}
           aria-label="Edit gear"
         >
