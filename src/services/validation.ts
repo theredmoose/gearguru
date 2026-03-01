@@ -131,8 +131,10 @@ export function parseSkiProfile(tip: string, waist: string, tail: string): SkiPr
 }
 
 export function validateDateOfBirth(dob: string): string | null {
-  // Parse dob as UTC (YYYY-MM-DD strings are UTC per spec)
+  if (!dob) return null; // caller is responsible for requiring the field
   const dobDate = new Date(dob);
+  if (isNaN(dobDate.getTime())) return 'Date of birth is invalid';
+  // Parse dob as UTC (YYYY-MM-DD strings are UTC per spec)
   const now = new Date();
   // Build UTC-based comparison dates to match how Date parses "YYYY-MM-DD"
   const todayUTC = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()));

@@ -203,6 +203,9 @@ describe('parseSkiProfile', () => {
   it('returns null when all fields are empty', () => {
     expect(parseSkiProfile('', '', '')).toBeNull();
   });
+  it('truncates decimal strings to integers (parseInt behavior)', () => {
+    expect(parseSkiProfile('120.5', '80', '110')).toEqual({ tip: 120, waist: 80, tail: 110 });
+  });
 });
 
 describe('validateDateOfBirth', () => {
@@ -224,5 +227,11 @@ describe('validateDateOfBirth', () => {
     minDate.setFullYear(minDate.getFullYear() - 120);
     const result = validateDateOfBirth(minDate.toISOString().slice(0, 10));
     expect(result).toBeNull();
+  });
+  it('returns null for empty string (field is optional at this level)', () => {
+    expect(validateDateOfBirth('')).toBeNull();
+  });
+  it('errors for invalid date string', () => {
+    expect(validateDateOfBirth('not-a-date')).toBe('Date of birth is invalid');
   });
 });
