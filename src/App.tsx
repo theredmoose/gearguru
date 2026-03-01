@@ -27,10 +27,14 @@ import {
   MeasureScreen,
   ResourcesScreen,
   SettingsScreen,
+  MeasurementHistoryScreen,
+  EditMeasurementEntryScreen,
+  NotificationsPanel,
+  NotificationsScreen,
 } from './components';
 import type { TopLevelTab } from './components';
-import { useFamilyMembers, useAuth, useGearItems, useSettings } from './hooks';
-import type { FamilyMember, GearItem, Sport } from './types';
+import { useFamilyMembers, useAuth, useGearItems, useSettings, useNotifications } from './hooks';
+import type { FamilyMember, GearItem, Sport, MeasurementEntry } from './types';
 
 type View =
   | 'home'
@@ -42,7 +46,10 @@ type View =
   | 'inventory'
   | 'add-gear'
   | 'edit-gear'
-  | 'settings';
+  | 'settings'
+  | 'measurement-history'
+  | 'edit-measurement-entry'
+  | 'notifications';
 
 function App() {
   const {
@@ -65,6 +72,8 @@ function App() {
   const { items: gearItems, addItem: addGearItem, updateItem: updateGearItem, deleteItem: deleteGearItem } =
     useGearItems(user?.uid ?? null);
   const { settings, updateSettings, resetSettings } = useSettings();
+  const { activeNotifications, dismissedNotifications, dismiss: dismissNotification, undismiss: undismissNotification } =
+    useNotifications(user?.uid ?? null, members, gearItems, settings.notificationsEnabled);
 
   const [view, setView] = useState<View>('home');
   const [activeTab, setActiveTab] = useState<TopLevelTab>('family');
@@ -73,6 +82,8 @@ function App() {
   const [selectedGearItem, setSelectedGearItem] = useState<GearItem | null>(null);
   const [gearOwnerId, setGearOwnerId] = useState<string | null>(null);
   const [gearDefaultSport, setGearDefaultSport] = useState<Sport | undefined>(undefined);
+  const [selectedMeasurementEntry, setSelectedMeasurementEntry] = useState<MeasurementEntry | null>(null);
+  const [verificationResent, setVerificationResent] = useState(false);
 
   // ── Tab navigation ──────────────────────────────────────────────
   const handleTabChange = (tab: TopLevelTab) => {
@@ -152,7 +163,7 @@ function App() {
   const handleEditGear = (item: GearItem) => {
     setSelectedGearItem(item);
     setGearOwnerId(item.ownerId);
-    setGearDefaultSport(item.sport);
+    setGearDefaultSport(item.sports[0]);
     setView('edit-gear');
   };
 
@@ -246,56 +257,75 @@ function App() {
       default: // 'family'
         return (
           <div className="flex flex-col min-h-0 flex-1">
-            {/* Blue app header */}
-            <div className="px-6 py-4 bg-blue-700 border-b border-blue-800 shadow-sm flex items-center justify-between">
-              <div>
-                <h1 className="text-lg font-black text-white tracking-tight">Gear Guru</h1>
-                <p className="text-blue-200 text-xs">Sports equipment sizing</p>
-              </div>
-              <div className="flex items-center gap-3">
-                <span className="text-blue-200 text-xs truncate max-w-[100px]">
-                  {user.displayName || user.email}
-                </span>
+            {/* App header */}
+            <div className="px-6 bg-white border-b border-slate-100 shadow-sm">
+              {/* spacing row above */}
+              <div className="h-5" />
+              {/* centered logo row */}
+              <div className="flex items-center justify-center relative">
+                <h1 className="text-xl font-black text-slate-900 tracking-tighter uppercase text-center">
+                  Gear <span style={{ color: '#008751' }}>Guru</span>
+                </h1>
                 <button
                   onClick={() => setView('settings')}
-                  className="p-1.5 hover:bg-blue-600 rounded-full transition-colors"
+                  className="absolute right-0 p-3 bg-slate-50 border border-slate-100 rounded-2xl text-emerald-700 shadow-sm hover:bg-white transition-all"
                   aria-label="Open settings"
                 >
-                  <Settings className="w-5 h-5 text-white" />
+                  <Settings className="w-5 h-5" />
                 </button>
               </div>
+              {/* spacing row below */}
+              <div className="h-5" />
             </div>
 
-            <div className="flex-1 overflow-y-auto bg-white px-6 py-6">
+            <NotificationsPanel
+              notifications={activeNotifications}
+              onDismiss={dismissNotification}
+              onViewDismissed={() => setView('notifications')}
+            />
+
+            <div className="flex-1 overflow-y-auto bg-[#F8FAFC] px-5 py-5">
               {loading && <p className="loading">Loading...</p>}
               {error && <p className="error-state">{getOperationErrorMessage(error, 'load')}</p>}
 
               {!loading && !error && members.length === 0 && (
-                <p className="empty-state">
-                  No family members yet. Add someone to get started with equipment sizing.
-                </p>
-              )}
-
-              {!loading && members.length > 0 && (
-                <div className="member-list mb-4">
-                  {members.map((member) => (
-                    <MemberCard
-                      key={member.id}
-                      member={member}
-                      onSelect={handleSelectMember}
-                      onEdit={handleEditMember}
-                      onDelete={handleDeleteMember}
-                    />
-                  ))}
+                <div className="flex flex-col items-center justify-center py-14 text-center">
+                  <div className="w-16 h-16 rounded-2xl bg-emerald-50 border border-emerald-100 flex items-center justify-center mb-4">
+                    <span className="text-3xl">⛷️</span>
+                  </div>
+                  <p className="text-base font-black text-slate-800 mb-1">No family members yet</p>
+                  <p className="text-sm text-slate-400 mb-6">Add someone to start tracking gear sizes</p>
+                  <button
+                    className="btn btn-primary"
+                    onClick={() => { setSelectedMember(null); setView('add'); }}
+                  >
+                    + Add Family Member
+                  </button>
                 </div>
               )}
 
-              <button
-                className="btn btn-primary"
-                onClick={() => { setSelectedMember(null); setView('add'); }}
-              >
-                + Add Family Member
-              </button>
+              {!loading && members.length > 0 && (
+                <>
+                  <p className="text-xs font-black text-slate-400 uppercase tracking-widest mb-3">Your Family</p>
+                  <div className="flex flex-col gap-2 mb-5">
+                    {members.map((member) => (
+                      <MemberCard
+                        key={member.id}
+                        member={member}
+                        onSelect={handleSelectMember}
+                        onEdit={handleEditMember}
+                        onDelete={handleDeleteMember}
+                      />
+                    ))}
+                  </div>
+                  <button
+                    className="w-full flex items-center justify-center gap-2 py-3.5 border-2 border-dashed border-slate-200 rounded-2xl text-sm font-bold text-slate-400 hover:border-emerald-300 hover:text-emerald-600 transition-all"
+                    onClick={() => { setSelectedMember(null); setView('add'); }}
+                  >
+                    <span className="text-base leading-none">+</span> Add Family Member
+                  </button>
+                </>
+              )}
             </div>
           </div>
         );
@@ -303,6 +333,16 @@ function App() {
   };
 
   const renderView = () => {
+    if (view === 'notifications') {
+      return (
+        <NotificationsScreen
+          notifications={dismissedNotifications}
+          onUndismiss={undismissNotification}
+          onBack={() => setView('home')}
+        />
+      );
+    }
+
     if (view === 'settings') {
       return (
         <SettingsScreen
@@ -323,6 +363,7 @@ function App() {
           member={view === 'edit' ? selectedMember ?? undefined : undefined}
           onSubmit={view === 'edit' ? handleUpdateMember : handleAddMember}
           onCancel={() => setView(selectedMember ? 'detail' : 'home')}
+          separateFeetHands={settings.display.separateFeetHands}
         />
       );
     }
@@ -339,8 +380,42 @@ function App() {
           onEdit={() => setView('edit')}
           onGetSizing={() => setView('sizing')}
           onOpenConverter={() => setView('converter')}
-          onAddGear={() => handleAddGearFromSizing('alpine')}
+          onAddGear={handleAddGearFromSizing}
           onEditGear={handleEditGear}
+          onViewHistory={() => setView('measurement-history')}
+        />
+      );
+    }
+
+    if (view === 'measurement-history' && selectedMember) {
+      return (
+        <MeasurementHistoryScreen
+          member={selectedMember}
+          onBack={() => setView('detail')}
+          onEditEntry={(entry) => {
+            setSelectedMeasurementEntry(entry);
+            setView('edit-measurement-entry');
+          }}
+          onAddEntry={() => {
+            setSelectedMeasurementEntry(null);
+            setView('edit-measurement-entry');
+          }}
+          onHistoryUpdated={(updatedMember) => setSelectedMember(updatedMember)}
+        />
+      );
+    }
+
+    if (view === 'edit-measurement-entry' && selectedMember) {
+      return (
+        <EditMeasurementEntryScreen
+          member={selectedMember}
+          entry={selectedMeasurementEntry}
+          onBack={() => setView('measurement-history')}
+          onSaved={(updatedMember) => {
+            setSelectedMember(updatedMember);
+            setView('measurement-history');
+          }}
+          separateFeetHands={settings.display.separateFeetHands}
         />
       );
     }

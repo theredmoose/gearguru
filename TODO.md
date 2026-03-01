@@ -13,13 +13,14 @@
 - [x] Skill level per sport
 - [x] List layout for gear types
 - [x] Separate settings section (DIN, Stance)
-- [x] 516 tests passing
+- [x] 686 tests passing (branch coverage 81.98%, above 80% threshold)
 - [x] CI/CD with GitHub Actions
 - [x] Deployed to Firebase Hosting
 - [x] Real gear photo analysis via Claude Vision API (with mock fallback)
 - [x] Fischer and Evosports Nordic sizing models with FA Value
 - [x] Range vs single size display toggle (per-session + default in Settings)
 - [x] Square UI (all rounded corners removed globally)
+- [x] Gear notifications — worn/fair/old-gear alerts on home screen with dismiss, view dismissed page, settings toggle (626 tests)
 
 ## Next Up
 - [x] Persist skill levels per member in database
@@ -28,17 +29,20 @@
 - [ ] Add data export (PDF/CSV)
 
 ## Future Enhancements
-- [ ] Growth tracking / size history
+- [x] Settings toggle: track foot and hand measurements as a single value or left/right separately — controls whether MemberForm and EditMeasurementEntryScreen show one field or paired L/R fields for foot length, foot width, and hand size
+
+- [x] Growth tracking / size history — measurement history with per-entry edit/delete, growth-trend analysis, ⚠ badge in MemberCard/MemberDetail/MeasureScreen
 - [ ] Hand-me-down suggestions between family members
 - [x] Brand-specific sizing charts — Fischer + Evosports Nordic models added; more manufacturers (Salomon, Atomic, Rossignol, K2) for Alpine/Snowboard
 - [ ] Add remaining manufacturer Alpine/Snowboard models (Salomon, Atomic, Rossignol, K2)
 - [ ] PWA support (offline, installable)
 - [ ] Dark mode
+- [ ] Personalized color theme — let users pick an accent color (or preset theme) in Settings, replacing the hardcoded green (#008751)
 - [ ] Multiple families / sharing
 - [ ] Age-specific sizing adjustments for children
 - [ ] Growth projections for kids (next season sizing)
-- [ ] Waist width recommendations for alpine skis
-- [ ] Binding safety check — warn when DIN setting is outside safe range for user's weight/skill
+- [x] Waist width recommendations for alpine skis — terrain selector (Groomed/All-Mountain/Powder) with mm ranges (PR #54)
+- [x] Binding safety check — inline green/amber/red badges in Gear Settings when stored DIN is outside safe range (PR #55)
 - [ ] Multi-brand sizing comparison view when adding gear
 - [ ] Equipment lifespan tracking based on condition progression
 - [ ] Stance width measurement guide (visual diagram)
@@ -47,11 +51,11 @@
 
 ## Technical Debt
 - [x] Code-split Firebase to reduce bundle size — chunks exceed 500KB after minification (currently 680KB), use dynamic imports
-- [ ] Add E2E tests with Playwright
-- [x] Increase test coverage to 80%+ for branches/functions — 88% stmts, 82% branches, 86% functions, 90% lines (516 tests)
-- [ ] Increase PhotoCapture test coverage (currently 38.2% — lowest in codebase)
-- [ ] Extract GEAR_TYPE_LABELS and SPORT_LABELS to a shared constants file (currently duplicated across GearCard, MemberDetail, SettingsScreen, etc.)
-- [ ] Add useMemo to MemberDetail sizingCards calculation (recalculates on every render)
+- [x] Add E2E tests with Playwright — 15 auth-page smoke tests (PR #53)
+- [x] Increase test coverage to 80%+ for branches/functions — 88% stmts, 82% branches, 86% functions, 90% lines (626 tests)
+- [x] Increase PhotoCapture test coverage — from 38.2% to 96.6% statements / 100% functions (PR #52)
+- [x] Extract GEAR_TYPE_LABELS and SPORT_LABELS to a shared constants file — moved to `src/constants/labels.ts` (PR #51)
+- [x] Add useMemo to MemberDetail sizingCards calculation (PR #51)
 
 ## Known Issues
 

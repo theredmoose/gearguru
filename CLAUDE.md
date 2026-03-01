@@ -13,13 +13,62 @@ Gear Guru is a personal sports equipment sizing database and calculator for trac
 
 The application manages personal measurements (height, weight, foot dimensions, etc.) and uses sizing formulas from various manufacturer charts to recommend appropriate equipment sizes.
 
+## Tech Stack
+
+- **Framework**: React 18 + TypeScript
+- **Build Tool**: Vite (dev server at `http://localhost:5173`)
+- **Styling**: Tailwind CSS v4
+- **Backend/DB**: Firebase Firestore + Firebase Hosting
+- **AI Integration**: Anthropic SDK (`@anthropic-ai/sdk`)
+- **Routing**: React Router DOM v7
+- **Testing**: Vitest + React Testing Library (unit), Playwright (e2e)
+- **Node.js**: 20+, **npm**: 10+
+
+## Commands
+
+```bash
+npm run dev            # Start dev server (localhost:5173)
+npm run build          # tsc + Vite production build
+npm run preview        # Preview production build locally
+npm run lint           # ESLint
+npm test               # Vitest in watch mode
+npm run test:run       # Vitest run once (CI)
+npm run test:coverage  # Coverage report
+npm run test:e2e       # Playwright e2e tests
+firebase deploy --only hosting   # Deploy to Firebase Hosting
+firebase deploy --only firestore:rules  # Deploy security rules
+```
+
+## Project Structure
+
+```
+src/
+├── components/   # Reusable React components
+├── screens/      # Top-level screen components
+├── services/     # Business logic (sizing calculations, conversions)
+├── hooks/        # React hooks (Firebase integration)
+├── types/        # TypeScript type definitions
+├── config/       # Firebase configuration
+├── constants/    # Shared constants
+└── utils/        # Utility functions
+tests/            # Vitest unit tests
+e2e/              # Playwright e2e tests (auth.spec.ts)
+docs/             # PRD, testing docs
+```
+
+## Environment Setup
+
+Requires `.env.local` with Firebase credentials (copy from `.env.example`):
+```
+VITE_FIREBASE_API_KEY=...
+VITE_FIREBASE_AUTH_DOMAIN=...
+VITE_FIREBASE_PROJECT_ID=...
+```
+
 ## Project Status
 
-This project is in the requirements/planning phase. The requirements specification is in `docs/requirements/Gear Guru.xlsx` which contains:
-- Data entry forms for family member measurements
-- Lookup tables for equipment sizing from various vendors
-- Sizing calculation formulas and conversion charts
-- Existing gear inventory tracking
+The app is fully implemented and deployed at https://gearguru-b3bc8.web.app.
+The requirements specification at `docs/requirements/Gear Guru.xlsx` serves as the source of truth for sizing formulas and lookup tables.
 
 ## Key Domain Concepts
 
@@ -47,8 +96,25 @@ Always create a new branch for changes. Use standard naming conventions:
 - `update/` - updates to existing functionality (e.g., `update/member-form-validation`)
 - `refactor/` - code refactoring (e.g., `refactor/services-cleanup`)
 
+### Worktrees (Required)
+All feature work **must** be done in a git worktree — never directly on a checked-out branch in the main working directory. This project is developed across multiple concurrent CLI sessions, and shared working directory state (HEAD, stash, uncommitted files) causes conflicts between sessions.
+
+```bash
+# Start new feature work
+git worktree add .worktrees/<branch-name> -b <branch-name>
+cd .worktrees/<branch-name>
+
+# List active worktrees
+git worktree list
+
+# Remove after merging
+git worktree remove .worktrees/<branch-name>
+```
+
+Worktrees live in `.worktrees/` (gitignored). Each has its own working directory and index, so concurrent sessions cannot interfere.
+
 ### Workflow
-1. **Create a feature branch** from `main` before making changes
+1. **Create a worktree** from `main` for every branch before making changes
 2. **Run all tests** before committing (`npm test`)
 3. **Ensure tests pass** - do not commit with failing tests
 4. **Write descriptive commit messages** explaining the "why" not just the "what"
@@ -75,3 +141,9 @@ Types: `Add`, `Fix`, `Update`, `Refactor`, `Remove`, `Move`
 - All new features must include tests
 - All existing tests must pass before merging
 - Run `npm test` to execute the test suite
+
+### PR Review Checklist
+When preparing or reviewing a PR, always recommend whether any new settings should be tracked:
+- If the feature introduces user-configurable behaviour, add a field to `AppSettings` (persisted via `useSettings` / localStorage) and expose a toggle in `SettingsScreen`.
+- Add `notificationsEnabled: true` (or equivalent default) to `DEFAULT_SETTINGS` so the field is backwards-compatible with existing stored settings.
+- Note in the PR description which, if any, new settings were added.

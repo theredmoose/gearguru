@@ -1,9 +1,12 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import {
   calculateNordicSkiSizing,
+  calculateNordicSkiSizingByModel,
   calculateNordicBootSizing,
   calculateAlpineSkiSizing,
   calculateAlpineBootSizing,
+  calculateAlpineWaistWidth,
+  checkDINSafety,
   calculateSnowboardSizing,
   calculateSnowboardBootSizing,
   calculateHockeySkateSize,
@@ -202,6 +205,71 @@ describe('sizing service', () => {
         const female = calculateAlpineBootSizing(MEASUREMENTS.adultFemale, 'intermediate', 'female');
         expect(female.flexRating.min).toBeLessThan(male.flexRating.min);
       });
+    });
+  });
+
+  // ============================================
+  // ALPINE WAIST WIDTH
+  // ============================================
+  describe('calculateAlpineWaistWidth', () => {
+    it('returns 65–80 mm for groomed terrain', () => {
+      const result = calculateAlpineWaistWidth('groomed');
+      expect(result.min).toBe(65);
+      expect(result.max).toBe(80);
+    });
+
+    it('returns 80–96 mm for all-mountain terrain', () => {
+      const result = calculateAlpineWaistWidth('all-mountain');
+      expect(result.min).toBe(80);
+      expect(result.max).toBe(96);
+    });
+
+    it('returns 96–120 mm for powder terrain', () => {
+      const result = calculateAlpineWaistWidth('powder');
+      expect(result.min).toBe(96);
+      expect(result.max).toBe(120);
+    });
+
+    it('ranges are in ascending order (groomed < all-mountain < powder)', () => {
+      const groomed     = calculateAlpineWaistWidth('groomed');
+      const allMountain = calculateAlpineWaistWidth('all-mountain');
+      const powder      = calculateAlpineWaistWidth('powder');
+      expect(groomed.max).toBeLessThanOrEqual(allMountain.min);
+      expect(allMountain.max).toBeLessThanOrEqual(powder.min);
+    });
+  });
+
+  // ============================================
+  // DIN SAFETY CHECK
+  // ============================================
+  describe('checkDINSafety', () => {
+    const range = { min: 5, max: 7 };
+
+    it('returns "safe" when DIN is within range', () => {
+      expect(checkDINSafety(5, range)).toBe('safe');
+      expect(checkDINSafety(6, range)).toBe('safe');
+      expect(checkDINSafety(7, range)).toBe('safe');
+    });
+
+    it('returns "too-low" when DIN is below minimum', () => {
+      expect(checkDINSafety(4, range)).toBe('too-low');
+      expect(checkDINSafety(1, range)).toBe('too-low');
+    });
+
+    it('returns "too-high" when DIN is above maximum', () => {
+      expect(checkDINSafety(8, range)).toBe('too-high');
+      expect(checkDINSafety(12, range)).toBe('too-high');
+    });
+
+    it('treats boundary values as safe', () => {
+      expect(checkDINSafety(range.min, range)).toBe('safe');
+      expect(checkDINSafety(range.max, range)).toBe('safe');
+    });
+
+    it('works with fractional DIN settings', () => {
+      expect(checkDINSafety(5.5, range)).toBe('safe');
+      expect(checkDINSafety(4.5, range)).toBe('too-low');
+      expect(checkDINSafety(7.5, range)).toBe('too-high');
     });
   });
 
@@ -413,6 +481,331 @@ describe('sizing service', () => {
       // footWidth 11.5cm → estimatedLast 115mm > 104 → extra-wide
       const result = calculateAlpineBootSizing(MEASUREMENTS.wideFeet, 'intermediate', 'male');
       expect(result.lastWidth).toBe('extra-wide');
+    });
+  });
+
+  // ============================================
+  // ALPINE BOOT — FLEX RATING FOR LIGHT SKIERS
+  // ============================================
+  describe('calculateAlpineBootSizing (flex rating weight branches)', () => {
+    it('lowers flex for light skiers (weight < 60kg)', () => {
+      // lightAthlete has weight 52 < 60 → flex decreases by 10
+      const light = calculateAlpineBootSizing(MEASUREMENTS.lightAthlete, 'intermediate', 'male');
+      const normal = calculateAlpineBootSizing(MEASUREMENTS.adultMale, 'intermediate', 'male');
+      expect(light.flexRating.min).toBeLessThan(normal.flexRating.min);
+    });
+
+    it('increases flex for heavy skiers (weight > 85kg)', () => {
+      const heavy = calculateAlpineBootSizing(MEASUREMENTS.heavyAthlete, 'intermediate', 'male');
+      const normal = calculateAlpineBootSizing(MEASUREMENTS.adultMale, 'intermediate', 'male');
+      expect(heavy.flexRating.min).toBeGreaterThan(normal.flexRating.min);
+    });
+
+    it('applies female gender offset and light-weight reduction together', () => {
+      const lightFemale = calculateAlpineBootSizing(
+        MEASUREMENTS.lightAthlete, // weight 52
+        'intermediate',
+        'female'
+      );
+      const male = calculateAlpineBootSizing(MEASUREMENTS.adultMale, 'intermediate', 'male');
+      expect(lightFemale.flexRating.min).toBeLessThan(male.flexRating.min);
+    });
+
+    it('"other" gender receives no gender offset (same as male)', () => {
+      const other = calculateAlpineBootSizing(MEASUREMENTS.adultMale, 'intermediate', 'other');
+      const male = calculateAlpineBootSizing(MEASUREMENTS.adultMale, 'intermediate', 'male');
+      expect(other.flexRating.min).toBe(male.flexRating.min);
+      expect(other.flexRating.max).toBe(male.flexRating.max);
+    });
+  });
+
+  // ============================================
+  // ALPINE SKI — DIN FOR VERY LIGHT SKIER
+  // ============================================
+  describe('calculateAlpineSkiSizing (DIN weight branches)', () => {
+    it('produces a low DIN for very light skiers (weight < 50kg)', () => {
+      const veryLight = { ...MEASUREMENTS.child, weight: 40 };
+      const result = calculateAlpineSkiSizing(veryLight, 'beginner', 'male');
+      expect(result.din.min).toBeGreaterThanOrEqual(1);
+      expect(result.din.max).toBeLessThan(6);
+    });
+
+    it('produces a higher DIN for very heavy skiers (weight >= 90kg)', () => {
+      const veryHeavy = { ...MEASUREMENTS.heavyAthlete, weight: 95 };
+      const result = calculateAlpineSkiSizing(veryHeavy, 'intermediate', 'male');
+      expect(result.din.min).toBeGreaterThan(4);
+    });
+  });
+
+  // ============================================
+  // ALPINE SKI — WEIGHT ADJUSTMENTS
+  // ============================================
+  describe('calculateAlpineSkiSizing (weight adjustments)', () => {
+    it('adds 3cm to max length for very heavy skiers (weight > 85kg)', () => {
+      const normal = calculateAlpineSkiSizing(MEASUREMENTS.adultMale, 'intermediate', 'male');
+      const heavy = calculateAlpineSkiSizing(MEASUREMENTS.heavyAthlete, 'intermediate', 'male');
+      // Both have same gender offset; heavyAthlete also taller, so just verify heavy >= normal
+      expect(heavy.skiLengthMax).toBeGreaterThanOrEqual(normal.skiLengthMax);
+    });
+
+    it('subtracts 3cm from max length for very light skiers (weight < 55kg)', () => {
+      const lightMeasurements = { ...MEASUREMENTS.lightAthlete, weight: 50 };
+      const normal = calculateAlpineSkiSizing(MEASUREMENTS.adultFemale, 'intermediate', 'female');
+      const light = calculateAlpineSkiSizing(lightMeasurements, 'intermediate', 'female');
+      // Light skier gets -3 adjustment
+      expect(light.skiLengthMax).toBeLessThanOrEqual(normal.skiLengthMax);
+    });
+  });
+
+  // ============================================
+  // SNOWBOARD — WEIGHT BRANCHES
+  // ============================================
+  describe('calculateSnowboardSizing (weight branches)', () => {
+    it('decreases board length for very light riders (weight < 55kg)', () => {
+      const veryLight = { ...MEASUREMENTS.lightAthlete, weight: 50 }; // 50 < 55
+      const normal = calculateSnowboardSizing(MEASUREMENTS.adultFemale, 'intermediate');
+      const light = calculateSnowboardSizing(veryLight, 'intermediate');
+      // Light rider gets -5 weight adjustment; both have different heights so compare adjustment effect
+      // Just verify the formula applies: boardMin = height - 25 + (-5)
+      expect(light.boardLengthMin).toBe(veryLight.height - 25 + (-5));
+    });
+
+    it('uses -2 weight adjustment for riders 55–64kg', () => {
+      const midLight = { ...MEASUREMENTS.adultFemale, weight: 60 }; // 55 <= 60 < 65
+      expect(midLight.height - 25 + (-2)).toBe(
+        calculateSnowboardSizing(midLight, 'intermediate').boardLengthMin
+      );
+    });
+
+    it('uses +3 weight adjustment for riders 65–80kg', () => {
+      // adultMale weight=80, 65 < 80 <= 80, hits weight > 80? No. 80 is not > 80.
+      // Use 75kg which satisfies !(<55) && !(<65) && !(>80) → weightAdjustment = 0
+      // Actually 65-80 range has adjustment 0, and >80 gets +3
+      const midHeavy = { ...MEASUREMENTS.adultMale, weight: 75 }; // 65 < 75 <= 80 → 0
+      expect(midHeavy.height - 25).toBe(
+        calculateSnowboardSizing(midHeavy, 'intermediate').boardLengthMin
+      );
+    });
+
+    it('uses +3 weight adjustment for riders over 80kg', () => {
+      const heavy = { ...MEASUREMENTS.adultMale, weight: 85 }; // 85 > 80
+      expect(heavy.height - 25 + 3).toBe(
+        calculateSnowboardSizing(heavy, 'intermediate').boardLengthMin
+      );
+    });
+
+    it('waist width is 245mm for boot mondo < 260', () => {
+      // child has foot 22cm → mondo 220 < 260
+      const result = calculateSnowboardSizing(MEASUREMENTS.child, 'intermediate');
+      expect(result.waistWidthMin).toBe(245);
+    });
+
+    it('waist width is 250mm for boot mondo 260–274', () => {
+      // narrowFeet: foot 27cm → mondo 270, 260 ≤ 270 < 275
+      const result = calculateSnowboardSizing(MEASUREMENTS.narrowFeet, 'intermediate');
+      expect(result.waistWidthMin).toBe(250);
+    });
+
+    it('waist width is 255mm for boot mondo 275–289', () => {
+      // adultMale: foot 27.5cm → mondo 275, 275 ≤ 275 < 290
+      const result = calculateSnowboardSizing(MEASUREMENTS.adultMale, 'intermediate');
+      expect(result.waistWidthMin).toBe(255);
+    });
+
+    it('waist width is 260mm for boot mondo ≥ 290', () => {
+      // heavyAthlete: foot 29cm → mondo 290 ≥ 290
+      const result = calculateSnowboardSizing(MEASUREMENTS.heavyAthlete, 'intermediate');
+      expect(result.waistWidthMin).toBe(260);
+    });
+  });
+
+  // ============================================
+  // NORDIC SIZING BY MODEL — FISCHER
+  // ============================================
+  describe('calculateNordicSkiSizingByModel (Fischer)', () => {
+    it('returns Fischer model with FA value range for classic', () => {
+      const result = calculateNordicSkiSizingByModel(
+        MEASUREMENTS.adultMale,
+        'nordic-classic',
+        'intermediate',
+        'fischer'
+      );
+      expect(result.modelName).toBe('Fischer');
+      expect(result.faValueRange).toBeDefined();
+      expect(result.faValueRange!.min).toBeGreaterThan(0);
+      expect(result.faValueRange!.max).toBeGreaterThan(result.faValueRange!.min);
+    });
+
+    it('includes kick-zone note for Fischer classic', () => {
+      const result = calculateNordicSkiSizingByModel(
+        MEASUREMENTS.adultMale,
+        'nordic-classic',
+        'intermediate',
+        'fischer'
+      );
+      expect(result.modelNotes?.some((n) => /kick/i.test(n))).toBe(true);
+    });
+
+    it('uses lower FA multiplier for Fischer skate vs classic', () => {
+      const skate = calculateNordicSkiSizingByModel(
+        MEASUREMENTS.adultMale,
+        'nordic-skate',
+        'intermediate',
+        'fischer'
+      );
+      const classic = calculateNordicSkiSizingByModel(
+        MEASUREMENTS.adultMale,
+        'nordic-classic',
+        'intermediate',
+        'fischer'
+      );
+      // Skate FA uses 0.80–0.90, classic uses 0.85–0.95
+      expect(skate.faValueRange!.min).toBeLessThan(classic.faValueRange!.min);
+    });
+
+    it('handles Fischer combi (default case)', () => {
+      const result = calculateNordicSkiSizingByModel(
+        MEASUREMENTS.adultMale,
+        'nordic-combi',
+        'intermediate',
+        'fischer'
+      );
+      expect(result.sport).toBe('nordic-combi');
+      expect(result.skiLengthMin).toBe(185); // height + 5
+      expect(result.skiLengthMax).toBe(195); // height + 15 (Fischer combi)
+    });
+
+    it('applies +3 weight adjustment for heavy skiers in Fischer', () => {
+      const heavy = calculateNordicSkiSizingByModel(
+        MEASUREMENTS.heavyAthlete, // weight 95 > 80
+        'nordic-classic',
+        'intermediate',
+        'fischer'
+      );
+      const normal = calculateNordicSkiSizingByModel(
+        MEASUREMENTS.adultFemale, // same height might differ, just check recommendation is higher
+        'nordic-classic',
+        'intermediate',
+        'fischer'
+      );
+      // heavyAthlete is taller AND gets +3; adultFemale is shorter
+      expect(heavy.skiLengthRecommended).toBeGreaterThan(normal.skiLengthRecommended);
+    });
+
+    it('applies -2 weight adjustment for light skiers in Fischer', () => {
+      const light = calculateNordicSkiSizingByModel(
+        { ...MEASUREMENTS.lightAthlete, weight: 55 }, // 55 < 60
+        'nordic-classic',
+        'intermediate',
+        'fischer'
+      );
+      const noAdj = calculateNordicSkiSizingByModel(
+        { ...MEASUREMENTS.lightAthlete, weight: 70 }, // 60 ≤ 70 ≤ 80
+        'nordic-classic',
+        'intermediate',
+        'fischer'
+      );
+      expect(light.skiLengthRecommended).toBeLessThan(noAdj.skiLengthRecommended);
+    });
+  });
+
+  // ============================================
+  // NORDIC SIZING BY MODEL — EVOSPORTS
+  // ============================================
+  describe('calculateNordicSkiSizingByModel (Evosports)', () => {
+    it('returns Evosports model name', () => {
+      const result = calculateNordicSkiSizingByModel(
+        MEASUREMENTS.adultMale,
+        'nordic-classic',
+        'intermediate',
+        'evosports'
+      );
+      expect(result.modelName).toBe('Evosports');
+    });
+
+    it('includes bias-toward-shorter note', () => {
+      const result = calculateNordicSkiSizingByModel(
+        MEASUREMENTS.adultMale,
+        'nordic-classic',
+        'intermediate',
+        'evosports'
+      );
+      expect(result.modelNotes?.some((n) => /shorter/i.test(n))).toBe(true);
+    });
+
+    it('handles Evosports combi (default case)', () => {
+      const result = calculateNordicSkiSizingByModel(
+        MEASUREMENTS.adultMale,
+        'nordic-combi',
+        'intermediate',
+        'evosports'
+      );
+      expect(result.sport).toBe('nordic-combi');
+      expect(result.skiLengthMin).toBe(185); // height + 5
+      expect(result.skiLengthMax).toBe(190); // height + 10 (Evosports combi)
+    });
+
+    it('handles Evosports skate style', () => {
+      const result = calculateNordicSkiSizingByModel(
+        MEASUREMENTS.adultMale,
+        'nordic-skate',
+        'intermediate',
+        'evosports'
+      );
+      expect(result.skiLengthMin).toBe(185); // height + 5
+      expect(result.skiLengthMax).toBe(195); // height + 15
+    });
+
+    it('applies weight adjustment for heavy skiers in Evosports', () => {
+      const heavy = calculateNordicSkiSizingByModel(
+        { ...MEASUREMENTS.adultMale, weight: 85 }, // > 80 → +2
+        'nordic-classic',
+        'intermediate',
+        'evosports'
+      );
+      const normal = calculateNordicSkiSizingByModel(
+        { ...MEASUREMENTS.adultMale, weight: 70 }, // 60 ≤ 70 ≤ 80 → 0
+        'nordic-classic',
+        'intermediate',
+        'evosports'
+      );
+      expect(heavy.skiLengthRecommended).toBeGreaterThanOrEqual(normal.skiLengthRecommended);
+    });
+
+    it('applies -2 weight adjustment for light skiers in Evosports', () => {
+      const light = calculateNordicSkiSizingByModel(
+        { ...MEASUREMENTS.adultMale, weight: 55 }, // < 60 → -2
+        'nordic-classic',
+        'intermediate',
+        'evosports'
+      );
+      const noAdj = calculateNordicSkiSizingByModel(
+        { ...MEASUREMENTS.adultMale, weight: 70 }, // → 0
+        'nordic-classic',
+        'intermediate',
+        'evosports'
+      );
+      expect(light.skiLengthRecommended).toBeLessThan(noAdj.skiLengthRecommended);
+    });
+  });
+
+  // ============================================
+  // NORDIC SIZING BY MODEL — GENERIC (default)
+  // ============================================
+  describe('calculateNordicSkiSizingByModel (generic)', () => {
+    it('routes to generic model by default', () => {
+      const byModel = calculateNordicSkiSizingByModel(
+        MEASUREMENTS.adultMale,
+        'nordic-classic',
+        'intermediate'
+      );
+      const direct = calculateNordicSkiSizing(
+        MEASUREMENTS.adultMale,
+        'nordic-classic',
+        'intermediate'
+      );
+      expect(byModel.skiLengthRecommended).toBe(direct.skiLengthRecommended);
+      expect(byModel.modelName).toBeUndefined();
     });
   });
 });

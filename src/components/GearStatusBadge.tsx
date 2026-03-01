@@ -6,9 +6,12 @@ interface GearStatusBadgeProps {
 }
 
 const STATUS_CONFIG: Record<GearStatus, { label: string; color: string }> = {
-  available: { label: 'Available', color: '#22c55e' },
-  'checked-out': { label: 'Checked Out', color: '#f97316' },
-  maintenance: { label: 'Maintenance', color: '#ef4444' },
+  active:       { label: 'Active',       color: '#3b82f6' },
+  available:    { label: 'Available',    color: '#22c55e' },
+  outgrown:     { label: 'Outgrown',     color: '#f59e0b' },
+  'to-sell':    { label: 'To Sell',      color: '#f97316' },
+  sold:         { label: 'Sold',         color: '#94a3b8' },
+  'needs-repair': { label: 'Needs Repair', color: '#ef4444' },
 };
 
 export function GearStatusBadge({ status, size = 'medium' }: GearStatusBadgeProps) {

@@ -1,12 +1,14 @@
 import { useState, useRef } from 'react';
 import { ChevronLeft } from 'lucide-react';
-import type { FamilyMember, GearItem, SkillLevel, Sport, GearType, SizingModel, SizingDisplay } from '../types';
-import { SIZING_MODEL_LABELS } from '../types';
+import type { FamilyMember, GearItem, SkillLevel, Sport, GearType, SizingModel, SizingDisplay, AlpineTerrain } from '../types';
+import { SIZING_MODEL_LABELS, ALPINE_TERRAIN_LABELS } from '../types';
 import {
   calculateNordicSkiSizingByModel,
   calculateNordicBootSizing,
   calculateAlpineSkiSizing,
   calculateAlpineBootSizing,
+  calculateAlpineWaistWidth,
+  checkDINSafety,
   calculateSnowboardSizing,
   calculateSnowboardBootSizing,
   calculateHockeySkateSize,
@@ -52,6 +54,7 @@ export function SportSizing({
   const [currentIndex, setCurrentIndex] = useState(0);
   const [sizingModel, setSizingModel] = useState<SizingModel>(defaultSizingModel);
   const [sizingDisplay, setSizingDisplay] = useState<SizingDisplay>(defaultSizingDisplay);
+  const [alpineTerrain, setAlpineTerrain] = useState<AlpineTerrain>('all-mountain');
   const [skillLevels, setSkillLevels] = useState<Record<Sport, SkillLevel>>(() => ({
     'nordic-classic': member.skillLevels?.['nordic-classic'] ?? 'intermediate',
     'nordic-skate':   member.skillLevels?.['nordic-skate']   ?? 'intermediate',
@@ -67,7 +70,7 @@ export function SportSizing({
   const currentSport = SPORTS[currentIndex];
   const skillLevel = skillLevels[currentSport.id] ?? 'intermediate';
 
-  const sportGearItems = gearItems.filter((item) => item.sport === currentSport.id);
+  const sportGearItems = gearItems.filter((item) => item.sports.includes(currentSport.id));
 
   const handleSlotTap = (slotType: GearType) => {
     const existingGear = sportGearItems.find((item) => item.type === slotType);
@@ -191,7 +194,15 @@ export function SportSizing({
   const renderAlpineContent = () => {
     const skiSizing  = calculateAlpineSkiSizing(member.measurements, skillLevel, member.gender);
     const bootSizing = calculateAlpineBootSizing(member.measurements, skillLevel, member.gender);
+    const waistWidth = calculateAlpineWaistWidth(alpineTerrain);
     const showRange  = sizingDisplay === 'range';
+
+    // Collect gear items that have a DIN setting stored so we can check safety
+    const skisWithDIN = sportGearItems.filter(
+      (item) =>
+        item.extendedDetails?.type === 'alpineSki' &&
+        item.extendedDetails.details.bindings?.dinSetting !== undefined
+    );
 
     return (
       <div className="sizing-sections">
@@ -215,6 +226,13 @@ export function SportSizing({
                 {showRange && (
                   <span className="sizing-range">({formatSizeRange(skiSizing.skiLengthMin, skiSizing.skiLengthMax)})</span>
                 )}
+              </div>
+            </div>
+            <div className="sizing-row">
+              <span className="sizing-label">Ski Waist</span>
+              <div className="sizing-value-group">
+                <span className="sizing-value">{waistWidth.min}–{waistWidth.max}</span>
+                <span className="sizing-unit">mm</span>
               </div>
             </div>
             <div className="sizing-row">
@@ -244,11 +262,48 @@ export function SportSizing({
             <div className="sizing-row">
               <span className="sizing-label">DIN</span>
               <div className="sizing-value-group">
-                <span className="sizing-value">{skiSizing.din.min}-{skiSizing.din.max}</span>
+                <span className="sizing-value">{skiSizing.din.min}–{skiSizing.din.max}</span>
                 <span className="sizing-note">Verify with tech</span>
               </div>
             </div>
           </div>
+
+          {/* DIN safety check — shown when gear items have a stored DIN setting */}
+          {skisWithDIN.length > 0 && (
+            <div className="mt-3 space-y-2">
+              {skisWithDIN.map((ski) => {
+                const ext = ski.extendedDetails;
+                const alpineDetails = ext?.type === 'alpineSki' ? ext.details : null;
+                const din = alpineDetails?.bindings?.dinSetting ?? 0;
+                const status = checkDINSafety(din, skiSizing.din);
+                const name = [ski.brand, ski.model].filter(Boolean).join(' ');
+                return (
+                  <div
+                    key={ski.id}
+                    role="alert"
+                    className={`flex items-start gap-2 px-3 py-2.5 rounded-xl text-xs border ${
+                      status === 'safe'
+                        ? 'bg-green-50 border-green-100 text-green-700'
+                        : status === 'too-low'
+                        ? 'bg-amber-50 border-amber-200 text-amber-800'
+                        : 'bg-red-50 border-red-200 text-red-700'
+                    }`}
+                  >
+                    <span className="font-black flex-shrink-0 mt-px" aria-hidden="true">
+                      {status === 'safe' ? '✓' : '⚠'}
+                    </span>
+                    <p className="font-semibold leading-snug">
+                      <span className="font-black">{name}</span>
+                      {' DIN '}{din}
+                      {status === 'safe' && ' — within safe range'}
+                      {status === 'too-low' && ` — below recommended (${skiSizing.din.min}–${skiSizing.din.max}). May pre-release.`}
+                      {status === 'too-high' && ` — above recommended (${skiSizing.din.min}–${skiSizing.din.max}). Injury risk.`}
+                    </p>
+                  </div>
+                );
+              })}
+            </div>
+          )}
         </section>
       </div>
     );
@@ -460,6 +515,28 @@ export function SportSizing({
                 aria-pressed={sizingModel === m}
               >
                 {SIZING_MODEL_LABELS[m]}
+              </button>
+            ))}
+          </div>
+        )}
+
+        {/* Terrain selector (Alpine only) */}
+        {currentSport.id === 'alpine' && (
+          <div className="px-6 py-2 bg-slate-50 border-b border-slate-100 flex items-center gap-2">
+            <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest mr-1">Terrain</span>
+            {(['groomed', 'all-mountain', 'powder'] as AlpineTerrain[]).map((t) => (
+              <button
+                key={t}
+                onClick={() => setAlpineTerrain(t)}
+                className={`px-3 py-1 rounded-lg text-[10px] font-bold border transition-colors ${
+                  alpineTerrain === t
+                    ? 'text-white border-transparent'
+                    : 'bg-white text-slate-500 border-slate-200 hover:border-slate-300'
+                }`}
+                style={alpineTerrain === t ? { backgroundColor: currentSport.color, borderColor: currentSport.color } : undefined}
+                aria-pressed={alpineTerrain === t}
+              >
+                {ALPINE_TERRAIN_LABELS[t]}
               </button>
             ))}
           </div>

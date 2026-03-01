@@ -9,6 +9,7 @@ import {
   resetPassword,
   resendEmailVerification,
   onAuthChange,
+  checkRedirectResult,
   getAuthErrorMessage,
 } from '../services/auth';
 
@@ -59,6 +60,18 @@ export function useAuth(): AuthState & AuthActions {
     return () => cleanup?.();
   }, []);
 
+  // Handle pending redirect result (Google/Facebook redirect sign-in flow).
+  // onAuthStateChanged covers the success case; this catches redirect errors.
+  useEffect(() => {
+    checkRedirectResult().catch((err: unknown) => {
+      const errorCode = (err as { code?: string })?.code || 'unknown';
+      if (mountedRef.current) {
+        setError(getAuthErrorMessage(errorCode));
+        setLoading(false);
+      }
+    });
+  }, []);
+
   // Clear error
   const clearError = useCallback(() => {
     setError(null);
@@ -105,6 +118,8 @@ export function useAuth(): AuthState & AuthActions {
       setError(null);
       setLoading(true);
       await signInWithGoogle();
+      // On success, onAuthStateChanged fires and sets user + loading=false together,
+      // avoiding a flash of the unauthenticated state (loading=false, user=null).
     } catch (err: unknown) {
       const errorCode = (err as { code?: string })?.code || 'unknown';
       if (mountedRef.current) {
@@ -113,10 +128,9 @@ export function useAuth(): AuthState & AuthActions {
           setAccountConflictEmail(conflictEmail);
         }
         setError(getAuthErrorMessage(errorCode));
+        setLoading(false);
       }
       throw err;
-    } finally {
-      if (mountedRef.current) setLoading(false);
     }
   }, []);
 
@@ -126,6 +140,7 @@ export function useAuth(): AuthState & AuthActions {
       setError(null);
       setLoading(true);
       await signInWithFacebook();
+      // Same as Google: let onAuthStateChanged clear loading on success.
     } catch (err: unknown) {
       const errorCode = (err as { code?: string })?.code || 'unknown';
       if (mountedRef.current) {
@@ -134,10 +149,9 @@ export function useAuth(): AuthState & AuthActions {
           setAccountConflictEmail(conflictEmail);
         }
         setError(getAuthErrorMessage(errorCode));
+        setLoading(false);
       }
       throw err;
-    } finally {
-      if (mountedRef.current) setLoading(false);
     }
   }, []);
 
