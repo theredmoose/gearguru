@@ -17,11 +17,11 @@ interface SettingsScreenProps {
 
 const DEFAULT_SPORTS: Sport[] = ['alpine', 'nordic-classic', 'nordic-skate', 'snowboard', 'hockey'];
 
-const sectionTitleCls = 'text-[10px] font-black text-slate-500 uppercase tracking-widest mb-3';
+const sectionTitleCls = 'text-xs font-black text-slate-500 uppercase tracking-widest mb-3';
 const rowCls = 'flex items-center justify-between py-4 border-b border-slate-100 last:border-0';
 const labelCls = 'text-sm font-semibold text-slate-700';
-const subLabelCls = 'text-[11px] text-slate-400 mt-0.5';
-const toggleBtnCls = 'px-3 py-1.5 rounded-lg text-xs font-bold bg-[#ECFDF5] text-[#008751] border border-emerald-200 hover:bg-emerald-50 transition-colors';
+const subLabelCls = 'text-xs text-slate-400 mt-0.5';
+const toggleBtnCls = 'px-4 py-2 rounded-xl text-xs font-bold bg-[#ECFDF5] text-[#008751] border border-emerald-200 hover:bg-emerald-50 transition-colors';
 
 export function SettingsScreen({
   settings,
@@ -113,7 +113,7 @@ export function SettingsScreen({
         {/* ── Default Sport ─────────────────────────── */}
         <section>
           <p className={sectionTitleCls}>Default Sport</p>
-          <p className="text-[11px] text-slate-400 mb-2">
+          <p className="text-xs text-slate-400 mb-2">
             The sport shown first when viewing member sizing details.
           </p>
           <div className="bg-slate-50 rounded-3xl px-4">
@@ -121,7 +121,7 @@ export function SettingsScreen({
               <div key={sport} className={rowCls}>
                 <p className={labelCls}>{SPORT_LABELS[sport]}</p>
                 <button
-                  className={`px-3 py-1.5 rounded-lg text-xs font-bold border transition-colors ${
+                  className={`px-4 py-2 rounded-xl text-xs font-bold border transition-colors ${
                     settings.defaultSport === sport
                       ? 'bg-[#008751] text-white border-[#008751]'
                       : 'bg-slate-100 text-slate-500 border-slate-200 hover:bg-slate-200'
@@ -140,7 +140,7 @@ export function SettingsScreen({
         {/* ── Display ───────────────────────────────── */}
         <section>
           <p className={sectionTitleCls}>Display</p>
-          <p className="text-[11px] text-slate-400 mb-2">
+          <p className="text-xs text-slate-400 mb-2">
             Choose which measurements appear in member profiles.
           </p>
           <div className="bg-slate-50 rounded-3xl px-4">
@@ -254,7 +254,7 @@ export function SettingsScreen({
                 {(['generic', 'fischer', 'evosports'] as SizingModel[]).map((m) => (
                   <button
                     key={m}
-                    className={`px-2.5 py-1.5 rounded-lg text-xs font-bold border transition-colors ${
+                    className={`px-3 py-2 rounded-xl text-xs font-bold border transition-colors ${
                       settings.sizingModel === m
                         ? 'bg-[#008751] text-white border-[#008751]'
                         : 'bg-white text-slate-500 border-slate-200 hover:bg-slate-100'
@@ -289,7 +289,7 @@ export function SettingsScreen({
                   onChange={(e) => onUpdateSettings({ notificationsEnabled: e.target.checked })}
                   aria-label="Enable gear notifications"
                 />
-                <div className="w-10 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600" />
+                <div className="w-10 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#008751]" />
               </label>
             </div>
           </div>

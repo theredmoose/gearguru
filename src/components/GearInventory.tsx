@@ -1,7 +1,7 @@
 import { useState } from 'react';
-import { ChevronLeft } from 'lucide-react';
 import type { FamilyMember, GearItem } from '../types';
 import { GearCard } from './GearCard';
+import { ScreenHeader } from './ScreenHeader';
 
 interface GearInventoryProps {
   members: FamilyMember[];
@@ -44,37 +44,35 @@ export function GearInventory({
 
   return (
     <div className="flex flex-col min-h-0 flex-1">
-      {/* Header */}
-      <div className="px-6 py-4 bg-white border-b border-slate-100 shadow-sm flex items-center gap-3">
-        <button
-          className="p-3 bg-slate-50 border border-slate-100 rounded-2xl text-emerald-700 shadow-sm hover:bg-white transition-all flex-shrink-0"
-          onClick={onBack}
-          aria-label="Back"
-        >
-          <ChevronLeft className="w-5 h-5" />
-          <span className="sr-only">← Home</span>
-        </button>
-        <h1 className="text-base font-black text-slate-900 uppercase tracking-tight flex-1">Family Gear</h1>
-      </div>
+      <ScreenHeader title="Family Gear" onBack={onBack} />
 
       {/* Filter bar */}
-      <div className="px-6 py-3 bg-white border-b border-slate-100 flex items-center gap-3">
-        <label htmlFor="owner-filter" className="text-xs font-bold text-slate-500 uppercase tracking-wide flex-shrink-0">
-          Filter by owner:
-        </label>
-        <select
-          id="owner-filter"
-          value={filterOwnerId}
-          onChange={(e) => setFilterOwnerId(e.target.value)}
-          className="flex-1 text-sm font-bold text-slate-700 bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#008751]/30"
-        >
-          <option value="all">All Members</option>
+      <div className="px-5 py-3 bg-white border-b border-slate-100">
+        <div className="flex items-center gap-2 overflow-x-auto scrollbar-none">
+          <button
+            onClick={() => setFilterOwnerId('all')}
+            className={`flex-shrink-0 px-4 py-2 rounded-full text-xs font-bold transition-all ${
+              filterOwnerId === 'all'
+                ? 'bg-[#008751] text-white shadow-sm'
+                : 'bg-slate-100 text-slate-500 hover:bg-slate-200'
+            }`}
+          >
+            All
+          </button>
           {members.map((member) => (
-            <option key={member.id} value={member.id}>
-              {member.name}
-            </option>
+            <button
+              key={member.id}
+              onClick={() => setFilterOwnerId(member.id)}
+              className={`flex-shrink-0 px-4 py-2 rounded-full text-xs font-bold transition-all ${
+                filterOwnerId === member.id
+                  ? 'bg-[#008751] text-white shadow-sm'
+                  : 'bg-slate-100 text-slate-500 hover:bg-slate-200'
+              }`}
+            >
+              {member.name.split(' ')[0]}
+            </button>
           ))}
-        </select>
+        </div>
       </div>
 
       {/* Content */}
@@ -84,7 +82,7 @@ export function GearInventory({
             <p className="text-slate-400 font-bold text-sm">No gear found.</p>
             {filterOwnerId !== 'all' && (
               <button
-                className="btn btn-primary"
+                className="px-6 py-3 bg-[#008751] text-white text-sm font-bold rounded-2xl shadow-sm"
                 onClick={() => onAddGear(filterOwnerId)}
               >
                 + Add Gear
@@ -138,7 +136,7 @@ export function GearInventory({
               />
             ))}
             <button
-              className="btn btn-primary w-full mt-2"
+              className="w-full flex items-center justify-center py-3.5 border-2 border-dashed border-slate-200 rounded-2xl text-sm font-bold text-slate-400 hover:border-emerald-300 hover:text-emerald-600 transition-all mt-2"
               onClick={() => onAddGear(filterOwnerId)}
             >
               + Add Gear

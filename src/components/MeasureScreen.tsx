@@ -13,7 +13,7 @@ export function MeasureScreen({ members, onSelectMember }: MeasureScreenProps) {
     <div className="flex flex-col min-h-0 flex-1">
       <ScreenHeader title="Measure" />
       <div className="flex-1 overflow-y-auto bg-[#F8FAFC] px-6 py-6">
-        <p className="text-[11px] text-slate-400 font-bold uppercase tracking-widest mb-4">
+        <p className="text-xs text-slate-400 font-bold uppercase tracking-widest mb-4">
           Select a member to update measurements
         </p>
 
@@ -37,25 +37,27 @@ export function MeasureScreen({ members, onSelectMember }: MeasureScreenProps) {
                 <button
                   key={member.id}
                   onClick={() => onSelectMember(member)}
-                  className="w-full bg-slate-50 border border-slate-100 rounded-3xl p-4 flex items-center justify-between shadow-sm hover:shadow-md active:scale-[0.98] transition-all text-left"
+                  className="w-full bg-white border border-slate-100 rounded-3xl p-4 flex items-center justify-between shadow-sm hover:shadow-md active:scale-[0.98] transition-all text-left"
                 >
                   <div className="flex items-center gap-3">
-                    <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-emerald-50 to-slate-100 border border-slate-100 flex items-center justify-center flex-shrink-0">
-                      <span className="text-xl font-black text-[#008751] select-none">
+                    <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-emerald-50 to-slate-100 border border-slate-100 flex items-center justify-center flex-shrink-0">
+                      <span className="text-2xl font-black text-[#008751] select-none">
                         {member.name.charAt(0).toUpperCase()}
                       </span>
                     </div>
                     <div>
-                      <p className="text-sm font-black text-slate-900">
-                        {member.name}
+                      <div className="flex items-center gap-2">
+                        <p className="text-sm font-black text-slate-900">
+                          {member.name}
+                        </p>
                         {badgeReason && <GrowthWarningBadge reason={badgeReason} />}
-                      </p>
-                      <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wide">
+                      </div>
+                      <p className="text-xs text-slate-400 font-bold uppercase tracking-wide mt-0.5">
                         {measurements.height} cm · {measurements.weight} kg
                       </p>
                     </div>
                   </div>
-                  <span className="text-[10px] font-black text-[#008751] uppercase tracking-widest">
+                  <span className="text-xs font-black text-[#008751] uppercase tracking-widest">
                     Edit →
                   </span>
                 </button>

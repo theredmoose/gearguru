@@ -106,23 +106,23 @@ describe('GearInventory', () => {
 
     it('shows back button', () => {
       render(<GearInventory {...defaultProps} />);
-      expect(screen.getByText('← Home')).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: /go back/i })).toBeInTheDocument();
     });
 
-    it('shows owner filter dropdown', () => {
+    it('shows owner filter pills', () => {
       render(<GearInventory {...defaultProps} />);
-      expect(screen.getByRole('combobox')).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: 'All' })).toBeInTheDocument();
     });
 
-    it('shows All Members option in dropdown', () => {
+    it('shows All filter pill', () => {
       render(<GearInventory {...defaultProps} />);
-      expect(screen.getByRole('option', { name: 'All Members' })).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: 'All' })).toBeInTheDocument();
     });
 
-    it('shows each member in the dropdown', () => {
+    it('shows each member in the filter pills', () => {
       render(<GearInventory {...defaultProps} />);
-      expect(screen.getByRole('option', { name: 'Alice' })).toBeInTheDocument();
-      expect(screen.getByRole('option', { name: 'Bob' })).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: 'Alice' })).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: 'Bob' })).toBeInTheDocument();
     });
 
     it('shows empty state when no gear items exist', () => {
@@ -137,7 +137,7 @@ describe('GearInventory', () => {
 
     it('shows Add Gear button in empty state when a specific owner is selected', () => {
       render(<GearInventory {...defaultProps} gearItems={[]} />);
-      fireEvent.change(screen.getByRole('combobox'), { target: { value: 'member-1' } });
+      fireEvent.click(screen.getByRole('button', { name: 'Alice' }));
       expect(screen.getByText('+ Add Gear')).toBeInTheDocument();
     });
   });
@@ -178,23 +178,22 @@ describe('GearInventory', () => {
   describe('filtering', () => {
     it('shows only selected owner gear when filtered', () => {
       render(<GearInventory {...defaultProps} />);
-      fireEvent.change(screen.getByRole('combobox'), { target: { value: 'member-1' } });
+      fireEvent.click(screen.getByRole('button', { name: 'Alice' }));
       expect(screen.getByTestId('gear-card-gear-1')).toBeInTheDocument();
       expect(screen.queryByTestId('gear-card-gear-2')).not.toBeInTheDocument();
     });
 
     it('hides items not belonging to selected owner', () => {
       render(<GearInventory {...defaultProps} />);
-      fireEvent.change(screen.getByRole('combobox'), { target: { value: 'member-2' } });
+      fireEvent.click(screen.getByRole('button', { name: 'Bob' }));
       expect(screen.queryByTestId('gear-card-gear-1')).not.toBeInTheDocument();
       expect(screen.getByTestId('gear-card-gear-2')).toBeInTheDocument();
     });
 
-    it('shows all items when filter reset to All Members', () => {
+    it('shows all items when filter reset to All', () => {
       render(<GearInventory {...defaultProps} />);
-      const select = screen.getByRole('combobox');
-      fireEvent.change(select, { target: { value: 'member-1' } });
-      fireEvent.change(select, { target: { value: 'all' } });
+      fireEvent.click(screen.getByRole('button', { name: 'Alice' }));
+      fireEvent.click(screen.getByRole('button', { name: 'All' }));
       expect(screen.getByTestId('gear-card-gear-1')).toBeInTheDocument();
       expect(screen.getByTestId('gear-card-gear-2')).toBeInTheDocument();
     });
@@ -206,13 +205,13 @@ describe('GearInventory', () => {
   describe('flat view', () => {
     it('shows gear list when specific owner with gear is selected', () => {
       render(<GearInventory {...defaultProps} />);
-      fireEvent.change(screen.getByRole('combobox'), { target: { value: 'member-1' } });
+      fireEvent.click(screen.getByRole('button', { name: 'Alice' }));
       expect(screen.getByTestId('gear-card-gear-1')).toBeInTheDocument();
     });
 
     it('shows + Add Gear button at bottom of flat view', () => {
       render(<GearInventory {...defaultProps} />);
-      fireEvent.change(screen.getByRole('combobox'), { target: { value: 'member-1' } });
+      fireEvent.click(screen.getByRole('button', { name: 'Alice' }));
       expect(screen.getByText('+ Add Gear')).toBeInTheDocument();
     });
   });
@@ -223,7 +222,7 @@ describe('GearInventory', () => {
   describe('interactions', () => {
     it('calls onBack when back button is clicked', () => {
       render(<GearInventory {...defaultProps} />);
-      fireEvent.click(screen.getByText('← Home'));
+      fireEvent.click(screen.getByRole('button', { name: /go back/i }));
       expect(mockOnBack).toHaveBeenCalledTimes(1);
     });
 
@@ -237,7 +236,7 @@ describe('GearInventory', () => {
 
     it('calls onAddGear with ownerId when + Add Gear is clicked in flat view', () => {
       render(<GearInventory {...defaultProps} />);
-      fireEvent.change(screen.getByRole('combobox'), { target: { value: 'member-2' } });
+      fireEvent.click(screen.getByRole('button', { name: 'Bob' }));
       fireEvent.click(screen.getByText('+ Add Gear'));
       expect(mockOnAddGear).toHaveBeenCalledWith('member-2');
     });
@@ -256,7 +255,7 @@ describe('GearInventory', () => {
 
     it('calls onAddGear with the correct ownerId from empty state', () => {
       render(<GearInventory {...defaultProps} gearItems={[]} />);
-      fireEvent.change(screen.getByRole('combobox'), { target: { value: 'member-1' } });
+      fireEvent.click(screen.getByRole('button', { name: 'Alice' }));
       fireEvent.click(screen.getByText('+ Add Gear'));
       expect(mockOnAddGear).toHaveBeenCalledWith('member-1');
     });

@@ -299,12 +299,11 @@ export function MemberDetail({
               <h2 className="text-2xl font-black text-slate-900 tracking-tight leading-none truncate">
                 {member.name}
               </h2>
-              <div className="w-2.5 h-2.5 rounded-full bg-[#008751] shadow-[0_0_10px_rgba(0,135,81,0.5)] flex-shrink-0" />
             </div>
 
             <div className="space-y-0.5 mb-3">
               {statRows.map((row) => (
-                <div key={row.label} className="flex items-center justify-between border-b border-slate-50 py-2">
+                <div key={row.label} className="flex items-center justify-between border-b border-slate-100 py-2">
                   <span className="text-xs text-slate-400 font-bold uppercase tracking-widest">
                     {row.label}
                   </span>
