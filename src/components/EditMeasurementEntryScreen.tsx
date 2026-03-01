@@ -2,6 +2,18 @@ import { useState } from 'react';
 import type { FamilyMember, MeasurementEntry } from '../types';
 import { ScreenHeader } from './ScreenHeader';
 import { addMeasurementEntry, updateMeasurementEntry } from '../services/firebase';
+import {
+  validateHeight,
+  validateWeight,
+  validateRequiredFootLength,
+  validateOptionalFootWidth,
+  validateOptionalUsShoeSize,
+  validateOptionalEuShoeSize,
+  validateOptionalHeadCircumference,
+  validateOptionalHandSize,
+  validateOptionalArmLength,
+  validateOptionalInseam,
+} from '../services/validation';
 
 interface EditMeasurementEntryScreenProps {
   member: FamilyMember;
@@ -59,28 +71,45 @@ export function EditMeasurementEntryScreen({
     setError(null);
 
     if (!recordedAt) { setError('Date is required'); return; }
-    if (height <= 0) { setError('Height must be greater than 0'); return; }
-    if (height > 300) { setError('Height must be 300 cm or less'); return; }
-    if (weight <= 0) { setError('Weight must be greater than 0'); return; }
-    if (weight > 300) { setError('Weight must be 300 kg or less'); return; }
+    const heightError = validateHeight(height);
+    if (heightError) { setError(heightError); return; }
+
+    const weightError = validateWeight(weight);
+    if (weightError) { setError(weightError); return; }
+
     if (separateFeetHands) {
-      if (footLengthLeft <= 0) { setError('Left foot length is required'); return; }
-      if (footLengthLeft > 30) { setError('Left foot length must be 30 cm or less'); return; }
-      if (footLengthRight <= 0) { setError('Right foot length is required'); return; }
-      if (footLengthRight > 30) { setError('Right foot length must be 30 cm or less'); return; }
+      const footLeftError = validateRequiredFootLength(footLengthLeft, 'left');
+      if (footLeftError) { setError(footLeftError); return; }
+      const footRightError = validateRequiredFootLength(footLengthRight, 'right');
+      if (footRightError) { setError(footRightError); return; }
     } else {
-      if (footLengthSingle <= 0) { setError('Foot length is required'); return; }
-      if (footLengthSingle > 30) { setError('Foot length must be 30 cm or less'); return; }
+      const footSingleError = validateRequiredFootLength(footLengthSingle, 'single');
+      if (footSingleError) { setError(footSingleError); return; }
     }
-    if (footWidthLeft !== '' && Number(footWidthLeft) > 15) { setError('Left foot width must be 15 cm or less'); return; }
-    if (footWidthRight !== '' && Number(footWidthRight) > 15) { setError('Right foot width must be 15 cm or less'); return; }
-    if (usShoeSize !== '' && Number(usShoeSize) > 25) { setError('US shoe size must be 25 or less'); return; }
-    if (euShoeSize !== '' && Number(euShoeSize) > 60) { setError('EU shoe size must be 60 or less'); return; }
-    if (armLength !== '' && Number(armLength) > 120) { setError('Arm length must be 120 cm or less'); return; }
-    if (inseam !== '' && Number(inseam) > 120) { setError('Inseam must be 120 cm or less'); return; }
-    if (headCircumference !== '' && (Number(headCircumference) < 40 || Number(headCircumference) > 70)) { setError('Head circumference must be between 40 and 70 cm'); return; }
-    if (handSize !== '' && Number(handSize) < 4) { setError('Hand size must be 4 cm or more'); return; }
-    if (handSize !== '' && Number(handSize) > 30) { setError('Hand size must be 30 cm or less'); return; }
+
+    const footWidthLeftError = validateOptionalFootWidth(footWidthLeft, 'left');
+    if (footWidthLeftError) { setError(footWidthLeftError); return; }
+
+    const footWidthRightError = validateOptionalFootWidth(footWidthRight, 'right');
+    if (footWidthRightError) { setError(footWidthRightError); return; }
+
+    const usShoeSizeError = validateOptionalUsShoeSize(usShoeSize);
+    if (usShoeSizeError) { setError(usShoeSizeError); return; }
+
+    const euShoeSizeError = validateOptionalEuShoeSize(euShoeSize);
+    if (euShoeSizeError) { setError(euShoeSizeError); return; }
+
+    const armLengthError = validateOptionalArmLength(armLength);
+    if (armLengthError) { setError(armLengthError); return; }
+
+    const inseamError = validateOptionalInseam(inseam);
+    if (inseamError) { setError(inseamError); return; }
+
+    const headCircError = validateOptionalHeadCircumference(headCircumference);
+    if (headCircError) { setError(headCircError); return; }
+
+    const handSizeError = validateOptionalHandSize(handSize);
+    if (handSizeError) { setError(handSizeError); return; }
 
     const recordedAtIso = new Date(recordedAt + 'T12:00:00').toISOString();
 

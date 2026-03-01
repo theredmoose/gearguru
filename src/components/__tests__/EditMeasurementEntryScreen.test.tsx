@@ -152,7 +152,7 @@ describe('EditMeasurementEntryScreen', () => {
         fireEvent.click(screen.getByRole('button', { name: /save/i }));
         await waitFor(() => {
           expect(
-            screen.getByText('Hand size must be 4 cm or more')
+            screen.getByText('Hand size must be between 4 and 30 cm')
           ).toBeInTheDocument();
         });
         expect(addMeasurementEntry).not.toHaveBeenCalled();
@@ -250,7 +250,7 @@ describe('EditMeasurementEntryScreen', () => {
         fireEvent.change(screen.getByLabelText('Hand Size (cm)'), { target: { value: '31' } });
         fireEvent.click(screen.getByRole('button', { name: /save/i }));
         await waitFor(() => {
-          expect(screen.getByText('Hand size must be 30 cm or less')).toBeInTheDocument();
+          expect(screen.getByText('Hand size must be between 4 and 30 cm')).toBeInTheDocument();
         });
         expect(addMeasurementEntry).not.toHaveBeenCalled();
       });
