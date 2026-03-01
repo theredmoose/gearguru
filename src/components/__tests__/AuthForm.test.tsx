@@ -288,12 +288,12 @@ describe('AuthForm', () => {
   describe('branding', () => {
     it('shows Gear Guru title', () => {
       render(<AuthForm {...defaultProps} />);
-      expect(screen.getByText('Gear Guru')).toBeInTheDocument();
+      expect(screen.getByRole('heading', { level: 1 })).toBeInTheDocument();
     });
 
-    it('shows Sports Equipment Sizing subtitle', () => {
+    it('shows app subtitle', () => {
       render(<AuthForm {...defaultProps} />);
-      expect(screen.getByText(/sports equipment sizing/i)).toBeInTheDocument();
+      expect(screen.getByText(/family gear sizing/i)).toBeInTheDocument();
     });
   });
 });

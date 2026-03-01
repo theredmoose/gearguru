@@ -16,8 +16,11 @@ import {
   createGearItem,
   updateGearItem,
   deleteGearItem,
+  addMeasurementEntry,
+  updateMeasurementEntry,
+  deleteMeasurementEntry,
 } from '../firebase';
-import type { FirestoreTimestamp } from '../../types';
+import type { FirestoreTimestamp, MeasurementEntry } from '../../types';
 import { FAMILY_MEMBERS } from '@tests/fixtures/familyMembers';
 import { MEASUREMENTS } from '@tests/fixtures/measurements';
 
@@ -131,7 +134,7 @@ describe('firebase service', () => {
       expect(result.id).toBe('gear-1');
       expect(result.userId).toBe('user-123');
       expect(result.ownerId).toBe('member-1');
-      expect(result.sport).toBe('alpine');
+      expect(result.sports).toEqual(['alpine']);
       expect(result.type).toBe('ski');
       expect(result.brand).toBe('Rossignol');
       expect(result.model).toBe('Experience 88');
@@ -211,6 +214,26 @@ describe('firebase service', () => {
         const data = { ...baseMockData, condition };
         const result = docToGearItem('gear-1', data);
         expect(result.condition).toBe(condition);
+      });
+    });
+
+    describe('sports migration', () => {
+      it('returns sports array from legacy sport field', () => {
+        const legacyData = { ...baseMockData, sport: 'alpine' };
+        const result = docToGearItem('gear-1', legacyData);
+        expect(result.sports).toEqual(['alpine']);
+      });
+
+      it('returns sports array when sports field exists', () => {
+        const modernData = { ...baseMockData, sports: ['alpine', 'snowboard'] };
+        const result = docToGearItem('gear-1', modernData);
+        expect(result.sports).toEqual(['alpine', 'snowboard']);
+      });
+
+      it('prefers sports over sport when both exist', () => {
+        const bothData = { ...baseMockData, sport: 'alpine', sports: ['snowboard'] };
+        const result = docToGearItem('gear-1', bothData);
+        expect(result.sports).toEqual(['snowboard']);
       });
     });
   });
@@ -473,6 +496,196 @@ describe('firebase service', () => {
       const { deleteDoc } = await import('firebase/firestore');
       await deleteGearItem('gear-1');
       expect(vi.mocked(deleteDoc)).toHaveBeenCalled();
+    });
+  });
+
+  // ============================================
+  // MEASUREMENT HISTORY CRUD
+  // ============================================
+
+  const makeEntry = (overrides: Partial<MeasurementEntry> = {}): MeasurementEntry => ({
+    id: 'entry-1',
+    recordedAt: '2024-06-01T00:00:00.000Z',
+    height: 140,
+    weight: 35,
+    footLengthLeft: 22,
+    footLengthRight: 22,
+    ...overrides,
+  });
+
+  describe('docToFamilyMember with measurementHistory', () => {
+    const mockTimestamp = { seconds: 1705320000, nanoseconds: 0 };
+
+    it('maps measurementHistory when present', () => {
+      const history = [makeEntry(), makeEntry({ id: 'entry-2', recordedAt: '2024-01-01T00:00:00.000Z' })];
+      const data = {
+        userId: 'user-1', name: 'John', dateOfBirth: '1990-01-01', gender: 'male',
+        measurements: MEASUREMENTS.adultMale,
+        measurementHistory: history,
+        createdAt: mockTimestamp, updatedAt: mockTimestamp,
+      };
+      const result = docToFamilyMember('member-1', data);
+      expect(result.measurementHistory).toHaveLength(2);
+      expect(result.measurementHistory?.[0].id).toBe('entry-1');
+    });
+
+    it('returns undefined measurementHistory when not in doc', () => {
+      const data = {
+        userId: 'user-1', name: 'John', dateOfBirth: '1990-01-01', gender: 'male',
+        measurements: MEASUREMENTS.adultMale,
+        createdAt: mockTimestamp, updatedAt: mockTimestamp,
+      };
+      const result = docToFamilyMember('member-1', data);
+      expect(result.measurementHistory).toBeUndefined();
+    });
+  });
+
+  describe('updateMeasurements (with history)', () => {
+    it('prepends a new entry to measurementHistory on update', async () => {
+      const existingEntry = makeEntry({ id: 'old-entry' });
+      const mockTimestamp = { seconds: 1705320000, nanoseconds: 0 };
+
+      const { getDoc, updateDoc } = await import('firebase/firestore');
+      vi.mocked(getDoc).mockResolvedValueOnce({
+        exists: () => true,
+        id: 'member-1',
+        data: () => ({
+          userId: 'user-1', name: 'John', dateOfBirth: '1990-01-01', gender: 'male',
+          measurements: MEASUREMENTS.adultMale,
+          measurementHistory: [existingEntry],
+          createdAt: mockTimestamp, updatedAt: mockTimestamp,
+        }),
+      } as any);
+
+      await updateMeasurements('member-1', MEASUREMENTS.adultMale);
+
+      const call = vi.mocked(updateDoc).mock.calls[0];
+      const updateArg = call[1] as Record<string, unknown>;
+      const history = updateArg.measurementHistory as MeasurementEntry[];
+      expect(history).toHaveLength(2);
+      // New entry prepended
+      expect(history[0].id).not.toBe('old-entry');
+      expect(history[1].id).toBe('old-entry');
+    });
+
+    it('creates a history array when none exists yet', async () => {
+      const mockTimestamp = { seconds: 1705320000, nanoseconds: 0 };
+      const { getDoc, updateDoc } = await import('firebase/firestore');
+      vi.mocked(getDoc).mockResolvedValueOnce({
+        exists: () => true,
+        id: 'member-1',
+        data: () => ({
+          userId: 'user-1', name: 'John', dateOfBirth: '1990-01-01', gender: 'male',
+          measurements: MEASUREMENTS.adultMale,
+          createdAt: mockTimestamp, updatedAt: mockTimestamp,
+        }),
+      } as any);
+
+      await updateMeasurements('member-1', MEASUREMENTS.adultMale);
+
+      const call = vi.mocked(updateDoc).mock.calls[0];
+      const updateArg = call[1] as Record<string, unknown>;
+      const history = updateArg.measurementHistory as MeasurementEntry[];
+      expect(history).toHaveLength(1);
+    });
+  });
+
+  describe('addMeasurementEntry', () => {
+    it('prepends the new entry to existing history', async () => {
+      const existing = makeEntry({ id: 'existing' });
+      const mockTimestamp = { seconds: 1705320000, nanoseconds: 0 };
+      const { getDoc, updateDoc } = await import('firebase/firestore');
+      vi.mocked(getDoc).mockResolvedValueOnce({
+        exists: () => true,
+        id: 'member-1',
+        data: () => ({
+          measurementHistory: [existing],
+          createdAt: mockTimestamp, updatedAt: mockTimestamp,
+        }),
+      } as any);
+
+      const newEntry = makeEntry({ id: 'new-entry' });
+      await addMeasurementEntry('member-1', newEntry);
+
+      const call = vi.mocked(updateDoc).mock.calls[0];
+      const updateArg = call[1] as Record<string, unknown>;
+      const history = updateArg.measurementHistory as MeasurementEntry[];
+      expect(history[0].id).toBe('new-entry');
+      expect(history[1].id).toBe('existing');
+    });
+  });
+
+  describe('updateMeasurementEntry', () => {
+    it('updates the matching entry by id', async () => {
+      const entries = [
+        makeEntry({ id: 'e1', height: 140 }),
+        makeEntry({ id: 'e2', height: 145 }),
+      ];
+      const mockTimestamp = { seconds: 1705320000, nanoseconds: 0 };
+      const { getDoc, updateDoc } = await import('firebase/firestore');
+      vi.mocked(getDoc).mockResolvedValueOnce({
+        exists: () => true,
+        id: 'member-1',
+        data: () => ({
+          measurementHistory: entries,
+          createdAt: mockTimestamp, updatedAt: mockTimestamp,
+        }),
+      } as any);
+
+      await updateMeasurementEntry('member-1', 'e1', { height: 142 });
+
+      const call = vi.mocked(updateDoc).mock.calls[0];
+      const updateArg = call[1] as Record<string, unknown>;
+      const history = updateArg.measurementHistory as MeasurementEntry[];
+      expect(history.find((e) => e.id === 'e1')?.height).toBe(142);
+      expect(history.find((e) => e.id === 'e2')?.height).toBe(145);
+    });
+
+    it('does nothing when doc does not exist', async () => {
+      const { getDoc, updateDoc } = await import('firebase/firestore');
+      vi.mocked(getDoc).mockResolvedValueOnce({
+        exists: () => false,
+      } as any);
+
+      await updateMeasurementEntry('member-1', 'e1', { height: 142 });
+      expect(vi.mocked(updateDoc)).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('deleteMeasurementEntry', () => {
+    it('removes the matching entry by id', async () => {
+      const entries = [
+        makeEntry({ id: 'e1' }),
+        makeEntry({ id: 'e2' }),
+      ];
+      const mockTimestamp = { seconds: 1705320000, nanoseconds: 0 };
+      const { getDoc, updateDoc } = await import('firebase/firestore');
+      vi.mocked(getDoc).mockResolvedValueOnce({
+        exists: () => true,
+        id: 'member-1',
+        data: () => ({
+          measurementHistory: entries,
+          createdAt: mockTimestamp, updatedAt: mockTimestamp,
+        }),
+      } as any);
+
+      await deleteMeasurementEntry('member-1', 'e1');
+
+      const call = vi.mocked(updateDoc).mock.calls[0];
+      const updateArg = call[1] as Record<string, unknown>;
+      const history = updateArg.measurementHistory as MeasurementEntry[];
+      expect(history).toHaveLength(1);
+      expect(history[0].id).toBe('e2');
+    });
+
+    it('does nothing when doc does not exist', async () => {
+      const { getDoc, updateDoc } = await import('firebase/firestore');
+      vi.mocked(getDoc).mockResolvedValueOnce({
+        exists: () => false,
+      } as any);
+
+      await deleteMeasurementEntry('member-1', 'e1');
+      expect(vi.mocked(updateDoc)).not.toHaveBeenCalled();
     });
   });
 });

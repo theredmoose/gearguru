@@ -53,17 +53,17 @@ export function ResourcesScreen() {
   return (
     <div className="flex flex-col min-h-0 flex-1">
       <ScreenHeader title="Resources" />
-      <div className="flex-1 overflow-y-auto bg-white px-6 py-6 space-y-5">
+      <div className="flex-1 overflow-y-auto bg-[#F8FAFC] px-6 py-6 space-y-5">
         <p className="text-[11px] text-slate-400 font-bold uppercase tracking-widest">
           Quick sizing reference
         </p>
 
         {SIZING_GUIDES.map((guide) => (
-          <div key={guide.sport} className={`rounded-2xl border p-4 ${guide.color}`}>
-            <h2 className={`text-xs font-black uppercase tracking-widest mb-3 ${guide.labelColor}`}>
+          <div key={guide.sport} className={`rounded-3xl border p-5 ${guide.color}`}>
+            <h2 className={`text-xs font-black uppercase tracking-widest mb-4 ${guide.labelColor}`}>
               {guide.sport}
             </h2>
-            <div className="space-y-1.5">
+            <div className="space-y-3">
               {guide.rules.map((rule) => (
                 <div key={rule.label} className="flex justify-between items-start gap-2">
                   <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wide whitespace-nowrap">

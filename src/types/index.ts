@@ -5,10 +5,12 @@
 export interface FamilyMember {
   id: string;
   userId: string; // Firebase Auth user ID
+  familyId?: string; // Scaffolding for future multi-family sharing (currently === userId)
   name: string;
   dateOfBirth: string; // ISO date string
   gender: 'male' | 'female' | 'other';
   measurements: Measurements;
+  measurementHistory?: MeasurementEntry[];
   skillLevels?: Partial<Record<Sport, SkillLevel>>;
   createdAt: string;
   updatedAt: string;
@@ -33,10 +35,31 @@ export interface Measurements {
   armLength?: number; // shoulder to wrist, for poles
   inseam?: number; // for stance width calculations
   headCircumference?: number; // cm, for helmet sizing
-  handSize?: number; // cm, wrist to fingertip
+  handSize?: number; // cm, wrist to fingertip (single-foot mode; fallback)
+  handSizeLeft?: number; // cm (separate L/R mode)
+  handSizeRight?: number; // cm (separate L/R mode)
 
   // Last measured date
   measuredAt: string;
+}
+
+export interface MeasurementEntry {
+  id: string;            // uuid - for targeting edits/deletes
+  recordedAt: string;    // ISO date string - user-editable
+  height: number;
+  weight: number;
+  footLengthLeft: number;
+  footLengthRight: number;
+  footWidthLeft?: number;
+  footWidthRight?: number;
+  usShoeSize?: number;
+  euShoeSize?: number;
+  armLength?: number;
+  inseam?: number;
+  headCircumference?: number;
+  handSize?: number;
+  handSizeLeft?: number;
+  handSizeRight?: number;
 }
 
 // ============================================
@@ -64,6 +87,15 @@ export const SIZING_MODEL_LABELS: Record<SizingModel, string> = {
   generic:   'Generic',
   fischer:   'Fischer',
   evosports: 'Evosports',
+};
+
+// Alpine terrain preference — drives waist width recommendation
+export type AlpineTerrain = 'groomed' | 'all-mountain' | 'powder';
+
+export const ALPINE_TERRAIN_LABELS: Record<AlpineTerrain, string> = {
+  'groomed':      'Groomed',
+  'all-mountain': 'All-Mountain',
+  'powder':       'Powder',
 };
 
 // Nordic Skiing
@@ -215,13 +247,14 @@ export type ExtendedGearDetails =
 // GEAR INVENTORY
 // ============================================
 
-export type GearStatus = 'available' | 'checked-out' | 'maintenance';
+export type GearStatus = 'active' | 'available' | 'outgrown' | 'to-sell' | 'sold' | 'needs-repair';
 
 export interface GearItem {
   id: string;
   userId: string; // Firebase Auth user ID
+  familyId?: string; // Scaffolding for future multi-family sharing (currently === userId)
   ownerId: string; // FamilyMember id
-  sport: Sport;
+  sports: Sport[];  // required, min 1
   type: GearType;
   brand: string;
   model: string;
@@ -305,6 +338,7 @@ export type BootUnit = 'mp' | 'eu' | 'us-men' | 'us-women';
 export interface DisplaySettings {
   showFoot: boolean;
   showHand: boolean;
+  separateFeetHands: boolean;
 }
 
 export interface AppSettings {
@@ -317,6 +351,7 @@ export interface AppSettings {
   sizingDisplay: SizingDisplay;
   bootUnit: BootUnit; // preferred unit shown in boot sizing cards
   defaultDIN?: number; // pre-fills the DIN setting field when adding alpine skis
+  notificationsEnabled: boolean;
 }
 
 export const DEFAULT_SETTINGS: AppSettings = {
@@ -327,8 +362,26 @@ export const DEFAULT_SETTINGS: AppSettings = {
   display: {
     showFoot: true,
     showHand: true,
+    separateFeetHands: false,
   },
   sizingModel: 'generic',
   sizingDisplay: 'range',
   bootUnit: 'mp',
+  notificationsEnabled: true,
 };
+
+// ============================================
+// NOTIFICATION TYPES
+// ============================================
+
+export type NotificationType = 'replace' | 'service' | 'old-gear';
+
+export interface AppNotification {
+  id: string;           // deterministic: e.g. "worn-{gearItemId}", "old-{gearItemId}"
+  type: NotificationType;
+  title: string;
+  body: string;
+  gearItemId?: string;
+  memberId?: string;
+  createdAt: string;    // ISO date string
+}

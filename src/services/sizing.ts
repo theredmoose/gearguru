@@ -2,6 +2,7 @@ import type {
   Measurements,
   SkillLevel,
   SizingModel,
+  AlpineTerrain,
   NordicSkiSizing,
   NordicBootSizing,
   AlpineSkiSizing,
@@ -347,6 +348,47 @@ export function calculateAlpineSkiSizing(
     skiLengthRecommended: skiRecommended,
     din,
   };
+}
+
+/**
+ * Recommend alpine ski waist width range based on terrain preference.
+ *
+ * Waist width (the narrowest point of the ski) is the primary driver of
+ * how a ski performs in different snow/terrain conditions:
+ *   groomed      65–80 mm  — hardpack, carving, race
+ *   all-mountain 80–96 mm  — versatile, mixed conditions
+ *   powder       96–120 mm — off-piste, soft snow, freeride
+ */
+export function calculateAlpineWaistWidth(
+  terrain: AlpineTerrain
+): { min: number; max: number } {
+  const ranges: Record<AlpineTerrain, { min: number; max: number }> = {
+    'groomed':      { min: 65,  max: 80  },
+    'all-mountain': { min: 80,  max: 96  },
+    'powder':       { min: 96,  max: 120 },
+  };
+  return ranges[terrain];
+}
+
+/**
+ * Check whether a stored DIN setting is within the recommended safe range
+ * for a given member profile.
+ *
+ * - 'too-low'  → binding may pre-release during normal skiing (fall risk)
+ * - 'safe'     → within recommended range
+ * - 'too-high' → binding unlikely to release in a crash (injury risk)
+ *
+ * The recommendedRange should come from AlpineSkiSizing.din (calculateAlpineSkiSizing).
+ */
+export type DINSafetyStatus = 'too-low' | 'safe' | 'too-high';
+
+export function checkDINSafety(
+  dinSetting: number,
+  recommendedRange: { min: number; max: number }
+): DINSafetyStatus {
+  if (dinSetting < recommendedRange.min) return 'too-low';
+  if (dinSetting > recommendedRange.max) return 'too-high';
+  return 'safe';
 }
 
 /**

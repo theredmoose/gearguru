@@ -44,17 +44,17 @@ export function GearInventory({
 
   return (
     <div className="flex flex-col min-h-0 flex-1">
-      {/* Blue app header */}
-      <div className="px-6 py-4 bg-blue-700 border-b border-blue-800 shadow-sm flex items-center gap-3">
+      {/* Header */}
+      <div className="px-6 py-4 bg-white border-b border-slate-100 shadow-sm flex items-center gap-3">
         <button
-          className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-blue-600 transition-colors text-white flex-shrink-0"
+          className="p-3 bg-slate-50 border border-slate-100 rounded-2xl text-emerald-700 shadow-sm hover:bg-white transition-all flex-shrink-0"
           onClick={onBack}
           aria-label="Back"
         >
           <ChevronLeft className="w-5 h-5" />
           <span className="sr-only">← Home</span>
         </button>
-        <h1 className="text-lg font-black text-white tracking-tight flex-1">Family Gear</h1>
+        <h1 className="text-base font-black text-slate-900 uppercase tracking-tight flex-1">Family Gear</h1>
       </div>
 
       {/* Filter bar */}
@@ -66,7 +66,7 @@ export function GearInventory({
           id="owner-filter"
           value={filterOwnerId}
           onChange={(e) => setFilterOwnerId(e.target.value)}
-          className="flex-1 text-sm font-bold text-slate-700 bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
+          className="flex-1 text-sm font-bold text-slate-700 bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#008751]/30"
         >
           <option value="all">All Members</option>
           {members.map((member) => (
@@ -78,7 +78,7 @@ export function GearInventory({
       </div>
 
       {/* Content */}
-      <div className="flex-1 overflow-y-auto bg-white px-6 py-4">
+      <div className="flex-1 overflow-y-auto bg-[#F8FAFC] px-6 py-6">
         {filteredItems.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-16 gap-4">
             <p className="text-slate-400 font-bold text-sm">No gear found.</p>
@@ -102,7 +102,7 @@ export function GearInventory({
                     {member.name}
                   </h2>
                   <button
-                    className="text-xs font-bold text-blue-600 hover:text-blue-800 transition-colors"
+                    className="text-xs font-bold text-[#008751] hover:text-emerald-800 transition-colors"
                     onClick={() => onAddGear(member.id)}
                   >
                     + Add
