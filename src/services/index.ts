@@ -53,3 +53,20 @@ export {
   formatSkiDetails,
   type GearAnalysisResult,
 } from './gearAnalysis';
+
+export {
+  validateHeight,
+  validateWeight,
+  validateOptionalFootLength,
+  validateRequiredFootLength,
+  validateOptionalFootWidth,
+  validateOptionalUsShoeSize,
+  validateOptionalEuShoeSize,
+  validateOptionalHeadCircumference,
+  validateOptionalHandSize,
+  validateOptionalArmLength,
+  validateOptionalInseam,
+  validateYear,
+  parseSkiProfile,
+  validateDateOfBirth,
+} from './validation';
