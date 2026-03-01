@@ -284,7 +284,7 @@ function App() {
               onViewDismissed={() => setView('notifications')}
             />
 
-            <div className="flex-1 overflow-y-auto bg-[#F8FAFC] px-5 py-5">
+            <div className="flex-1 overflow-y-auto bg-[#F8FAFC] px-5 pt-8 pb-6">
               {loading && <p className="loading">Loading...</p>}
               {error && <p className="error-state">{getOperationErrorMessage(error, 'load')}</p>}
 
@@ -306,8 +306,8 @@ function App() {
 
               {!loading && members.length > 0 && (
                 <>
-                  <p className="text-xs font-black text-slate-400 uppercase tracking-widest mb-3">Your Family</p>
-                  <div className="flex flex-col gap-2 mb-5">
+                  <p className="text-xs font-black text-slate-500 uppercase tracking-widest mb-4">Your Family</p>
+                  <div className="flex flex-col gap-3 mb-5">
                     {members.map((member) => (
                       <MemberCard
                         key={member.id}
@@ -324,6 +324,18 @@ function App() {
                   >
                     <span className="text-base leading-none">+</span> Add Family Member
                   </button>
+
+                  {activeNotifications.length === 0 && (
+                    <div className="mt-8 flex items-center gap-3 bg-emerald-50 border border-emerald-100 rounded-full px-5 py-3.5 shadow-sm">
+                      <div className="w-7 h-7 rounded-full bg-white border border-emerald-100 flex items-center justify-center flex-shrink-0 shadow-sm">
+                        <span className="text-sm leading-none text-[#008751] font-black">✓</span>
+                      </div>
+                      <div>
+                        <p className="text-sm font-black text-emerald-800">All clear</p>
+                        <p className="text-xs font-semibold text-emerald-600">No gear alerts for your family</p>
+                      </div>
+                    </div>
+                  )}
                 </>
               )}
             </div>

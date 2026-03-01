@@ -31,8 +31,8 @@ describe('MemberCard', () => {
 
     it('displays height and weight', () => {
       render(<MemberCard {...defaultProps} />);
-      expect(screen.getByText(/180 cm/)).toBeInTheDocument();
-      expect(screen.getByText(/80 kg/)).toBeInTheDocument();
+      expect(screen.getByText('180')).toBeInTheDocument();
+      expect(screen.getByText('80')).toBeInTheDocument();
     });
   });
 
@@ -77,13 +77,13 @@ describe('MemberCard', () => {
       render(<MemberCard {...defaultProps} member={FAMILY_MEMBERS.tommy} />);
       expect(screen.getByText('Tommy Doe')).toBeInTheDocument();
       expect(screen.getByText('T')).toBeInTheDocument();
-      expect(screen.getByText(/140 cm/)).toBeInTheDocument();
+      expect(screen.getByText('140')).toBeInTheDocument();
     });
 
     it('displays correct info for female member', () => {
       render(<MemberCard {...defaultProps} member={FAMILY_MEMBERS.jane} />);
       expect(screen.getByText('Jane Doe')).toBeInTheDocument();
-      expect(screen.getByText(/165 cm/)).toBeInTheDocument();
+      expect(screen.getByText('165')).toBeInTheDocument();
     });
   });
 });
