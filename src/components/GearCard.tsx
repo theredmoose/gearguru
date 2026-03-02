@@ -3,6 +3,7 @@ import type { GearItem, FamilyMember } from '../types';
 import { GearStatusBadge } from './GearStatusBadge';
 import { GearTypeIcon } from './GearIcons';
 import { GEAR_TYPE_LABELS, SPORT_LABELS } from '../constants/labels';
+import { BTN_ICON_INLINE_CLS, BTN_ICON_DANGER_CLS } from '../constants/design';
 
 interface GearCardProps {
   item: GearItem;
@@ -90,7 +91,7 @@ export function GearCard({
       {/* Main info */}
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-1.5 flex-wrap mb-0.5">
-          <span className="text-xs font-black text-slate-400 uppercase tracking-widest">
+          <span className="text-xs font-black text-slate-400 tracking-widest">
             {GEAR_TYPE_LABELS[item.type] ?? item.type}
           </span>
           <span
@@ -108,7 +109,7 @@ export function GearCard({
           {item.brand} {item.model}
         </p>
 
-        <p className="text-[10px] font-bold text-slate-500 mt-0.5">
+        <p className="text-xs font-bold text-slate-500 mt-0.5">
           <span>Size: {item.size}</span>
           {item.year && <><span> · </span><span>{item.year}</span></>}
         </p>
@@ -138,13 +139,13 @@ export function GearCard({
         {item.location && (
           <div className="flex items-center gap-1 mt-0.5">
             <MapPin className="w-3 h-3 text-slate-400" />
-            <span className="text-[10px] text-slate-400 font-bold">{item.location}</span>
+            <span className="text-xs text-slate-400 font-bold">{item.location}</span>
           </div>
         )}
 
         {/* Owner / Sport */}
         {showOwner
-          ? <p className="text-[10px] text-slate-400 font-bold mt-0.5">{ownerName}</p>
+          ? <p className="text-xs text-slate-400 font-bold mt-0.5">{ownerName}</p>
           : (
             <div className="flex flex-wrap gap-1 mt-0.5">
               {item.sports.map((s) => (
@@ -160,14 +161,14 @@ export function GearCard({
       {/* Actions */}
       <div className="flex flex-col gap-1 flex-shrink-0">
         <button
-          className="w-10 h-10 flex items-center justify-center rounded-xl hover:bg-slate-100 transition-colors text-slate-300 hover:text-[#008751]"
+          className={BTN_ICON_INLINE_CLS}
           onClick={handleEdit}
           aria-label="Edit gear"
         >
           <Pencil className="w-4 h-4" />
         </button>
         <button
-          className="w-10 h-10 flex items-center justify-center rounded-xl hover:bg-red-50 transition-colors text-slate-300 hover:text-red-400"
+          className={BTN_ICON_DANGER_CLS}
           onClick={handleDelete}
           aria-label="Delete gear"
         >

@@ -17,7 +17,7 @@ interface SettingsScreenProps {
 
 const DEFAULT_SPORTS: Sport[] = ['alpine', 'nordic-classic', 'nordic-skate', 'snowboard', 'hockey'];
 
-const sectionTitleCls = 'text-xs font-black text-slate-500 uppercase tracking-widest mb-3';
+const sectionTitleCls = 'text-xs font-black text-slate-500 tracking-widest mb-3';
 const rowCls = 'flex items-center justify-between py-4 border-b border-slate-100 last:border-0';
 const labelCls = 'text-sm font-semibold text-slate-700';
 const subLabelCls = 'text-xs text-slate-400 mt-0.5';

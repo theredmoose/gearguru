@@ -24,11 +24,12 @@ const defaultProps = {
 
 describe('NotificationsPanel', () => {
   describe('rendering', () => {
-    it('renders nothing when notifications array is empty', () => {
-      const { container } = render(
+    it('renders all-clear state when notifications array is empty', () => {
+      render(
         <NotificationsPanel notifications={[]} onDismiss={vi.fn()} onViewDismissed={vi.fn()} />
       );
-      expect(container.firstChild).toBeNull();
+      expect(screen.getByText('All clear')).toBeInTheDocument();
+      expect(screen.getByText('Alerts')).toBeInTheDocument();
     });
 
     it('renders notification title and body', () => {

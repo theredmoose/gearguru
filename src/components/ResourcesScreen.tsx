@@ -53,20 +53,23 @@ export function ResourcesScreen() {
   return (
     <div className="flex flex-col min-h-0 flex-1">
       <ScreenHeader title="Resources" />
-      <div className="flex-1 overflow-y-auto bg-[#F8FAFC] px-6 py-6 space-y-5">
-        <p className="text-xs text-slate-400 font-bold uppercase tracking-widest">
+      <div className="flex-1 overflow-y-auto bg-[#F8FAFC] px-5 pt-8 pb-8 space-y-5">
+        <p className="text-xs text-slate-400 font-bold tracking-widest px-1">
           Quick sizing reference
         </p>
 
         {SIZING_GUIDES.map((guide) => (
-          <div key={guide.sport} className={`rounded-3xl border p-5 ${guide.color}`}>
-            <h2 className={`text-xs font-black uppercase tracking-widest mb-4 ${guide.labelColor}`}>
+          <div key={guide.sport} className={`rounded-3xl border px-5 pt-5 pb-2 ${guide.color}`}>
+            <h2 className={`text-sm font-black tracking-widest mb-4 ${guide.labelColor}`}>
               {guide.sport}
             </h2>
-            <div className="space-y-3">
-              {guide.rules.map((rule) => (
-                <div key={rule.label} className="flex justify-between items-start gap-2">
-                  <span className="text-xs font-bold text-slate-500 uppercase tracking-wide whitespace-nowrap">
+            <div>
+              {guide.rules.map((rule, i) => (
+                <div
+                  key={rule.label}
+                  className={`flex justify-between items-center gap-4 py-3.5 ${i < guide.rules.length - 1 ? 'border-b border-black/5' : ''}`}
+                >
+                  <span className="text-xs font-bold text-slate-500 tracking-wide whitespace-nowrap">
                     {rule.label}
                   </span>
                   <span className="text-xs font-black text-slate-800 text-right">
@@ -78,7 +81,7 @@ export function ResourcesScreen() {
           </div>
         ))}
 
-        <p className="text-xs text-slate-400 text-center pb-2">
+        <p className="text-xs text-slate-400 text-center pb-2 px-2">
           All sizing is a starting point. Always verify with a qualified shop technician.
         </p>
       </div>

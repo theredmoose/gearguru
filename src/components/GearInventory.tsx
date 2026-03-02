@@ -1,7 +1,9 @@
 import { useState } from 'react';
+import { Plus } from 'lucide-react';
 import type { FamilyMember, GearItem } from '../types';
 import { GearCard } from './GearCard';
 import { ScreenHeader } from './ScreenHeader';
+import { BTN_ADD_CLS, BTN_PILL_ACTIVE_CLS, BTN_PILL_INACTIVE_CLS } from '../constants/design';
 
 interface GearInventoryProps {
   members: FamilyMember[];
@@ -27,6 +29,10 @@ export function GearInventory({
       ? gearItems
       : gearItems.filter((item) => item.ownerId === filterOwnerId);
 
+  const addForOwnerId = filterOwnerId === 'all'
+    ? (members.length > 0 ? members[0].id : null)
+    : filterOwnerId;
+
   // Group gear by owner for display
   const groupedByOwner = members.reduce(
     (acc, member) => {
@@ -44,18 +50,28 @@ export function GearInventory({
 
   return (
     <div className="flex flex-col min-h-0 flex-1">
-      <ScreenHeader title="Family Gear" onBack={onBack} />
+      <ScreenHeader
+        title="Family Gear"
+        onBack={onBack}
+        right={
+          addForOwnerId ? (
+            <button
+              onClick={() => onAddGear(addForOwnerId)}
+              className={BTN_ADD_CLS}
+              aria-label="Add gear"
+            >
+              <Plus className="w-5 h-5" />
+            </button>
+          ) : undefined
+        }
+      />
 
       {/* Filter bar */}
       <div className="px-5 py-3 bg-white border-b border-slate-100">
         <div className="flex items-center gap-2 overflow-x-auto scrollbar-none">
           <button
             onClick={() => setFilterOwnerId('all')}
-            className={`flex-shrink-0 px-4 py-2 rounded-full text-xs font-bold transition-all ${
-              filterOwnerId === 'all'
-                ? 'bg-[#008751] text-white shadow-sm'
-                : 'bg-slate-100 text-slate-500 hover:bg-slate-200'
-            }`}
+            className={filterOwnerId === 'all' ? BTN_PILL_ACTIVE_CLS : BTN_PILL_INACTIVE_CLS}
           >
             All
           </button>
@@ -63,11 +79,7 @@ export function GearInventory({
             <button
               key={member.id}
               onClick={() => setFilterOwnerId(member.id)}
-              className={`flex-shrink-0 px-4 py-2 rounded-full text-xs font-bold transition-all ${
-                filterOwnerId === member.id
-                  ? 'bg-[#008751] text-white shadow-sm'
-                  : 'bg-slate-100 text-slate-500 hover:bg-slate-200'
-              }`}
+              className={filterOwnerId === member.id ? BTN_PILL_ACTIVE_CLS : BTN_PILL_INACTIVE_CLS}
             >
               {member.name.split(' ')[0]}
             </button>
@@ -96,7 +108,7 @@ export function GearInventory({
               <div key={member.id}>
                 {/* Group header */}
                 <div className="flex items-center justify-between mb-3">
-                  <h2 className="text-xs font-black text-slate-500 uppercase tracking-widest">
+                  <h2 className="text-xs font-black text-slate-500 tracking-widest">
                     {member.name}
                   </h2>
                   <button
