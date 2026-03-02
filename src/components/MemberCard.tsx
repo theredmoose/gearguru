@@ -1,7 +1,10 @@
-import { Pencil, Trash2, ChevronRight } from 'lucide-react';
+import { useState } from 'react';
+import { Pencil, Trash2, ArrowLeftRight } from 'lucide-react';
 import type { FamilyMember, Sport } from '../types';
 import { shouldWarnGrowth, isMeasurementStale, analyzeGrowthTrend } from '../services/growthAnalysis';
+import { getShoeSizesFromFootLength } from '../services/shoeSize';
 import { GrowthWarningBadge } from './GrowthWarningBadge';
+import { STAT_ROW_CLS, STAT_LABEL_CLS, STAT_VALUE_CLS, BTN_ICON_INLINE_CLS, BTN_ICON_DANGER_CLS } from '../constants/design';
 
 interface MemberCardProps {
   member: FamilyMember;
@@ -29,8 +32,14 @@ function calculateAge(dateOfBirth: string): number {
 }
 
 export function MemberCard({ member, onSelect, onEdit, onDelete }: MemberCardProps) {
+  const [heightUnit, setHeightUnit] = useState<'cm' | 'ft'>('cm');
+  const [weightUnit, setWeightUnit] = useState<'kg' | 'lbs'>('kg');
+  const [shoeUnit, setShoeUnit] = useState<'mp' | 'eu'>('mp');
+
   const age = calculateAge(member.dateOfBirth);
   const { measurements } = member;
+  const footLength = Math.max(measurements.footLengthLeft, measurements.footLengthRight);
+  const mondopoint = footLength > 0 ? Math.round(footLength * 10) : 0;
   const showWarning = shouldWarnGrowth(member);
   const badgeReason = showWarning
     ? isMeasurementStale(member) && analyzeGrowthTrend(member.measurementHistory ?? []).isGrowing
@@ -41,6 +50,31 @@ export function MemberCard({ member, onSelect, onEdit, onDelete }: MemberCardPro
     : null;
 
   const sports = Object.keys(member.skillLevels ?? {}) as Sport[];
+
+  const heightDisplay = heightUnit === 'ft'
+    ? (() => {
+        const totalInches = measurements.height / 2.54;
+        const feet = Math.floor(totalInches / 12);
+        const inches = Math.round(totalInches % 12);
+        return `${feet}'${inches}"`;
+      })()
+    : `${measurements.height} cm`;
+
+  const weightDisplay = weightUnit === 'lbs'
+    ? `${Math.round(measurements.weight * 2.2046)} lbs`
+    : `${measurements.weight} kg`;
+
+  const shoeDisplay = mondopoint > 0
+    ? shoeUnit === 'eu'
+      ? `EU ${getShoeSizesFromFootLength(footLength).eu}`
+      : `${mondopoint} MP`
+    : '';
+
+  const statRows = [
+    { label: 'Height', value: heightDisplay, onToggle: () => setHeightUnit(u => u === 'cm' ? 'ft' : 'cm') },
+    { label: 'Weight', value: weightDisplay, onToggle: () => setWeightUnit(u => u === 'kg' ? 'lbs' : 'kg') },
+    ...(mondopoint > 0 ? [{ label: 'Shoe', value: shoeDisplay, onToggle: () => setShoeUnit(u => u === 'mp' ? 'eu' : 'mp') }] : []),
+  ];
 
   const handleDelete = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -56,58 +90,92 @@ export function MemberCard({ member, onSelect, onEdit, onDelete }: MemberCardPro
 
   return (
     <div
-      className="bg-white border border-slate-100 rounded-2xl px-4 py-3.5 flex items-center gap-3 shadow-sm hover:shadow-md active:scale-[0.99] transition-all cursor-pointer"
+      className="bg-white rounded-3xl border border-slate-100 shadow-sm hover:shadow-md active:scale-[0.99] transition-all cursor-pointer"
       onClick={() => onSelect(member)}
     >
-      {/* Avatar */}
-      <div className="w-13 h-13 w-[52px] h-[52px] rounded-xl bg-gradient-to-br from-emerald-50 to-slate-100 border border-slate-100 flex items-center justify-center flex-shrink-0">
-        <span className="text-xl font-black text-[#008751] select-none">
-          {member.name.charAt(0).toUpperCase()}
-        </span>
-      </div>
+      <div className="flex items-start gap-4 px-5 pt-5 pb-5">
 
-      {/* Info */}
-      <div className="flex-1 min-w-0">
-        <div className="flex items-center gap-2">
-          <p className="text-lg font-black text-slate-900 leading-tight truncate">
-            {member.name}
-          </p>
-          {badgeReason && <GrowthWarningBadge reason={badgeReason} />}
+        {/* Circular avatar */}
+        <div className="w-12 h-12 rounded-full bg-gradient-to-br from-emerald-50 to-slate-100 border border-slate-100 flex items-center justify-center flex-shrink-0 mt-1">
+          <span className="text-xl font-black text-[#008751] select-none">
+            {member.name.charAt(0).toUpperCase()}
+          </span>
         </div>
-        <p className="text-xs font-semibold text-slate-400 uppercase tracking-wide mt-0.5">
-          {age} yrs · {measurements.height} cm · {measurements.weight} kg
-        </p>
-        {sports.length > 0 && (
-          <div className="flex flex-wrap gap-1 mt-2">
-            {sports.map((sport) => (
-              <span
-                key={sport}
-                className="text-xs font-bold text-emerald-700 bg-emerald-50 border border-emerald-100 px-2 py-0.5 rounded-md uppercase tracking-wide"
-              >
-                {SPORT_LABELS[sport]}
-              </span>
-            ))}
-          </div>
-        )}
-      </div>
 
-      {/* Actions */}
-      <div className="flex items-center gap-0.5 flex-shrink-0">
-        <button
-          className="w-11 h-11 flex items-center justify-center rounded-xl hover:bg-slate-100 transition-colors text-slate-300 hover:text-[#008751]"
-          onClick={handleEdit}
-          aria-label="Edit member"
-        >
-          <Pencil className="w-4 h-4" />
-        </button>
-        <button
-          className="w-11 h-11 flex items-center justify-center rounded-xl hover:bg-red-50 transition-colors text-slate-300 hover:text-red-400"
-          onClick={handleDelete}
-          aria-label="Delete member"
-        >
-          <Trash2 className="w-4 h-4" />
-        </button>
-        <ChevronRight className="w-4 h-4 text-slate-200 ml-1" />
+        {/* Main content */}
+        <div className="flex-1 min-w-0">
+
+          {/* Name + action buttons row */}
+          <div className="flex items-start justify-between mb-1">
+            <div className="flex items-center gap-2 flex-1 min-w-0">
+              <p className="text-xl font-black text-slate-900 leading-tight truncate">
+                {member.name}
+              </p>
+              {badgeReason && <GrowthWarningBadge reason={badgeReason} />}
+            </div>
+            <div className="flex gap-0.5 flex-shrink-0 ml-2">
+              <button
+                className={BTN_ICON_INLINE_CLS}
+                onClick={handleEdit}
+                aria-label="Edit member"
+              >
+                <Pencil className="w-4 h-4" />
+              </button>
+              <button
+                className={BTN_ICON_DANGER_CLS}
+                onClick={handleDelete}
+                aria-label="Delete member"
+              >
+                <Trash2 className="w-4 h-4" />
+              </button>
+            </div>
+          </div>
+
+          <p className="text-xs text-slate-400 font-semibold mb-2">
+            Age {age}{member.gender ? ` · ${member.gender}` : ''}
+          </p>
+
+          {sports.length > 0 && (
+            <div className="flex flex-wrap gap-1 mb-2.5">
+              {sports.map((sport) => (
+                <span
+                  key={sport}
+                  className="text-xs font-bold text-emerald-700 bg-emerald-50 border border-emerald-100 px-2 py-0.5 rounded-lg uppercase tracking-wide"
+                >
+                  {SPORT_LABELS[sport]}
+                </span>
+              ))}
+            </div>
+          )}
+
+          {/* Stat rows */}
+          <div className="border-t border-slate-100 pt-2">
+            {statRows.map((row) => {
+              const spaceIdx = row.value.lastIndexOf(' ');
+              const num = spaceIdx >= 0 ? row.value.slice(0, spaceIdx) : row.value;
+              const unit = spaceIdx >= 0 ? row.value.slice(spaceIdx + 1) : '';
+              return (
+                <div key={row.label} className={STAT_ROW_CLS}>
+                  <span className={STAT_LABEL_CLS}>{row.label}</span>
+                  <div className="flex items-center justify-end gap-0.5">
+                    <span className={`${STAT_VALUE_CLS} text-right`}>{num}</span>
+                    <span className="text-xs font-bold text-slate-500 w-7 text-left">{unit}</span>
+                    {row.onToggle && (
+                      <button
+                        onClick={(e) => { e.stopPropagation(); row.onToggle!(); }}
+                        aria-label={`Toggle ${row.label} units`}
+                        className="text-slate-300 hover:text-emerald-400 transition-colors p-0.5"
+                      >
+                        <ArrowLeftRight className="w-3 h-3" />
+                      </button>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+
       </div>
     </div>
   );

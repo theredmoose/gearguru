@@ -512,7 +512,7 @@ describe('App gear from inventory', () => {
     renderApp();
     fireEvent.click(screen.getByText('GEAR'));
     // Select specific member to show Add Gear button
-    fireEvent.change(screen.getByRole('combobox'), { target: { value: 'member-1' } });
+    fireEvent.click(screen.getByRole('button', { name: 'Gear' }));
     fireEvent.click(screen.getByText('+ Add Gear'));
     expect(screen.getByRole('heading', { name: 'Add Gear' })).toBeInTheDocument();
   });
@@ -520,7 +520,7 @@ describe('App gear from inventory', () => {
   it('returns to gear view when gear form cancelled from inventory', () => {
     renderApp();
     fireEvent.click(screen.getByText('GEAR'));
-    fireEvent.change(screen.getByRole('combobox'), { target: { value: 'member-1' } });
+    fireEvent.click(screen.getByRole('button', { name: 'Gear' }));
     fireEvent.click(screen.getByText('+ Add Gear'));
     fireEvent.click(screen.getByRole('button', { name: 'Cancel' }));
     expect(screen.getByRole('heading', { name: 'Family Gear' })).toBeInTheDocument();
@@ -529,7 +529,7 @@ describe('App gear from inventory', () => {
   it('calls addGearItem on gear form submit from inventory', async () => {
     renderApp();
     fireEvent.click(screen.getByText('GEAR'));
-    fireEvent.change(screen.getByRole('combobox'), { target: { value: 'member-1' } });
+    fireEvent.click(screen.getByRole('button', { name: 'Gear' }));
     fireEvent.click(screen.getByText('+ Add Gear'));
     fireEvent.change(screen.getByLabelText('Brand'), { target: { value: 'Fischer' } });
     fireEvent.change(screen.getByLabelText('Model'), { target: { value: 'Crown' } });

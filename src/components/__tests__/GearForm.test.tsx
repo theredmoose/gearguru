@@ -115,31 +115,29 @@ describe('GearForm', () => {
       expect(screen.getByLabelText('Size')).toBeInTheDocument();
     });
 
-    it('shows the Condition field', () => {
+    it('shows the Condition field as a select', () => {
       render(<GearForm {...defaultProps} />);
-      // Condition is now a pill button group; default selection is Good
-      expect(screen.getByRole('button', { name: /^good$/i })).toBeInTheDocument();
+      expect(screen.getByLabelText('Condition')).toBeInTheDocument();
     });
 
-    it('shows the Status field', () => {
+    it('shows the Status field as a select', () => {
       render(<GearForm {...defaultProps} />);
-      // Status is now a pill button group; default selection is Available
-      expect(screen.getByRole('button', { name: /^available$/i })).toBeInTheDocument();
+      expect(screen.getByLabelText('Status')).toBeInTheDocument();
     });
 
-    it('shows the Year optional field', () => {
+    it('shows the Year field', () => {
       render(<GearForm {...defaultProps} />);
-      expect(screen.getByLabelText('Year (optional)')).toBeInTheDocument();
+      expect(screen.getByLabelText('Year')).toBeInTheDocument();
     });
 
-    it('shows the Location optional field', () => {
+    it('shows the Location field', () => {
       render(<GearForm {...defaultProps} />);
-      expect(screen.getByLabelText('Location (optional)')).toBeInTheDocument();
+      expect(screen.getByLabelText('Location')).toBeInTheDocument();
     });
 
-    it('shows the Notes optional field', () => {
+    it('shows the Notes field', () => {
       render(<GearForm {...defaultProps} />);
-      expect(screen.getByLabelText('Notes (optional)')).toBeInTheDocument();
+      expect(screen.getByLabelText('Notes')).toBeInTheDocument();
     });
 
     it('pre-populates brand when editing', () => {
@@ -293,7 +291,7 @@ describe('GearForm', () => {
       fireEvent.change(screen.getByLabelText('Brand'), { target: { value: 'Atomic' } });
       fireEvent.change(screen.getByLabelText('Model'), { target: { value: 'Redster' } });
       fireEvent.change(screen.getByLabelText('Size'), { target: { value: '170' } });
-      fireEvent.change(screen.getByLabelText('Year (optional)'), { target: { value: '2023' } });
+      fireEvent.change(screen.getByLabelText('Year'), { target: { value: '2023' } });
       fireEvent.click(screen.getByRole('button', { name: 'Add Gear' }));
       await waitFor(() =>
         expect(mockOnSubmit).toHaveBeenCalledWith(
@@ -347,25 +345,26 @@ describe('GearForm', () => {
   });
 
   // ============================================
-  // STATUS BUTTONS
+  // STATUS SELECT
   // ============================================
-  describe('status buttons', () => {
-    it('shows all 6 status options', () => {
+  describe('status select', () => {
+    it('shows all status options in the dropdown', () => {
       render(<GearForm {...defaultProps} />);
-      expect(screen.getByRole('button', { name: /^active$/i })).toBeInTheDocument();
-      expect(screen.getByRole('button', { name: /^available$/i })).toBeInTheDocument();
-      expect(screen.getByRole('button', { name: /^outgrown$/i })).toBeInTheDocument();
-      expect(screen.getByRole('button', { name: /^to sell$/i })).toBeInTheDocument();
-      expect(screen.getByRole('button', { name: /^sold$/i })).toBeInTheDocument();
-      expect(screen.getByRole('button', { name: /^needs repair$/i })).toBeInTheDocument();
+      expect(screen.getByLabelText('Status')).toBeInTheDocument();
+      expect(screen.getByRole('option', { name: 'Active' })).toBeInTheDocument();
+      expect(screen.getByRole('option', { name: 'Available' })).toBeInTheDocument();
+      expect(screen.getByRole('option', { name: 'Outgrown' })).toBeInTheDocument();
+      expect(screen.getByRole('option', { name: 'To Sell' })).toBeInTheDocument();
+      expect(screen.getByRole('option', { name: 'Sold' })).toBeInTheDocument();
+      expect(screen.getByRole('option', { name: 'Needs Repair' })).toBeInTheDocument();
     });
 
-    it('sets status to outgrown when that button clicked', async () => {
+    it('sets status to outgrown when selected', async () => {
       render(<GearForm {...defaultProps} />);
       fireEvent.change(screen.getByLabelText('Brand'), { target: { value: 'Atomic' } });
       fireEvent.change(screen.getByLabelText('Model'), { target: { value: 'Redster' } });
       fireEvent.change(screen.getByLabelText('Size'), { target: { value: '170' } });
-      fireEvent.click(screen.getByRole('button', { name: /^outgrown$/i }));
+      fireEvent.change(screen.getByLabelText('Status'), { target: { value: 'outgrown' } });
       fireEvent.click(screen.getByRole('button', { name: 'Add Gear' }));
       await waitFor(() =>
         expect(mockOnSubmit).toHaveBeenCalledWith(
@@ -384,7 +383,7 @@ describe('GearForm', () => {
       fireEvent.change(screen.getByLabelText('Brand'), { target: { value: 'Atomic' } });
       fireEvent.change(screen.getByLabelText('Model'), { target: { value: 'Redster' } });
       fireEvent.change(screen.getByLabelText('Size'), { target: { value: '170' } });
-      fireEvent.change(screen.getByLabelText('Notes (optional)'), { target: { value: 'Needs wax' } });
+      fireEvent.change(screen.getByLabelText('Notes'), { target: { value: 'Needs wax' } });
       fireEvent.click(screen.getByRole('button', { name: 'Add Gear' }));
       await waitFor(() =>
         expect(mockOnSubmit).toHaveBeenCalledWith(
@@ -421,10 +420,10 @@ describe('GearForm', () => {
       fireEvent.change(screen.getByPlaceholderText('Tip'), { target: { value: '123' } });
       fireEvent.change(screen.getByPlaceholderText('Waist'), { target: { value: '75' } });
       fireEvent.change(screen.getByPlaceholderText('Tail'), { target: { value: '108' } });
-      fireEvent.change(screen.getByLabelText('Turn Radius (R value in meters)'), { target: { value: '16.5' } });
+      fireEvent.change(screen.getByLabelText('Radius (m)'), { target: { value: '16.5' } });
       fireEvent.change(screen.getByLabelText('Binding Brand'), { target: { value: 'Marker' } });
       fireEvent.change(screen.getByLabelText('Binding Model'), { target: { value: 'Griffon' } });
-      fireEvent.change(screen.getByLabelText('DIN Range (binding capacity)'), { target: { value: '4-13' } });
+      fireEvent.change(screen.getByLabelText('DIN Range'), { target: { value: '4-13' } });
       fireEvent.click(screen.getByRole('button', { name: 'Add Gear' }));
       await waitFor(() =>
         expect(mockOnSubmit).toHaveBeenCalledWith(

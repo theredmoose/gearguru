@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { ChevronDown } from 'lucide-react';
 import type { GearItem, GearType, Sport, GearPhoto, ExtendedGearDetails, AlpineSkiDetails, SkiProfile, GearStatus } from '../types';
 import { PhotoCapture } from './PhotoCapture';
 import { analyzeGearPhotos } from '../services/gearAnalysis';
@@ -34,7 +35,12 @@ const GEAR_TYPES: { id: GearType; label: string }[] = [
   { id: 'other', label: 'Other' },
 ];
 
-const CONDITIONS = ['new', 'good', 'fair', 'worn'] as const;
+const CONDITIONS: { id: 'new' | 'good' | 'fair' | 'worn'; label: string }[] = [
+  { id: 'new',  label: 'New' },
+  { id: 'good', label: 'Good' },
+  { id: 'fair', label: 'Fair' },
+  { id: 'worn', label: 'Worn' },
+];
 
 const STATUSES: { id: GearStatus; label: string }[] = [
   { id: 'active',       label: 'Active' },
@@ -48,8 +54,8 @@ const STATUSES: { id: GearStatus; label: string }[] = [
 // Shared input/label classes
 const inputCls =
   'w-full border border-slate-200 rounded-xl px-3 py-2.5 text-sm text-slate-800 bg-white focus:outline-none focus:ring-2 focus:ring-[#008751] placeholder:text-slate-300';
-const labelCls = 'block text-xs font-black text-slate-500 uppercase tracking-widest mb-1';
-const sectionTitleCls = 'text-xs font-black text-slate-400 uppercase tracking-widest pb-2 mb-3 border-b border-slate-100';
+const labelCls = 'block text-xs font-black text-slate-500 tracking-widest mb-1';
+const sectionTitleCls = 'text-xs font-black text-slate-400 tracking-widest pb-2 mb-3 border-b border-slate-100';
 
 export function GearForm({
   item,
@@ -106,12 +112,10 @@ export function GearForm({
     (extendedDetails?.type === 'alpineSki' ? extendedDetails.details.bindings?.dinRange : '') ?? ''
   );
   const [dinSetting, setDinSetting] = useState<string>(() => {
-    // Prefer the value already saved on this gear item
     const saved = extendedDetails?.type === 'alpineSki'
       ? extendedDetails.details.bindings?.dinSetting
       : undefined;
     if (saved !== undefined) return saved.toString();
-    // Fall back to the user's default DIN
     if (defaultDIN !== undefined) return defaultDIN.toString();
     return '';
   });
@@ -349,7 +353,7 @@ export function GearForm({
                     className={inputCls}
                     value={brand}
                     onChange={(e) => setBrand(e.target.value)}
-                    placeholder="e.g., Fischer"
+                    placeholder="Brand name"
                     required
                   />
                 </div>
@@ -362,7 +366,7 @@ export function GearForm({
                     className={inputCls}
                     value={model}
                     onChange={(e) => setModel(e.target.value)}
-                    placeholder="e.g., RCS Skate"
+                    placeholder="Model name"
                     required
                   />
                 </div>
@@ -377,20 +381,20 @@ export function GearForm({
                     className={inputCls}
                     value={size}
                     onChange={(e) => setSize(e.target.value)}
-                    placeholder={showAlpineSkiDetails ? 'e.g., 170' : 'e.g., 186cm'}
+                    placeholder={showAlpineSkiDetails ? '170' : '186 cm'}
                     required
                   />
                 </div>
 
                 <div>
-                  <label htmlFor="year" className={labelCls}>Year (optional)</label>
+                  <label htmlFor="year" className={labelCls}>Year</label>
                   <input
                     id="year"
                     type="number"
                     className={inputCls}
                     value={year}
                     onChange={(e) => setYear(e.target.value)}
-                    placeholder="e.g., 2023"
+                    placeholder="2023"
                     min="1980"
                     max={new Date().getFullYear() + 1}
                   />
@@ -398,56 +402,14 @@ export function GearForm({
               </div>
 
               <div>
-                <label className={labelCls}>Condition</label>
-                <div className="flex gap-1.5 mt-1">
-                  {CONDITIONS.map((c) => (
-                    <button
-                      key={c}
-                      type="button"
-                      aria-pressed={condition === c}
-                      onClick={() => setCondition(c)}
-                      className={`flex-1 py-2 text-xs font-black uppercase tracking-wide transition-colors min-h-[36px] ${
-                        condition === c
-                          ? 'bg-[#008751] text-white'
-                          : 'bg-slate-100 text-slate-500 hover:bg-slate-200'
-                      }`}
-                    >
-                      {c.charAt(0).toUpperCase() + c.slice(1)}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              <div>
-                <label className={labelCls}>Status</label>
-                <div className="flex gap-1.5 mt-1">
-                  {STATUSES.map((s) => (
-                    <button
-                      key={s.id}
-                      type="button"
-                      aria-pressed={status === s.id}
-                      onClick={() => setStatus(s.id)}
-                      className={`flex-1 py-2 text-xs font-black uppercase tracking-wide transition-colors min-h-[36px] leading-tight text-center ${
-                        status === s.id
-                          ? 'bg-[#008751] text-white'
-                          : 'bg-slate-100 text-slate-500 hover:bg-slate-200'
-                      }`}
-                    >
-                      {s.label}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              <div>
-                <label htmlFor="location" className={labelCls}>Location (optional)</label>
+                <label htmlFor="location" className={labelCls}>Location</label>
                 <input
                   id="location"
                   type="text"
                   className={inputCls}
                   value={location}
                   onChange={(e) => setLocation(e.target.value)}
-                  placeholder="e.g., Garage, Ski locker, Car"
+                  placeholder="Garage, ski locker, car"
                 />
               </div>
 
@@ -493,21 +455,21 @@ export function GearForm({
                 </div>
 
                 <div>
-                  <label htmlFor="radius" className={labelCls}>Turn Radius (R value in meters)</label>
+                  <label htmlFor="radius" className={labelCls}>Radius (m)</label>
                   <input
                     id="radius"
                     type="number"
                     className={inputCls}
                     value={radius}
                     onChange={(e) => setRadius(e.target.value)}
-                    placeholder="e.g., 15.5"
+                    placeholder="15.5"
                     step="0.1"
                     min="5"
                     max="40"
                   />
                 </div>
 
-                <p className="text-xs font-black text-slate-400 uppercase tracking-widest pb-1 border-b border-slate-100 mb-1">Bindings</p>
+                <p className={sectionTitleCls}>Bindings</p>
                 <div className="grid grid-cols-2 gap-3">
                   <div>
                     <label htmlFor="bindingBrand" className={labelCls}>Binding Brand</label>
@@ -517,7 +479,7 @@ export function GearForm({
                       className={inputCls}
                       value={bindingBrand}
                       onChange={(e) => setBindingBrand(e.target.value)}
-                      placeholder="e.g., Marker"
+                      placeholder="Marker"
                     />
                   </div>
                   <div>
@@ -528,20 +490,20 @@ export function GearForm({
                       className={inputCls}
                       value={bindingModel}
                       onChange={(e) => setBindingModel(e.target.value)}
-                      placeholder="e.g., Griffon 13"
+                      placeholder="Griffon 13"
                     />
                   </div>
                 </div>
 
                 <div>
-                  <label htmlFor="bindingDin" className={labelCls}>DIN Range (binding capacity)</label>
+                  <label htmlFor="bindingDin" className={labelCls}>DIN Range</label>
                   <input
                     id="bindingDin"
                     type="text"
                     className={inputCls}
                     value={bindingDin}
                     onChange={(e) => setBindingDin(e.target.value)}
-                    placeholder="e.g., 4-13"
+                    placeholder="4-13"
                   />
                 </div>
 
@@ -573,17 +535,57 @@ export function GearForm({
             </section>
           )}
 
+          {/* Condition & Status */}
+          <section>
+            <h3 className={sectionTitleCls}>Condition & Status</h3>
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <label htmlFor="condition" className={labelCls}>Condition</label>
+                <div className="relative">
+                  <select
+                    id="condition"
+                    value={condition}
+                    onChange={(e) => setCondition(e.target.value as 'new' | 'good' | 'fair' | 'worn')}
+                    className={`${inputCls} appearance-none`}
+                  >
+                    {CONDITIONS.map((c) => (
+                      <option key={c.id} value={c.id}>{c.label}</option>
+                    ))}
+                  </select>
+                  <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
+                </div>
+              </div>
+
+              <div>
+                <label htmlFor="status" className={labelCls}>Status</label>
+                <div className="relative">
+                  <select
+                    id="status"
+                    value={status}
+                    onChange={(e) => setStatus(e.target.value as GearStatus)}
+                    className={`${inputCls} appearance-none`}
+                  >
+                    {STATUSES.map((s) => (
+                      <option key={s.id} value={s.id}>{s.label}</option>
+                    ))}
+                  </select>
+                  <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
+                </div>
+              </div>
+            </div>
+          </section>
+
           {/* Notes */}
           <section>
             <h3 className={sectionTitleCls}>Notes</h3>
             <div>
-              <label htmlFor="notes" className={labelCls}>Notes (optional)</label>
+              <label htmlFor="notes" className={labelCls}>Notes</label>
               <textarea
                 id="notes"
                 className={`${inputCls} resize-none`}
                 value={notes}
                 onChange={(e) => setNotes(e.target.value)}
-                placeholder="e.g., Needs waxing, base repair needed"
+                placeholder="Needs waxing, base repair needed"
                 rows={3}
               />
             </div>
