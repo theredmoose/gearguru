@@ -2,6 +2,7 @@ import { useState, useMemo } from 'react';
 import { Settings, PlusCircle, ChevronDown, CheckCircle2, AlertCircle, ArrowLeftRight } from 'lucide-react';
 import type { FamilyMember, GearItem, Sport, SkillLevel, AppSettings, BootUnit } from '../types';
 import { ScreenHeader } from './ScreenHeader';
+import { SECTION_HEADER_CLS, COLOR_PRIMARY, COLOR_ACCENT, BTN_ADD_CLS } from '../constants/design';
 import { GearTypeIcon } from './GearIcons';
 import { GearLoadoutPanel } from './GearLoadoutPanel';
 import { GrowthWarningBadge } from './GrowthWarningBadge';
@@ -304,7 +305,7 @@ export function MemberDetail({
             <div className="space-y-0.5 mb-3">
               {statRows.map((row) => (
                 <div key={row.label} className="flex items-center justify-between border-b border-slate-100 py-2">
-                  <span className="text-xs text-slate-400 font-bold uppercase tracking-widest">
+                  <span className="text-xs text-slate-400 font-bold tracking-widest">
                     {row.label}
                   </span>
                   {row.action ? (
@@ -377,10 +378,10 @@ export function MemberDetail({
         </div>
 
         {/* ── Sizing ── */}
-        <div className="mb-6">
+        <div className="mt-6 mb-6">
           <div className="flex items-center justify-between mb-4 ml-2">
-            <h2 className="text-xl font-black tracking-tighter uppercase" style={{ color: '#008751' }}>
-              Sizing <span style={{ color: '#1e3a32' }}>Guide</span>
+            <h2 className={SECTION_HEADER_CLS} style={{ color: COLOR_PRIMARY }}>
+              Sizing <span style={{ color: COLOR_ACCENT }}>Guide</span>
             </h2>
             <button
               onClick={onGetSizing}
@@ -432,14 +433,14 @@ export function MemberDetail({
         </div>
 
         {/* ── Gear Vault ── */}
-        <div>
+        <div className="mt-6">
           <div className="flex items-center justify-between mb-4 px-2">
-            <h2 className="text-xl font-black tracking-tighter uppercase" style={{ color: '#008751' }}>
-              Gear <span style={{ color: '#1e3a32' }}>Vault</span>
+            <h2 className={SECTION_HEADER_CLS} style={{ color: COLOR_PRIMARY }}>
+              Gear <span style={{ color: COLOR_ACCENT }}>Vault</span>
             </h2>
             <button
               onClick={() => onAddGear(selectedSport)}
-              className="bg-[#008751] p-2 rounded-xl text-white shadow-lg shadow-emerald-100 transition-all active:scale-90"
+              className={BTN_ADD_CLS}
               aria-label="Add gear"
             >
               <PlusCircle className="w-5 h-5" />

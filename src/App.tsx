@@ -13,7 +13,8 @@ function getOperationErrorMessage(err: unknown, context: 'load' | 'save' = 'save
   if (err instanceof Error && err.message) return err.message;
   return 'Something went wrong. Please try again.';
 }
-import { Settings } from 'lucide-react';
+import { Settings, Plus } from 'lucide-react';
+import { SECTION_HEADER_CLS, COLOR_PRIMARY, COLOR_ACCENT, BTN_ADD_CLS } from './constants/design';
 import {
   MemberForm,
   MemberCard,
@@ -278,13 +279,7 @@ function App() {
               <div className="h-5" />
             </div>
 
-            <NotificationsPanel
-              notifications={activeNotifications}
-              onDismiss={dismissNotification}
-              onViewDismissed={() => setView('notifications')}
-            />
-
-            <div className="flex-1 overflow-y-auto bg-[#F8FAFC] px-5 pt-8 pb-6">
+            <div className="flex-1 overflow-y-auto bg-[#F8FAFC] px-6 pt-6 pb-8">
               {loading && <p className="loading">Loading...</p>}
               {error && <p className="error-state">{getOperationErrorMessage(error, 'load')}</p>}
 
@@ -306,8 +301,20 @@ function App() {
 
               {!loading && members.length > 0 && (
                 <>
-                  <p className="text-xs font-black text-slate-500 uppercase tracking-widest mb-4">Your Family</p>
-                  <div className="flex flex-col gap-3 mb-5">
+                  <div className="flex items-center justify-between mt-4 mb-3">
+                    <h2 className={SECTION_HEADER_CLS} style={{ color: COLOR_PRIMARY }}>
+                      Your <span style={{ color: COLOR_ACCENT }}>Family</span>
+                    </h2>
+                    <button
+                      onClick={() => { setSelectedMember(null); setView('add'); }}
+                      className={BTN_ADD_CLS}
+                      aria-label="Add Family Member"
+                    >
+                      <Plus className="w-5 h-5" />
+                    </button>
+                  </div>
+
+                  <div className="flex flex-col gap-5">
                     {members.map((member) => (
                       <MemberCard
                         key={member.id}
@@ -318,24 +325,12 @@ function App() {
                       />
                     ))}
                   </div>
-                  <button
-                    className="w-full flex items-center justify-center gap-2 py-3.5 border-2 border-dashed border-slate-200 rounded-2xl text-sm font-bold text-slate-400 hover:border-emerald-300 hover:text-emerald-600 transition-all"
-                    onClick={() => { setSelectedMember(null); setView('add'); }}
-                  >
-                    <span className="text-base leading-none">+</span> Add Family Member
-                  </button>
 
-                  {activeNotifications.length === 0 && (
-                    <div className="mt-8 flex items-center gap-3 bg-emerald-50 border border-emerald-100 rounded-full px-5 py-3.5 shadow-sm">
-                      <div className="w-7 h-7 rounded-full bg-white border border-emerald-100 flex items-center justify-center flex-shrink-0 shadow-sm">
-                        <span className="text-sm leading-none text-[#008751] font-black">✓</span>
-                      </div>
-                      <div>
-                        <p className="text-sm font-black text-emerald-800">All clear</p>
-                        <p className="text-xs font-semibold text-emerald-600">No gear alerts for your family</p>
-                      </div>
-                    </div>
-                  )}
+                  <NotificationsPanel
+                    notifications={activeNotifications}
+                    onDismiss={dismissNotification}
+                    onViewDismissed={() => setView('notifications')}
+                  />
                 </>
               )}
             </div>
