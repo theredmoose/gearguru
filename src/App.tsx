@@ -484,7 +484,6 @@ function App() {
   // Show email verification banner for email/password accounts that haven't verified yet
   const isEmailProvider = user.providerData?.some(p => p.providerId === 'password');
   const showVerificationBanner = isEmailProvider && !user.emailVerified;
-  const [verificationResent, setVerificationResent] = useState(false);
 
   const handleResendVerification = async () => {
     try {
