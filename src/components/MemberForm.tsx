@@ -1,6 +1,17 @@
 import { useState } from 'react';
 import type { FamilyMember, Measurements } from '../types';
 import { ScreenHeader } from './ScreenHeader';
+import {
+  validateHeight,
+  validateWeight,
+  validateOptionalFootLength,
+  validateOptionalFootWidth,
+  validateOptionalUsShoeSize,
+  validateOptionalEuShoeSize,
+  validateOptionalHeadCircumference,
+  validateOptionalHandSize,
+  validateDateOfBirth,
+} from '../services/validation';
 
 interface MemberFormProps {
   member?: FamilyMember;
@@ -53,69 +64,38 @@ export function MemberForm({ member, onSubmit, onCancel, separateFeetHands = fal
       return;
     }
 
-    if (measurements.height <= 0) {
-      setError('Height must be greater than 0');
-      return;
-    }
-    if (measurements.height > 300) {
-      setError('Height must be 300 cm or less');
-      return;
-    }
+    const heightError = validateHeight(measurements.height);
+    if (heightError) { setError(heightError); return; }
 
-    if (measurements.weight <= 0) {
-      setError('Weight must be greater than 0');
-      return;
-    }
-    if (measurements.weight > 300) {
-      setError('Weight must be 300 kg or less');
-      return;
-    }
+    const weightError = validateWeight(measurements.weight);
+    if (weightError) { setError(weightError); return; }
 
-    if (measurements.footLengthLeft > 0 && (measurements.footLengthLeft < 12 || measurements.footLengthLeft > 30)) {
-      setError('Left foot length must be between 12 and 30 cm');
-      return;
-    }
-    if (measurements.footLengthRight > 0 && (measurements.footLengthRight < 12 || measurements.footLengthRight > 30)) {
-      setError('Right foot length must be between 12 and 30 cm');
-      return;
-    }
-    if (measurements.footWidthLeft !== undefined && measurements.footWidthLeft > 15) {
-      setError('Left foot width must be 15 cm or less');
-      return;
-    }
-    if (measurements.footWidthRight !== undefined && measurements.footWidthRight > 15) {
-      setError('Right foot width must be 15 cm or less');
-      return;
-    }
-    if (measurements.usShoeSize !== undefined && measurements.usShoeSize > 25) {
-      setError('US shoe size must be 25 or less');
-      return;
-    }
-    if (measurements.euShoeSize !== undefined && measurements.euShoeSize > 60) {
-      setError('EU shoe size must be 60 or less');
-      return;
-    }
-    if (measurements.headCircumference !== undefined && (measurements.headCircumference < 40 || measurements.headCircumference > 70)) {
-      setError('Head circumference must be between 40 and 70 cm');
-      return;
-    }
-    if (measurements.handSize !== undefined && (measurements.handSize < 4 || measurements.handSize > 30)) {
-      setError('Hand size must be between 4 and 30 cm');
-      return;
-    }
+    const footLeftError = validateOptionalFootLength(measurements.footLengthLeft, 'left');
+    if (footLeftError) { setError(footLeftError); return; }
 
-    const dobDate = new Date(dateOfBirth);
-    const today = new Date();
-    const minDate = new Date();
-    minDate.setFullYear(today.getFullYear() - 120);
-    if (dobDate > today) {
-      setError('Date of birth cannot be in the future');
-      return;
-    }
-    if (dobDate < minDate) {
-      setError('Date of birth is too far in the past');
-      return;
-    }
+    const footRightError = validateOptionalFootLength(measurements.footLengthRight, 'right');
+    if (footRightError) { setError(footRightError); return; }
+
+    const footWidthLeftError = validateOptionalFootWidth(measurements.footWidthLeft, 'left');
+    if (footWidthLeftError) { setError(footWidthLeftError); return; }
+
+    const footWidthRightError = validateOptionalFootWidth(measurements.footWidthRight, 'right');
+    if (footWidthRightError) { setError(footWidthRightError); return; }
+
+    const usShoeSizeError = validateOptionalUsShoeSize(measurements.usShoeSize);
+    if (usShoeSizeError) { setError(usShoeSizeError); return; }
+
+    const euShoeSizeError = validateOptionalEuShoeSize(measurements.euShoeSize);
+    if (euShoeSizeError) { setError(euShoeSizeError); return; }
+
+    const headCircError = validateOptionalHeadCircumference(measurements.headCircumference);
+    if (headCircError) { setError(headCircError); return; }
+
+    const handSizeError = validateOptionalHandSize(measurements.handSize);
+    if (handSizeError) { setError(handSizeError); return; }
+
+    const dobError = validateDateOfBirth(dateOfBirth);
+    if (dobError) { setError(dobError); return; }
 
     setSubmitting(true);
     try {

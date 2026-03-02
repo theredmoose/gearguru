@@ -2,6 +2,7 @@ import { useState } from 'react';
 import type { GearItem, GearType, Sport, GearPhoto, ExtendedGearDetails, AlpineSkiDetails, SkiProfile, GearStatus } from '../types';
 import { PhotoCapture } from './PhotoCapture';
 import { analyzeGearPhotos } from '../services/gearAnalysis';
+import { validateYear, parseSkiProfile } from '../services/validation';
 import { ScreenHeader } from './ScreenHeader';
 
 interface GearFormProps {
@@ -187,14 +188,8 @@ export function GearForm({
       return;
     }
 
-    if (year) {
-      const yearNum = parseInt(year, 10);
-      const currentYear = new Date().getFullYear();
-      if (isNaN(yearNum) || yearNum < 1980 || yearNum > currentYear + 1) {
-        setError(`Year must be between 1980 and ${currentYear + 1}.`);
-        return;
-      }
-    }
+    const yearError = validateYear(year);
+    if (yearError) { setError(yearError); return; }
 
     setSubmitting(true);
 
@@ -202,14 +197,7 @@ export function GearForm({
       let finalExtendedDetails: ExtendedGearDetails | undefined = extendedDetails;
 
       if (type === 'ski' && selectedSports.includes('alpine')) {
-        const tipN = parseInt(profileTip, 10);
-        const waistN = parseInt(profileWaist, 10);
-        const tailN = parseInt(profileTail, 10);
-        const profile: SkiProfile | undefined =
-          profileTip && profileWaist && profileTail &&
-          !isNaN(tipN) && !isNaN(waistN) && !isNaN(tailN)
-            ? { tip: tipN, waist: waistN, tail: tailN }
-            : undefined;
+        const profile = parseSkiProfile(profileTip, profileWaist, profileTail) ?? undefined;
 
         const parsedDinSetting = dinSetting ? parseFloat(dinSetting) : undefined;
         const alpineDetails: AlpineSkiDetails = {
