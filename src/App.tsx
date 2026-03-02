@@ -326,11 +326,13 @@ function App() {
                     ))}
                   </div>
 
-                  <NotificationsPanel
-                    notifications={activeNotifications}
-                    onDismiss={dismissNotification}
-                    onViewDismissed={() => setView('notifications')}
-                  />
+                  <div className="mt-5">
+                    <NotificationsPanel
+                      notifications={activeNotifications}
+                      onDismiss={dismissNotification}
+                      onViewDismissed={() => setView('notifications')}
+                    />
+                  </div>
                 </>
               )}
             </div>
