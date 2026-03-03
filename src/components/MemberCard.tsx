@@ -135,19 +135,6 @@ export function MemberCard({ member, onSelect, onEdit, onDelete }: MemberCardPro
             Age {age}{member.gender ? ` · ${member.gender}` : ''}
           </p>
 
-          {sports.length > 0 && (
-            <div className="flex flex-wrap gap-1 mb-2.5">
-              {sports.map((sport) => (
-                <span
-                  key={sport}
-                  className="text-xs font-bold text-emerald-700 bg-emerald-50 border border-emerald-100 px-2 py-0.5 rounded-lg uppercase tracking-wide"
-                >
-                  {SPORT_LABELS[sport]}
-                </span>
-              ))}
-            </div>
-          )}
-
           {/* Stat rows */}
           <div className="border-t border-slate-100 pt-2">
             {statRows.map((row) => {
@@ -174,6 +161,19 @@ export function MemberCard({ member, onSelect, onEdit, onDelete }: MemberCardPro
               );
             })}
           </div>
+
+          {sports.length > 0 && (
+            <div className="flex flex-wrap gap-1 mt-2">
+              {sports.map((sport) => (
+                <span
+                  key={sport}
+                  className="text-xs font-bold text-emerald-700 bg-emerald-50 border border-emerald-100 px-2 py-0.5 rounded-lg uppercase tracking-wide"
+                >
+                  {SPORT_LABELS[sport]}
+                </span>
+              ))}
+            </div>
+          )}
         </div>
 
       </div>
