@@ -142,23 +142,19 @@ export function MemberCard({ member, onSelect, onEdit, onDelete }: MemberCardPro
               const num = spaceIdx >= 0 ? row.value.slice(0, spaceIdx) : row.value;
               const unit = spaceIdx >= 0 ? row.value.slice(spaceIdx + 1) : '';
               return (
-                <div key={row.label} className={STAT_ROW_CLS}>
+                <div key={row.label} className="flex items-center border-b border-slate-50 py-1.5">
                   <span className={STAT_LABEL_CLS}>{row.label}</span>
-                  <div className="flex items-center justify-end gap-1">
-                    <span className="text-xs whitespace-nowrap">
-                      <span className={STAT_VALUE_CLS}>{num}</span>
-                      {unit && <span className="font-bold text-slate-500"> {unit}</span>}
-                    </span>
-                    {row.onToggle && (
-                      <button
-                        onClick={(e) => { e.stopPropagation(); row.onToggle!(); }}
-                        aria-label={`Toggle ${row.label} units`}
-                        className="text-slate-300 hover:text-emerald-400 transition-colors p-0.5"
-                      >
-                        <ArrowLeftRight className="w-3 h-3" />
-                      </button>
-                    )}
-                  </div>
+                  <span className={`${STAT_VALUE_CLS} flex-1 text-right`}>{num}</span>
+                  <span className="text-xs font-bold text-slate-500 w-7 pl-0.5">{unit}</span>
+                  {row.onToggle && (
+                    <button
+                      onClick={(e) => { e.stopPropagation(); row.onToggle!(); }}
+                      aria-label={`Toggle ${row.label} units`}
+                      className="text-slate-300 hover:text-emerald-400 transition-colors p-0.5"
+                    >
+                      <ArrowLeftRight className="w-3 h-3" />
+                    </button>
+                  )}
                 </div>
               );
             })}
