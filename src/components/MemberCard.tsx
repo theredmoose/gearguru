@@ -158,7 +158,7 @@ export function MemberCard({ member, onSelect, onEdit, onDelete }: MemberCardPro
                 <div key={row.label} className={STAT_ROW_CLS}>
                   <span className={STAT_LABEL_CLS}>{row.label}</span>
                   <div className="flex items-center justify-end gap-0.5">
-                    <span className={`${STAT_VALUE_CLS} text-right`}>{num}</span>
+                    <span className={`${STAT_VALUE_CLS} w-10 text-right`}>{num}</span>
                     <span className="text-xs font-bold text-slate-500 w-7 text-left">{unit}</span>
                     {row.onToggle && (
                       <button
