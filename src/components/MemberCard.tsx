@@ -144,9 +144,11 @@ export function MemberCard({ member, onSelect, onEdit, onDelete }: MemberCardPro
               return (
                 <div key={row.label} className={STAT_ROW_CLS}>
                   <span className={STAT_LABEL_CLS}>{row.label}</span>
-                  <div className="flex items-center justify-end gap-0.5">
-                    <span className={`${STAT_VALUE_CLS} w-10 text-right`}>{num}</span>
-                    <span className="text-xs font-bold text-slate-500 w-7 text-left">{unit}</span>
+                  <div className="flex items-center justify-end gap-1">
+                    <span className="text-xs whitespace-nowrap">
+                      <span className={STAT_VALUE_CLS}>{num}</span>
+                      {unit && <span className="font-bold text-slate-500"> {unit}</span>}
+                    </span>
                     {row.onToggle && (
                       <button
                         onClick={(e) => { e.stopPropagation(); row.onToggle!(); }}
