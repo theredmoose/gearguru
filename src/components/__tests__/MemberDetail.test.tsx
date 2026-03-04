@@ -66,18 +66,25 @@ describe('MemberDetail', () => {
 
     it('shows height in cm by default', () => {
       render(<MemberDetail {...defaultProps} />);
-      expect(screen.getByText('180 cm')).toBeInTheDocument();
+      // Value renders as two spans: number + unit
+      const row = screen.getByText('Height').closest('div')!;
+      expect(within(row).getByText('180')).toBeInTheDocument();
+      expect(within(row).getByText('cm')).toBeInTheDocument();
     });
 
     it('shows weight in kg by default', () => {
       render(<MemberDetail {...defaultProps} />);
-      expect(screen.getByText('80 kg')).toBeInTheDocument();
+      const row = screen.getByText('Weight').closest('div')!;
+      expect(within(row).getByText('80')).toBeInTheDocument();
+      expect(within(row).getByText('kg')).toBeInTheDocument();
     });
 
     it('shows foot length from the larger foot', () => {
       render(<MemberDetail {...defaultProps} />);
       // John has footLengthLeft=27.5, footLengthRight=27.5
-      expect(screen.getByText('27.5 cm')).toBeInTheDocument();
+      const row = screen.getByText('Foot').closest('div')!;
+      expect(within(row).getByText('27.5')).toBeInTheDocument();
+      expect(within(row).getByText('cm')).toBeInTheDocument();
     });
 
     it('shows dash for hand size when not provided', () => {
@@ -180,9 +187,9 @@ describe('MemberDetail', () => {
 
     it('shows ski length in cm by default', () => {
       render(<MemberDetail {...defaultProps} />);
-      // card label span → header div → content column div (contains items)
+      // Value renders as two spans: number + unit; check unit "cm" appears in Skis card
       const skisContent = screen.getByText('Skis').closest('div')!.parentElement!;
-      expect(within(skisContent).getByText(/\d+ cm/)).toBeInTheDocument();
+      expect(within(skisContent).getByText('cm')).toBeInTheDocument();
     });
 
     it('shows boot size in Mondo by default', () => {
@@ -209,15 +216,18 @@ describe('MemberDetail', () => {
       const heightToggle = screen.getByRole('button', { name: /toggle height units/i });
       fireEvent.click(heightToggle);
       fireEvent.click(heightToggle);
-      expect(screen.getByText('180 cm')).toBeInTheDocument();
+      const row = screen.getByText('Height').closest('div')!;
+      expect(within(row).getByText('180')).toBeInTheDocument();
+      expect(within(row).getByText('cm')).toBeInTheDocument();
     });
 
     it('toggles weight from kg to lbs when clicked', () => {
       render(<MemberDetail {...defaultProps} />);
       const weightToggle = screen.getByRole('button', { name: /toggle weight units/i });
       fireEvent.click(weightToggle);
-      // 80kg ≈ 176 lbs
-      expect(screen.getByText(/\d+ lbs/)).toBeInTheDocument();
+      // 80kg ≈ 176 lbs — unit span now reads "lbs"
+      const row = screen.getByText('Weight').closest('div')!;
+      expect(within(row).getByText('lbs')).toBeInTheDocument();
     });
 
     it('toggles weight back to kg on second click', () => {
@@ -225,7 +235,9 @@ describe('MemberDetail', () => {
       const weightToggle = screen.getByRole('button', { name: /toggle weight units/i });
       fireEvent.click(weightToggle);
       fireEvent.click(weightToggle);
-      expect(screen.getByText('80 kg')).toBeInTheDocument();
+      const row = screen.getByText('Weight').closest('div')!;
+      expect(within(row).getByText('80')).toBeInTheDocument();
+      expect(within(row).getByText('kg')).toBeInTheDocument();
     });
 
     it('toggles ski length to inches when Skis toggle clicked', () => {
@@ -294,11 +306,14 @@ describe('MemberDetail', () => {
       expect(defaultProps.onGetSizing).toHaveBeenCalled();
     });
 
-    it('calls onOpenConverter when foot value is clicked', () => {
+    it('toggles foot unit from cm to in when foot toggle icon is clicked', () => {
       render(<MemberDetail {...defaultProps} />);
-      // Foot row is a button when footLength > 0
-      fireEvent.click(screen.getByText('27.5 cm'));
-      expect(defaultProps.onOpenConverter).toHaveBeenCalled();
+      // Foot row has a separate toggle icon button (ArrowLeftRight)
+      const footToggle = screen.getByRole('button', { name: /toggle foot units/i });
+      fireEvent.click(footToggle);
+      // 27.5 cm → inches unit shown
+      const row = screen.getByText('Foot').closest('div')!;
+      expect(within(row).getByText('in')).toBeInTheDocument();
     });
 
     it('calls onAddGear when + button is clicked', () => {
