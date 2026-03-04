@@ -31,7 +31,7 @@ export const COLOR_BG = '#F8FAFC';
  * Used for: "Your Family", "Alerts", "Sizing Guide", "Gear Vault".
  * Pair with COLOR_PRIMARY (+ optional COLOR_ACCENT span for two-tone).
  */
-export const SECTION_HEADER_CLS = 'text-xl font-black tracking-tighter uppercase';
+export const SECTION_HEADER_CLS = 'text-[22px] font-black tracking-tighter uppercase';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // STAT ROWS (label/value pairs in member cards and detail panels)
@@ -41,10 +41,10 @@ export const SECTION_HEADER_CLS = 'text-xl font-black tracking-tighter uppercase
 export const STAT_ROW_CLS = 'grid grid-cols-[3fr_2fr] items-center border-b border-slate-50 py-1.5';
 
 /** Stat row label */
-export const STAT_LABEL_CLS = 'text-xs text-slate-400 font-bold tracking-wide';
+export const STAT_LABEL_CLS = 'text-sm text-slate-400 font-bold tracking-wide';
 
 /** Stat row value */
-export const STAT_VALUE_CLS = 'text-xs font-black text-slate-800';
+export const STAT_VALUE_CLS = 'text-base font-black text-slate-800';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // BUTTONS (all sized to ≥ 44 px touch targets per Apple HIG / WCAG 2.5.5)

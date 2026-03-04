@@ -10,9 +10,10 @@ tags:
   - react
   - tailwind-v4
 symptoms:
-  - Margin utilities (e.g. mt-5) present in JSX but computed margin is 0px
+  - Physical margin utilities (e.g. mt-5, mb-3) present in JSX but computed margin is 0px
+  - Physical padding utilities (e.g. pt-6, pb-8) present in JSX but computed padding is 0px
   - Section spacing collapses to zero with no visible error or warning
-  - gap-* and h-* spacing works fine; mt-*/mb-* does not
+  - gap-*, px-*, py-* and h-* spacing works fine; mt-*/mb-*, pt-*/pb-* do not
 root_cause: An unlayered `* { margin: 0 }` reset in index.css outranks Tailwind utility classes in @layer utilities regardless of specificity
 stack:
   - React
@@ -68,7 +69,20 @@ The CSS cascade specification defines that **unlayered styles always win over la
 
 Despite `.mt-5` having higher specificity, it loses because layered styles are always lower priority than unlayered styles. This is a key architectural change in Tailwind v4 vs v3 — in v3, utilities were not layer-wrapped, so specificity resolved conflicts normally.
 
-`gap-*` and `h-*` utilities are unaffected because the reset only zeroes `margin` — `gap` and `height` are untouched.
+`gap-*` and `h-*` utilities are unaffected because the reset only zeroes `margin` and `padding` — `gap` and `height` are untouched.
+
+Importantly, Tailwind v4 switched many utilities to **logical CSS properties** (e.g. `padding-inline`, `margin-block`), which are different CSS properties from the physical shorthand equivalents:
+
+| Tailwind utility | Generated CSS property | Type | Affected by reset? |
+|---|---|---|---|
+| `px-*` | `padding-inline` | logical | ❌ No — `padding: 0` only sets `padding-top/right/bottom/left` |
+| `py-*` | `padding-block` | logical | ❌ No |
+| `pt-*`, `pb-*` | `padding-top`, `padding-bottom` | physical | ✅ Yes — directly set to 0 by reset |
+| `p-*` | `padding` shorthand | physical | ✅ Yes |
+| `mt-*`, `mb-*` | `margin-top`, `margin-bottom` | physical | ✅ Yes — directly set to 0 by reset |
+| `mx-*`, `my-*` | `margin-inline`, `margin-block` | logical | ❌ No |
+
+This is why `px-6` padding appears to work while `pt-6` padding does not.
 
 ## Solution
 
@@ -122,19 +136,21 @@ Tailwind's `@layer utilities` beats `@layer base` in the cascade, so all margin 
 
 ### Safe Spacing Patterns (Until Fixed)
 
-| Technique | Property | Works? | Notes |
+| Technique | CSS property | Works? | Notes |
 |---|---|---|---|
 | `gap-*` | `gap` | ✅ | Preferred for flex/grid layouts |
-| `p-*`, `px-*`, `py-*`, `pt-*`, `pb-*` | `padding` | ✅ | Internal element spacing |
+| `px-*`, `py-*` | `padding-inline`, `padding-block` | ✅ | Logical padding — not set by `* { padding: 0 }` |
+| `mx-*`, `my-*` | `margin-inline`, `margin-block` | ✅ | Logical margin — not set by `* { margin: 0 }` |
 | `<div className="h-5" />` spacer | `height` | ✅ | Established pattern in this codebase |
-| `mt-*`, `mb-*`, `mx-*`, `my-*` | `margin` | ❌ | Overridden by unlayered `* { margin: 0 }` |
-| `space-y-*` / `space-x-*` | `margin` | ❌ | These emit margin rules; same problem |
+| `mt-*`, `mb-*`, `ml-*`, `mr-*` | `margin-top`, etc. | ❌ | Physical margin, zeroed by unlayered `* { margin: 0 }` |
+| `p-*`, `pt-*`, `pb-*`, `pl-*`, `pr-*` | `padding-top`, etc. | ❌ | Physical padding, zeroed by unlayered `* { padding: 0 }` |
+| `space-y-*` / `space-x-*` | `margin-block-*` | ⚠️ | Tailwind v4 uses logical margin, but physical/logical interaction with cascade layers is browser-dependent — prefer `gap-*` instead |
 
 ### Detection
 
 **DevTools**: Select the element → Styles tab → look for `margin`. If `* { margin: 0 }` shows without strikethrough above the Tailwind rule, the reset is winning.
 
-**Behavioral signal**: Spacing works with `gap-*` or `p-*` but not `mt-*` / `mb-*` for the same element.
+**Behavioral signal**: Spacing works with `gap-*`, `px-*`, or `py-*` but not `mt-*` / `mb-*` / `pt-*` / `pb-*` for the same element.
 
 **Quick test** — add temporarily to the component under test:
 
@@ -155,4 +171,4 @@ grep -n "^\*\s*{" src/index.css
 ## Related
 
 - `docs/solutions/logic-errors/form-validation-field-bounds.md`
-- 26+ components in this codebase use `mt-*`/`mb-*` utilities that are currently silently broken; audit against the safe spacing patterns table above.
+- 17 source files use physical `mt-*`/`mb-*` utilities that are currently silently broken; `pt-*`/`pb-*` physical padding utilities are equally affected — audit against the safe spacing patterns table above.

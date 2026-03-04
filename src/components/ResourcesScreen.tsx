@@ -1,4 +1,5 @@
 import { ScreenHeader } from './ScreenHeader';
+import { SECTION_HEADER_CLS, RADIUS_CARD, COLOR_PRIMARY } from '../constants/design';
 
 const SIZING_GUIDES = [
   {
@@ -53,28 +54,28 @@ export function ResourcesScreen() {
   return (
     <div className="flex flex-col min-h-0 flex-1">
       <ScreenHeader title="Resources" />
-      <div className="flex-1 overflow-y-auto bg-[#F8FAFC] px-5 pt-8 pb-8 space-y-5">
-        <p className="text-xs text-slate-400 font-bold tracking-widest px-1">
-          Quick sizing reference
-        </p>
+      <div className="flex-1 overflow-y-auto bg-[#F8FAFC] px-5 pt-8 pb-8 space-y-7">
+        <h2 className={SECTION_HEADER_CLS} style={{ color: COLOR_PRIMARY }}>
+          Quick Sizing Reference
+        </h2>
 
         {SIZING_GUIDES.map((guide) => (
-          <div key={guide.sport} className={`rounded-3xl border px-5 pt-5 pb-2 ${guide.color}`}>
-            <h2 className={`text-sm font-black tracking-widest mb-4 ${guide.labelColor}`}>
+          <div key={guide.sport} className={`${RADIUS_CARD} border px-5 pt-5 pb-4 ${guide.color}`}>
+            <h2 className={`text-xs font-black tracking-widest uppercase mb-4 ${guide.labelColor}`}>
               {guide.sport}
             </h2>
+            <div className="grid grid-cols-[5fr_7fr] items-center pb-2 mb-1 border-b border-black/10">
+              <span className="font-mono text-xs font-bold text-slate-400 uppercase tracking-wider">Gear</span>
+              <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">Sizing Calculation</span>
+            </div>
             <div>
               {guide.rules.map((rule, i) => (
                 <div
                   key={rule.label}
-                  className={`flex justify-between items-center gap-4 py-3.5 ${i < guide.rules.length - 1 ? 'border-b border-black/5' : ''}`}
+                  className={`grid grid-cols-[5fr_7fr] items-center py-1.5 ${i < guide.rules.length - 1 ? 'border-b border-black/5' : ''}`}
                 >
-                  <span className="text-xs font-bold text-slate-500 tracking-wide whitespace-nowrap">
-                    {rule.label}
-                  </span>
-                  <span className="text-xs font-black text-slate-800 text-right">
-                    {rule.value}
-                  </span>
+                  <span className="text-sm font-bold text-slate-500 tracking-wide">{rule.label}</span>
+                  <span className="text-sm text-slate-600">{rule.value}</span>
                 </div>
               ))}
             </div>
