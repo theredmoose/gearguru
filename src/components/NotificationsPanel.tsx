@@ -18,7 +18,7 @@ const DEFAULT_COLOR = { bubble: 'bg-slate-50 border-slate-200', dot: 'bg-slate-4
 
 export function NotificationsPanel({ notifications, onDismiss, onViewDismissed }: Props) {
   return (
-    <div className="mt-5 pb-2 flex flex-col gap-2.5">
+    <div className="pb-2 flex flex-col gap-2.5">
       <h2 className={`${SECTION_HEADER_CLS} mb-3`} style={{ color: COLOR_PRIMARY }}>Alerts</h2>
 
       {notifications.length === 0 ? (

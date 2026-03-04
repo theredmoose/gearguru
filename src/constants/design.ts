@@ -64,7 +64,7 @@ export const BTN_ICON_HEADER_CLS =
  * Example: Gear Vault "+", "Your Family +", gear inventory header "+".
  */
 export const BTN_ADD_CLS =
-  'w-11 h-11 flex items-center justify-center bg-[#008751] rounded-full text-white shadow-lg shadow-emerald-100 transition-all active:scale-90';
+  'flex items-center justify-center text-[#008751] hover:text-emerald-700 transition-colors active:scale-90 p-2';
 
 /**
  * Inline icon button — neutral edit / view action inside a card.

@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react';
-import { Settings, PlusCircle, ChevronDown, CheckCircle2, AlertCircle, ArrowLeftRight } from 'lucide-react';
+import { Settings, Plus, PlusCircle, ChevronDown, CheckCircle2, AlertCircle, ArrowLeftRight } from 'lucide-react';
 import type { FamilyMember, GearItem, Sport, SkillLevel, AppSettings, BootUnit } from '../types';
 import { ScreenHeader } from './ScreenHeader';
 import { SECTION_HEADER_CLS, COLOR_PRIMARY, COLOR_ACCENT, BTN_ADD_CLS } from '../constants/design';
@@ -443,7 +443,7 @@ export function MemberDetail({
               className={BTN_ADD_CLS}
               aria-label="Add gear"
             >
-              <PlusCircle className="w-5 h-5" />
+              <Plus className="w-5 h-5" />
             </button>
           </div>
 
