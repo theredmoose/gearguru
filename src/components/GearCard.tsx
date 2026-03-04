@@ -109,9 +109,14 @@ export function GearCard({
           {item.brand} {item.model}
         </p>
 
-        <p className="text-xs font-bold text-slate-500 mt-0.5">
-          <span>Size: {item.size}</span>
-          {item.year && <><span> · </span><span>{item.year}</span></>}
+        <p className="text-xs font-bold text-slate-500 mt-0.5 flex items-baseline gap-1 flex-wrap">
+          {(() => {
+            const m = item.size?.match(/^([\d.,–/]+(?:\s*\/\s*[\d.,–/]+)?)\s+([A-Za-z"'%]+)$/);
+            return m
+              ? <><span className="font-black text-slate-700">{m[1]}</span><span className="text-slate-400">{m[2]}</span></>
+              : <span>{item.size}</span>;
+          })()}
+          {item.year && <><span className="text-slate-300">·</span><span>{item.year}</span></>}
         </p>
 
         {/* Extended details for alpine skis */}

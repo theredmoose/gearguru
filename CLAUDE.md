@@ -87,6 +87,16 @@ Hockey Skates: US shoe size - 1 (approximately)
 
 
 
+## Design Review / Screenshots
+
+For mobile UI review, use Chrome DevTools at **iPhone 14 Pro** dimensions:
+1. `Cmd+Option+I` → click phone icon (Toggle device toolbar)
+2. Select **iPhone 14 Pro** from the Dimensions dropdown (393 × 852, DPR 3)
+3. Reload so styles render at mobile size
+4. Use the camera icon in the device toolbar to screenshot each screen
+
+Test account for manual review: `tester@3rbar.com` / `testertester`
+
 ## Git Practices
 
 ### Branch Naming
@@ -113,14 +123,21 @@ git worktree remove .worktrees/<branch-name>
 
 Worktrees live in `.worktrees/` (gitignored). Each has its own working directory and index, so concurrent sessions cannot interfere.
 
+### Bug Fix Protocol
+When the user asks to fix a bug or issue:
+1. **Compact context first** — run `/compact` to compress history and retain the bug description
+2. **Create a worktree** — then proceed with the workflow below
+
 ### Workflow
 1. **Create a worktree** from `main` for every branch before making changes
 2. **Run all tests** before committing (`npm test`)
 3. **Ensure tests pass** - do not commit with failing tests
 4. **Write descriptive commit messages** explaining the "why" not just the "what"
-5. **Create a PR** for review before merging to `main`
-6. **All tests must pass** before merging a branch
-7. **Do not delete branches** after merging unless explicitly asked to
+5. **Rebase on `main` before opening a PR** — always run `git rebase main` in the worktree before creating a PR. This surfaces conflicts early, keeps them in the branch's own history, and avoids "Fix: resolve merge conflicts" commits polluting `main`.
+6. **Create a PR** for review before merging to `main`
+7. **All tests must pass** before merging a branch
+8. **Do not use `--delete-branch`** with `gh pr merge` when using worktrees — it leaves the local branch stranded. Instead: `gh pr merge` → `git worktree remove .worktrees/<name>` → `git branch -d <branch>`
+9. **Do not delete branches** after merging unless explicitly asked to
 
 ### Commit Message Format
 ```
@@ -132,10 +149,12 @@ Worktrees live in `.worktrees/` (gitignored). Each has its own working directory
 Types: `Add`, `Fix`, `Update`, `Refactor`, `Remove`, `Move`
 
 ### TODO.md Maintenance
-- **Update `TODO.md` at the end of every feature branch or bug fix** — check off completed items, add any new issues discovered, and update the test count if it changed
-- Maintain bugs in both GitHub Issues (with `bug` label) and the `TODO.md` Known Issues section
-- When creating a bug, add it to both locations with matching description and priority
-- When resolving a bug, close the GitHub Issue and check off the item in `TODO.md`
+`TODO.md` tracks **sprint-level work only** — epics, milestones, and feature themes. It is not a task tracker for individual items.
+
+- **Bugs** → GitHub Issues with `bug` label. Not in `TODO.md`.
+- **Individual coding tasks** → GitHub Issues. Not in `TODO.md`.
+- **When resolving a bug or task** → close the GitHub Issue. No `TODO.md` update needed.
+- **When completing a sprint or major milestone** → update `TODO.md` to reflect the new state of the roadmap (check off epics, add new themes). Also update the test count if it changed.
 
 ### Testing Requirements
 - All new features must include tests
@@ -145,5 +164,5 @@ Types: `Add`, `Fix`, `Update`, `Refactor`, `Remove`, `Move`
 ### PR Review Checklist
 When preparing or reviewing a PR, always recommend whether any new settings should be tracked:
 - If the feature introduces user-configurable behaviour, add a field to `AppSettings` (persisted via `useSettings` / localStorage) and expose a toggle in `SettingsScreen`.
-- Add `notificationsEnabled: true` (or equivalent default) to `DEFAULT_SETTINGS` so the field is backwards-compatible with existing stored settings.
+- Add the new field with a sensible default to `DEFAULT_SETTINGS` for backwards compatibility with existing stored settings.
 - Note in the PR description which, if any, new settings were added.

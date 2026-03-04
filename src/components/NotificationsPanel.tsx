@@ -18,17 +18,17 @@ const DEFAULT_COLOR = { bubble: 'bg-slate-50 border-slate-200', dot: 'bg-slate-4
 
 export function NotificationsPanel({ notifications, onDismiss, onViewDismissed }: Props) {
   return (
-    <div className="mt-5 pb-2 flex flex-col gap-2.5">
+    <div className="pb-2 flex flex-col gap-2.5">
       <h2 className={`${SECTION_HEADER_CLS} mb-3`} style={{ color: COLOR_PRIMARY }}>Alerts</h2>
 
       {notifications.length === 0 ? (
         <div className="flex items-center gap-3 bg-emerald-50 border border-emerald-100 rounded-full px-5 py-3.5 shadow-sm">
           <div className="w-7 h-7 rounded-full bg-white border border-emerald-100 flex items-center justify-center flex-shrink-0 shadow-sm">
-            <span className="text-sm leading-none text-[#008751] font-black">✓</span>
+            <span className="text-base leading-none text-[#008751] font-black">✓</span>
           </div>
           <div>
-            <p className="text-sm font-black text-emerald-800">All clear</p>
-            <p className="text-xs font-semibold text-emerald-600">No gear alerts for your family</p>
+            <p className="text-base font-black text-emerald-800">All clear</p>
+            <p className="text-sm font-semibold text-emerald-600">No gear alerts for your family</p>
           </div>
         </div>
       ) : (
@@ -42,8 +42,8 @@ export function NotificationsPanel({ notifications, onDismiss, onViewDismissed }
               >
                 <div className={`w-2 h-2 rounded-full flex-shrink-0 ${dot}`} />
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-black text-slate-800 truncate">{n.title}</p>
-                  <p className="text-xs font-semibold text-slate-500 truncate">{n.body}</p>
+                  <p className="text-base font-black text-slate-800 truncate">{n.title}</p>
+                  <p className="text-sm font-semibold text-slate-500 truncate">{n.body}</p>
                 </div>
                 <button
                   onClick={() => onDismiss(n.id)}
@@ -57,7 +57,7 @@ export function NotificationsPanel({ notifications, onDismiss, onViewDismissed }
           })}
           <button
             onClick={onViewDismissed}
-            className="text-xs text-slate-400 font-semibold text-center mt-1 mb-1"
+            className="text-sm text-slate-400 font-semibold text-center mt-1 mb-1"
           >
             View dismissed
           </button>

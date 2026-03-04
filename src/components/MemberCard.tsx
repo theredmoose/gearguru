@@ -106,9 +106,9 @@ export function MemberCard({ member, onSelect, onEdit, onDelete }: MemberCardPro
         <div className="flex-1 min-w-0">
 
           {/* Name + action buttons row */}
-          <div className="flex items-start justify-between mb-1">
+          <div className="flex items-end justify-between mb-1">
             <div className="flex items-center gap-2 flex-1 min-w-0">
-              <p className="text-xl font-black text-slate-900 leading-tight truncate">
+              <p className="text-[24px] font-black text-slate-900 leading-tight truncate">
                 {member.name}
               </p>
               {badgeReason && <GrowthWarningBadge reason={badgeReason} />}
@@ -131,7 +131,7 @@ export function MemberCard({ member, onSelect, onEdit, onDelete }: MemberCardPro
             </div>
           </div>
 
-          <p className="text-xs text-slate-400 font-semibold mb-2">
+          <p className="text-sm text-slate-400 font-semibold mb-2">
             Age {age}{member.gender ? ` · ${member.gender}` : ''}
           </p>
 
@@ -142,10 +142,10 @@ export function MemberCard({ member, onSelect, onEdit, onDelete }: MemberCardPro
               const num = spaceIdx >= 0 ? row.value.slice(0, spaceIdx) : row.value;
               const unit = spaceIdx >= 0 ? row.value.slice(spaceIdx + 1) : '';
               return (
-                <div key={row.label} className="flex items-center border-b border-slate-50 py-1.5">
+                <div key={row.label} className="flex items-center justify-end border-b border-slate-50 py-1.5 gap-2">
                   <span className={STAT_LABEL_CLS}>{row.label}</span>
-                  <span className={`${STAT_VALUE_CLS} flex-1 text-right`}>{num}</span>
-                  <span className="text-xs font-bold text-slate-500 w-7 pl-0.5">{unit}</span>
+                  <span className={`${STAT_VALUE_CLS} w-12 text-right`}>{num}</span>
+                  <span className="text-sm font-bold text-slate-500 w-7">{unit}</span>
                   {row.onToggle && (
                     <button
                       onClick={(e) => { e.stopPropagation(); row.onToggle!(); }}
@@ -165,7 +165,7 @@ export function MemberCard({ member, onSelect, onEdit, onDelete }: MemberCardPro
               {sports.map((sport) => (
                 <span
                   key={sport}
-                  className="text-xs font-bold text-emerald-700 bg-emerald-50 border border-emerald-100 px-2 py-0.5 rounded-lg uppercase tracking-wide"
+                  className="text-sm font-bold text-emerald-700 bg-emerald-50 border border-emerald-100 px-2 py-0.5 rounded-lg uppercase tracking-wide"
                 >
                   {SPORT_LABELS[sport]}
                 </span>

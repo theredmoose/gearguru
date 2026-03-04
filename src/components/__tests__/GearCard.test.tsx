@@ -49,7 +49,7 @@ describe('GearCard', () => {
 
     it('displays size', () => {
       render(<GearCard {...defaultProps} />);
-      expect(screen.getByText('Size: 170cm')).toBeInTheDocument();
+      expect(screen.getByText('170cm')).toBeInTheDocument();
     });
 
     it('displays year when provided', () => {

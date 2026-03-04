@@ -264,7 +264,7 @@ function App() {
               <div className="h-5" />
               {/* centered logo row */}
               <div className="flex items-center justify-center relative">
-                <h1 className="text-xl font-black text-slate-900 tracking-tighter uppercase text-center">
+                <h1 className="text-[22px] font-black text-slate-900 tracking-tighter uppercase text-center">
                   Gear <span style={{ color: '#008751' }}>Guru</span>
                 </h1>
                 <button
@@ -288,8 +288,8 @@ function App() {
                   <div className="w-16 h-16 rounded-2xl bg-emerald-50 border border-emerald-100 flex items-center justify-center mb-4">
                     <span className="text-3xl">⛷️</span>
                   </div>
-                  <p className="text-base font-black text-slate-800 mb-1">No family members yet</p>
-                  <p className="text-sm text-slate-400 mb-6">Add someone to start tracking gear sizes</p>
+                  <p className="text-lg font-black text-slate-800 mb-1">No family members yet</p>
+                  <p className="text-base text-slate-400 mb-6">Add someone to start tracking gear sizes</p>
                   <button
                     className="btn btn-primary"
                     onClick={() => { setSelectedMember(null); setView('add'); }}
@@ -326,13 +326,12 @@ function App() {
                     ))}
                   </div>
 
-                  <div className="mt-5">
-                    <NotificationsPanel
-                      notifications={activeNotifications}
-                      onDismiss={dismissNotification}
-                      onViewDismissed={() => setView('notifications')}
-                    />
-                  </div>
+                  <div className="h-5" />
+                  <NotificationsPanel
+                    notifications={activeNotifications}
+                    onDismiss={dismissNotification}
+                    onViewDismissed={() => setView('notifications')}
+                  />
                 </>
               )}
             </div>

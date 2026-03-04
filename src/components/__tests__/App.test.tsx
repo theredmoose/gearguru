@@ -425,7 +425,7 @@ describe('App member operations', () => {
   it('shows shoe size converter from detail view', () => {
     renderApp();
     fireEvent.click(screen.getByText('Jane Smith'));
-    fireEvent.click(screen.getByText('25 cm'));
+    fireEvent.click(screen.getByRole('button', { name: /open foot converter/i }));
     expect(screen.getByText('Size Converter')).toBeInTheDocument();
   });
 

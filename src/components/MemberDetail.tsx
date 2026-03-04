@@ -1,8 +1,12 @@
 import { useState, useMemo } from 'react';
-import { Settings, PlusCircle, ChevronDown, CheckCircle2, AlertCircle, ArrowLeftRight } from 'lucide-react';
+import { Settings, Plus, PlusCircle, ChevronDown, CheckCircle2, AlertCircle, ArrowLeftRight } from 'lucide-react';
 import type { FamilyMember, GearItem, Sport, SkillLevel, AppSettings, BootUnit } from '../types';
 import { ScreenHeader } from './ScreenHeader';
-import { SECTION_HEADER_CLS, COLOR_PRIMARY, COLOR_ACCENT, BTN_ADD_CLS } from '../constants/design';
+import {
+  SECTION_HEADER_CLS, COLOR_PRIMARY, COLOR_ACCENT,
+  BTN_ADD_CLS, BTN_ICON_HEADER_CLS,
+  SURFACE_FLOAT, RADIUS_CARD_LG, RADIUS_CARD,
+} from '../constants/design';
 import { GearTypeIcon } from './GearIcons';
 import { GearLoadoutPanel } from './GearLoadoutPanel';
 import { GrowthWarningBadge } from './GrowthWarningBadge';
@@ -69,6 +73,32 @@ function fmtBoot(mondopoint: number, unit: BootUnit): { label: string; value: st
     case 'us-men':   return { label: 'US M',   value: String(sizes.usMen) };
     case 'us-women': return { label: 'US W',   value: String(sizes.usWomen) };
   }
+}
+
+/**
+ * Split "173 cm" → { num: "173", unit: "cm" }.
+ * Matches a numeric/range token followed by a unit word.
+ * Returns null when no split applies (e.g. "5'10"", "—", "M/L").
+ */
+function splitNumUnit(val: string): { num: string; unit: string } | null {
+  if (!val || val === '—') return null;
+  const m = val.match(/^([\d.,–/]+(?:\s*\/\s*[\d.,–/]+)?)\s+([A-Za-z"'%]+)$/);
+  return m ? { num: m[1], unit: m[2] } : null;
+}
+
+function renderStatValue(val: string, mode: 'toggle' | 'plain'): React.ReactNode {
+  const isToggle = mode === 'toggle';
+  const parts = splitNumUnit(val);
+  const numCls = `text-sm font-black leading-none ${isToggle ? 'text-slate-800 group-hover:text-[#008751] transition-colors' : 'text-slate-800'}`;
+  if (!parts) {
+    return <span className={numCls}>{val}</span>;
+  }
+  return (
+    <>
+      <span className={numCls}>{parts.num}</span>
+      <span className="text-xs font-bold text-slate-400 leading-none">{parts.unit}</span>
+    </>
+  );
 }
 
 function calculateAge(dateOfBirth: string): number {
@@ -191,6 +221,7 @@ export function MemberDetail({
     settings?.heightUnit === 'ft-in' ? 'ft' : 'cm'
   );
   const [weightUnit, setWeightUnit] = useState<'kg' | 'lbs'>(settings?.weightUnit ?? 'kg');
+  const [footUnit, setFootUnit] = useState<'cm' | 'in'>('cm');
 
   function cycleBootUnit() {
     setBootUnit(u => {
@@ -224,8 +255,12 @@ export function MemberDetail({
   // Format shoe size for display
   const shoeDisplay = footLength > 0
     ? (separateFeetHands && m.footLengthLeft !== m.footLengthRight
-        ? `${m.footLengthLeft} / ${m.footLengthRight} cm`
-        : `${footLength} cm`)
+        ? footUnit === 'in'
+          ? `${(m.footLengthLeft / 2.54).toFixed(1)} / ${(m.footLengthRight / 2.54).toFixed(1)} in`
+          : `${m.footLengthLeft} / ${m.footLengthRight} cm`
+        : footUnit === 'in'
+          ? `${(footLength / 2.54).toFixed(1)} in`
+          : `${footLength} cm`)
     : '—';
   // Hand size display
   const handDisplay = m.handSize ? `${m.handSize} cm` : '—';
@@ -250,7 +285,7 @@ export function MemberDetail({
     { label: 'Age',    value: `${age} yrs` },
     { label: 'Height', value: heightDisplay, badge: growthBadgeReason, onToggle: () => setHeightUnit(u => u === 'cm' ? 'ft' : 'cm') },
     { label: 'Weight', value: weightDisplay, onToggle: () => setWeightUnit(u => u === 'kg' ? 'lbs' : 'kg') },
-    ...(showFoot ? [{ label: 'Foot', value: shoeDisplay, action: footLength > 0 ? onOpenConverter : undefined }] : []),
+    ...(showFoot ? [{ label: 'Foot', value: shoeDisplay, action: footLength > 0 ? onOpenConverter : undefined, onToggle: footLength > 0 ? () => setFootUnit(u => u === 'cm' ? 'in' : 'cm') : undefined }] : []),
     ...(showHand ? [{ label: 'Hand', value: handDisplay }] : []),
   ] as Array<{
     label: string;
@@ -268,7 +303,7 @@ export function MemberDetail({
         right={
           <button
             onClick={onEdit}
-            className="p-3 bg-slate-50 border border-slate-100 rounded-2xl text-emerald-700 shadow-sm hover:bg-white transition-all"
+            className={BTN_ICON_HEADER_CLS}
             aria-label="Edit member"
           >
             <Settings className="w-5 h-5" />
@@ -277,10 +312,10 @@ export function MemberDetail({
       />
 
       {/* Scrollable body */}
-      <div className="flex-1 overflow-y-auto bg-[#F8FAFC] px-6 pt-6 pb-28">
+      <div className="flex-1 overflow-y-auto bg-[#F8FAFC] px-6 pt-8 pb-28">
 
         {/* ── Profile Card ── */}
-        <div className="bg-white p-4 rounded-[2.5rem] shadow-[0_15px_35px_rgba(0,0,0,0.03)] border border-white mb-5 flex gap-4">
+        <div className={`${SURFACE_FLOAT} ${RADIUS_CARD_LG} p-5 mb-7 flex gap-4`}>
 
           {/* Left column: interactive gear diagram */}
           <div className="w-[46%] flex-shrink-0">
@@ -302,32 +337,54 @@ export function MemberDetail({
               </h2>
             </div>
 
-            <div className="space-y-0.5 mb-3">
+            <div className="mb-3">
               {statRows.map((row) => (
-                <div key={row.label} className="flex items-center justify-between border-b border-slate-100 py-2">
-                  <span className="text-xs text-slate-400 font-bold tracking-widest">
+                <div key={row.label} className="flex items-center border-b border-slate-100 py-2.5">
+                  <span className="flex-1 text-[11px] text-slate-400 font-bold tracking-widest uppercase">
                     {row.label}
                   </span>
-                  {row.action ? (
-                    <button
-                      onClick={row.action}
-                      className="text-xs font-extrabold text-[#008751] hover:text-emerald-800 transition-colors"
-                    >
-                      {row.value}
-                    </button>
-                  ) : row.onToggle ? (
-                    <button
-                      onClick={row.onToggle}
-                      className="flex items-center gap-1 group"
-                      aria-label={`Toggle ${row.label} units`}
-                    >
-                      <span className="text-xs font-black text-slate-800 group-hover:text-[#008751] transition-colors">{row.value}</span>
-                      {row.badge && <GrowthWarningBadge reason={row.badge as 'stale' | 'growing' | 'both'} />}
-                      <ArrowLeftRight className="w-3 h-3 text-slate-300 group-hover:text-emerald-400 transition-colors" />
-                    </button>
-                  ) : (
-                    <span className="text-xs font-black text-slate-800">{row.value}</span>
-                  )}
+                  <div className="flex items-center gap-1.5">
+                    {row.action && row.onToggle ? (
+                      /* Foot: green value link (opens converter) + separate toggle icon */
+                      <>
+                        <button
+                          onClick={row.action}
+                          className="flex items-baseline gap-[3px] text-[#008751] hover:text-emerald-800 transition-colors"
+                          aria-label={`Open ${row.label} converter`}
+                        >
+                          {renderStatValue(row.value, 'toggle')}
+                        </button>
+                        <button
+                          onClick={row.onToggle}
+                          className="text-slate-300 hover:text-emerald-400 transition-colors flex-shrink-0"
+                          aria-label={`Toggle ${row.label} units`}
+                        >
+                          <ArrowLeftRight className="w-3.5 h-3.5" />
+                        </button>
+                      </>
+                    ) : row.onToggle ? (
+                      /* Height, Weight: single combined button (value + badge + icon) */
+                      <button
+                        onClick={row.onToggle}
+                        className="flex items-center gap-1.5 group"
+                        aria-label={`Toggle ${row.label} units`}
+                      >
+                        <span className="flex items-baseline gap-[3px]">
+                          {renderStatValue(row.value, 'toggle')}
+                        </span>
+                        {row.badge && <GrowthWarningBadge reason={row.badge as 'stale' | 'growing' | 'both'} />}
+                        <ArrowLeftRight className="w-3.5 h-3.5 text-slate-300 group-hover:text-emerald-400 transition-colors flex-shrink-0" />
+                      </button>
+                    ) : (
+                      /* Age, Hand: plain value + spacer for alignment */
+                      <>
+                        <span className="flex items-baseline gap-[3px]">
+                          {renderStatValue(row.value, 'plain')}
+                        </span>
+                        <span className="w-3.5 h-3.5 flex-shrink-0" aria-hidden />
+                      </>
+                    )}
+                  </div>
                 </div>
               ))}
             </div>
@@ -344,7 +401,7 @@ export function MemberDetail({
         </div>
 
         {/* ── Sport & Skill Level ── */}
-        <div className="flex gap-3 mb-4">
+        <div className="flex gap-3 mb-6">
           <div className="flex-1 relative">
             <label className="text-xs text-emerald-700 font-black uppercase tracking-widest block mb-1 ml-1">Sport</label>
             <select
@@ -378,8 +435,8 @@ export function MemberDetail({
         </div>
 
         {/* ── Sizing ── */}
-        <div className="mt-6 mb-6">
-          <div className="flex items-center justify-between mb-4 ml-2">
+        <div className="mt-8 mb-8">
+          <div className="flex items-center justify-between mb-5 ml-1">
             <h2 className={SECTION_HEADER_CLS} style={{ color: COLOR_PRIMARY }}>
               Sizing <span style={{ color: COLOR_ACCENT }}>Guide</span>
             </h2>
@@ -395,13 +452,13 @@ export function MemberDetail({
             {sizingCards.map((card) => (
               <div
                 key={card.label}
-                className="bg-white rounded-[2rem] p-4 flex items-start gap-3 min-h-[86px] border border-white shadow-[0_15px_30px_rgba(0,0,0,0.02)] relative overflow-hidden"
+                className={`${SURFACE_FLOAT} ${RADIUS_CARD} p-4 flex items-start gap-3 min-h-[90px] relative overflow-hidden`}
               >
                 <div className="flex-shrink-0 bg-slate-50 p-1.5 rounded-xl">
                   <GearTypeIcon type={card.type} className="w-7 h-7" />
                 </div>
                 <div className="flex flex-col flex-1 min-w-0">
-                  <div className="flex items-center justify-between mb-1.5">
+                  <div className="flex items-center justify-between mb-2">
                     <span className="text-xs text-emerald-700 font-black uppercase tracking-widest">
                       {card.label}
                     </span>
@@ -418,13 +475,19 @@ export function MemberDetail({
                       </button>
                     )}
                   </div>
-                  <div className="space-y-1">
-                    {card.items.map((item, i) => (
-                      <div key={i} className="flex justify-between items-baseline gap-1 w-full">
-                        <span className="text-xs font-bold text-slate-400 truncate min-w-0">{item.label}</span>
-                        <span className="text-sm font-black text-slate-900 whitespace-nowrap">{item.value}</span>
-                      </div>
-                    ))}
+                  <div className="space-y-1.5">
+                    {card.items.map((item, i) => {
+                      const parts = splitNumUnit(item.value);
+                      return (
+                        <div key={i} className="flex justify-between items-baseline gap-1 w-full">
+                          <span className="text-xs font-bold text-slate-400 truncate min-w-0">{item.label}</span>
+                          <span className="flex items-baseline gap-[3px] whitespace-nowrap flex-shrink-0">
+                            <span className="text-sm font-black text-slate-900">{parts ? parts.num : item.value}</span>
+                            {parts && <span className="text-xs font-bold text-slate-400">{parts.unit}</span>}
+                          </span>
+                        </div>
+                      );
+                    })}
                   </div>
                 </div>
               </div>
@@ -433,8 +496,8 @@ export function MemberDetail({
         </div>
 
         {/* ── Gear Vault ── */}
-        <div className="mt-6">
-          <div className="flex items-center justify-between mb-4 px-2">
+        <div className="mt-8">
+          <div className="flex items-center justify-between mb-5 px-1">
             <h2 className={SECTION_HEADER_CLS} style={{ color: COLOR_PRIMARY }}>
               Gear <span style={{ color: COLOR_ACCENT }}>Vault</span>
             </h2>
@@ -443,7 +506,7 @@ export function MemberDetail({
               className={BTN_ADD_CLS}
               aria-label="Add gear"
             >
-              <PlusCircle className="w-5 h-5" />
+              <Plus className="w-5 h-5" />
             </button>
           </div>
 
