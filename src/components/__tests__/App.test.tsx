@@ -276,7 +276,7 @@ describe('App tab navigation', () => {
   it('shows Gear Inventory when GEAR tab clicked', () => {
     renderApp();
     fireEvent.click(screen.getByText('GEAR'));
-    expect(screen.getByRole('heading', { name: 'Family Gear' })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'Gear' })).toBeInTheDocument();
   });
 
   it('shows Measure screen when MEASURE tab clicked', () => {
@@ -523,7 +523,7 @@ describe('App gear from inventory', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Gear' }));
     fireEvent.click(screen.getByText('+ Add Gear'));
     fireEvent.click(screen.getByRole('button', { name: 'Cancel' }));
-    expect(screen.getByRole('heading', { name: 'Family Gear' })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'Gear' })).toBeInTheDocument();
   });
 
   it('calls addGearItem on gear form submit from inventory', async () => {

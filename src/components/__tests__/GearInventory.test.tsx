@@ -99,9 +99,9 @@ describe('GearInventory', () => {
   // RENDERING
   // ============================================
   describe('rendering', () => {
-    it('shows "Family Gear" header', () => {
+    it('shows "Gear" header', () => {
       render(<GearInventory {...defaultProps} />);
-      expect(screen.getByRole('heading', { name: 'Family Gear' })).toBeInTheDocument();
+      expect(screen.getByRole('heading', { name: 'Gear' })).toBeInTheDocument();
     });
 
     it('shows back button', () => {

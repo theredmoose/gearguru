@@ -3,7 +3,7 @@ import type { GearItem, FamilyMember } from '../types';
 import { GearStatusBadge } from './GearStatusBadge';
 import { GearTypeIcon } from './GearIcons';
 import { GEAR_TYPE_LABELS, SPORT_LABELS } from '../constants/labels';
-import { BTN_ICON_INLINE_CLS, BTN_ICON_DANGER_CLS } from '../constants/design';
+import { BTN_ICON_INLINE_CLS, BTN_ICON_DANGER_CLS, SURFACE_RAISED, RADIUS_CARD, RADIUS_INNER } from '../constants/design';
 
 interface GearCardProps {
   item: GearItem;
@@ -65,11 +65,11 @@ export function GearCard({
 
   return (
     <div
-      className="gear-card bg-white border border-slate-100 rounded-3xl p-3.5 flex items-center gap-3 shadow-sm hover:shadow-md active:scale-[0.98] transition-all cursor-pointer mb-3"
+      className={`gear-card ${SURFACE_RAISED} ${RADIUS_CARD} p-3.5 flex items-center gap-3 active:scale-[0.98] cursor-pointer mb-3`}
       onClick={() => onEdit(item)}
     >
       {/* Icon tile or photo */}
-      <div className={`w-14 h-14 rounded-xl flex flex-col items-center justify-center border flex-shrink-0 overflow-hidden ${iconTileClass}`}>
+      <div className={`w-14 h-14 ${RADIUS_INNER} flex flex-col items-center justify-center border flex-shrink-0 overflow-hidden ${iconTileClass}`}>
         {displayPhoto ? (
           <div className="gear-card-photo w-full h-full relative">
             <img
