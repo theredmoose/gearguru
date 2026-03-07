@@ -250,6 +250,7 @@ export function MemberDetail({
 
   const showFoot = settings?.display.showFoot ?? true;
   const showHand = settings?.display.showHand ?? true;
+  const headDisplay = m.headCircumference ? `${m.headCircumference} cm` : '—';
   const separateFeetHands = settings?.display.separateFeetHands ?? false;
 
   // Format shoe size for display
@@ -281,19 +282,19 @@ export function MemberDetail({
     ? `${Math.round(m.weight * 2.2046)} lbs`
     : `${m.weight} kg`;
 
-  const statRows = [
+  type StatRow = { label: string; value: string; badge?: string | null; onToggle?: () => void; action?: () => void };
+
+  const statGroup1: StatRow[] = [
     { label: 'Age',    value: `${age} yrs` },
     { label: 'Height', value: heightDisplay, badge: growthBadgeReason, onToggle: () => setHeightUnit(u => u === 'cm' ? 'ft' : 'cm') },
     { label: 'Weight', value: weightDisplay, onToggle: () => setWeightUnit(u => u === 'kg' ? 'lbs' : 'kg') },
-    ...(showFoot ? [{ label: 'Foot', value: shoeDisplay, action: footLength > 0 ? onOpenConverter : undefined, onToggle: footLength > 0 ? () => setFootUnit(u => u === 'cm' ? 'in' : 'cm') : undefined }] : []),
+  ];
+
+  const statGroup2: StatRow[] = [
+    { label: 'Head', value: headDisplay },
     ...(showHand ? [{ label: 'Hand', value: handDisplay }] : []),
-  ] as Array<{
-    label: string;
-    value: string;
-    badge?: string | null;
-    onToggle?: () => void;
-    action?: () => void;
-  }>;
+    ...(showFoot ? [{ label: 'Foot', value: shoeDisplay, action: footLength > 0 ? onOpenConverter : undefined, onToggle: footLength > 0 ? () => setFootUnit(u => u === 'cm' ? 'in' : 'cm') : undefined }] : []),
+  ];
 
   return (
     <div className="member-detail flex flex-col min-h-screen">
@@ -331,16 +332,16 @@ export function MemberDetail({
 
           {/* Right column: name + stats + history */}
           <div className="flex-1 pt-1 min-w-0">
-            <div className="flex items-center gap-2 mb-5">
+            <div className="flex items-center gap-2 mb-0">
               <h2 className="text-2xl font-black text-slate-900 tracking-tight leading-none truncate">
                 {member.name}
               </h2>
             </div>
 
-            <div className="mb-3">
-              {statRows.map((row) => (
-                <div key={row.label} className="flex items-center border-b border-slate-100 py-2.5">
-                  <span className="flex-1 text-[11px] text-slate-400 font-bold tracking-widest uppercase">
+            <div className="mb-3 mt-0">
+              {[...statGroup1, ...statGroup2].map((row, i) => (
+                <div key={row.label} className="flex items-center border-b border-slate-100 py-2.5" style={(i === 0 || i === 1 || i === statGroup1.length) ? { marginTop: '8px' } : undefined}>
+                  <span className="flex-1 pl-[18px] text-[11px] text-slate-400 font-bold tracking-widest">
                     {row.label}
                   </span>
                   <div className="flex items-center gap-1.5">
