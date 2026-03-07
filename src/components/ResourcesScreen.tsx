@@ -54,17 +54,18 @@ export function ResourcesScreen() {
   return (
     <div className="flex flex-col min-h-0 flex-1">
       <ScreenHeader title="Resources" />
-      <div className="flex-1 overflow-y-auto bg-[#F8FAFC] px-5 pt-8 pb-8 space-y-7">
+      <div className="flex-1 overflow-y-auto bg-[#F8FAFC] px-5 pt-8 pb-8 flex flex-col gap-[22px]">
         <h2 className={SECTION_HEADER_CLS} style={{ color: COLOR_PRIMARY }}>
           Quick Sizing Reference
         </h2>
 
         {SIZING_GUIDES.map((guide) => (
           <div key={guide.sport} className={`${RADIUS_CARD} border px-5 pt-5 pb-4 ${guide.color}`}>
-            <h2 className={`text-xs font-black tracking-widest uppercase mb-4 ${guide.labelColor}`}>
+            <h2 className={`text-sm font-black tracking-widest uppercase ${guide.labelColor}`}>
               {guide.sport}
             </h2>
-            <div className="grid grid-cols-[5fr_7fr] items-center pb-2 mb-1 border-b border-black/10">
+            <div className="h-4" />
+            <div className="grid grid-cols-[5fr_7fr] items-center py-2 border-b border-black/10">
               <span className="font-mono text-xs font-bold text-slate-400 uppercase tracking-wider">Gear</span>
               <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">Sizing Calculation</span>
             </div>

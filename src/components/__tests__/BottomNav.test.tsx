@@ -29,18 +29,18 @@ describe('BottomNav', () => {
     const TABS: TopLevelTab[] = ['family', 'gear', 'measure', 'resources'];
 
     TABS.forEach((tab) => {
-      it(`applies active scale class to "${tab}" tab when it is active`, () => {
+      it(`applies active color class to "${tab}" tab when it is active`, () => {
         render(<BottomNav activeTab={tab} onChange={mockOnChange} />);
         const label = tab.toUpperCase();
         const btn = screen.getByText(label).closest('button')!;
-        expect(btn).toHaveClass('scale-110');
+        expect(btn).toHaveClass('text-[#008751]');
       });
     });
 
-    it('does not apply active class to inactive tabs', () => {
+    it('does not apply active color to inactive tabs', () => {
       render(<BottomNav activeTab="family" onChange={mockOnChange} />);
       const gearBtn = screen.getByText('GEAR').closest('button')!;
-      expect(gearBtn).not.toHaveClass('scale-110');
+      expect(gearBtn).not.toHaveClass('text-[#008751]');
     });
   });
 
