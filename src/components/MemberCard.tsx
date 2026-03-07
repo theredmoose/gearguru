@@ -34,7 +34,7 @@ function calculateAge(dateOfBirth: string): number {
 export function MemberCard({ member, onSelect, onEdit, onDelete }: MemberCardProps) {
   const [heightUnit, setHeightUnit] = useState<'cm' | 'ft'>('cm');
   const [weightUnit, setWeightUnit] = useState<'kg' | 'lbs'>('kg');
-  const [shoeUnit, setShoeUnit] = useState<'mp' | 'eu'>('mp');
+  const [shoeUnit, setShoeUnit] = useState<'mp' | 'eu' | 'us' | 'cm'>('mp');
 
   const age = calculateAge(member.dateOfBirth);
   const { measurements } = member;
@@ -64,16 +64,21 @@ export function MemberCard({ member, onSelect, onEdit, onDelete }: MemberCardPro
     ? `${Math.round(measurements.weight * 2.2046)} lbs`
     : `${measurements.weight} kg`;
 
-  const shoeDisplay = mondopoint > 0
+  const shoeSizes = mondopoint > 0 ? getShoeSizesFromFootLength(footLength) : null;
+  const shoeDisplay = shoeSizes
     ? shoeUnit === 'eu'
-      ? `EU ${getShoeSizesFromFootLength(footLength).eu}`
-      : `${mondopoint} MP`
+      ? `EU ${shoeSizes.eu}`
+      : shoeUnit === 'us'
+        ? `US ${shoeSizes.usMen}`
+        : shoeUnit === 'cm'
+          ? `${footLength} cm`
+          : `${mondopoint} MP`
     : '';
 
   const statRows = [
     { label: 'Height', value: heightDisplay, onToggle: () => setHeightUnit(u => u === 'cm' ? 'ft' : 'cm') },
     { label: 'Weight', value: weightDisplay, onToggle: () => setWeightUnit(u => u === 'kg' ? 'lbs' : 'kg') },
-    ...(mondopoint > 0 ? [{ label: 'Shoe', value: shoeDisplay, onToggle: () => setShoeUnit(u => u === 'mp' ? 'eu' : 'mp') }] : []),
+    ...(mondopoint > 0 ? [{ label: 'Shoe', value: shoeDisplay, onToggle: () => setShoeUnit(u => u === 'mp' ? 'eu' : u === 'eu' ? 'us' : u === 'us' ? 'cm' : 'mp') }] : []),
   ];
 
   const handleDelete = (e: React.MouseEvent) => {
