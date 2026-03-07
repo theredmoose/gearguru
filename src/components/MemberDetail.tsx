@@ -286,15 +286,16 @@ export function MemberDetail({
     { label: 'Age',    value: `${age} yrs` },
     { label: 'Height', value: heightDisplay, badge: growthBadgeReason, onToggle: () => setHeightUnit(u => u === 'cm' ? 'ft' : 'cm') },
     { label: 'Weight', value: weightDisplay, onToggle: () => setWeightUnit(u => u === 'kg' ? 'lbs' : 'kg') },
-    ...(showFoot ? [{ label: 'Foot', value: shoeDisplay, action: footLength > 0 ? onOpenConverter : undefined, onToggle: footLength > 0 ? () => setFootUnit(u => u === 'cm' ? 'in' : 'cm') : undefined }] : []),
+    { label: 'Head',   value: headDisplay, spaceBefore: true },
     ...(showHand ? [{ label: 'Hand', value: handDisplay }] : []),
-    { label: 'Head', value: headDisplay },
+    ...(showFoot ? [{ label: 'Foot', value: shoeDisplay, action: footLength > 0 ? onOpenConverter : undefined, onToggle: footLength > 0 ? () => setFootUnit(u => u === 'cm' ? 'in' : 'cm') : undefined }] : []),
   ] as Array<{
     label: string;
     value: string;
     badge?: string | null;
     onToggle?: () => void;
     action?: () => void;
+    spaceBefore?: boolean;
   }>;
 
   return (
@@ -341,7 +342,7 @@ export function MemberDetail({
 
             <div className="mb-3 mt-[11px]">
               {statRows.map((row) => (
-                <div key={row.label} className="flex items-center border-b border-slate-100 py-2.5">
+                <div key={row.label} className={`flex items-center border-b border-slate-100 py-2.5${row.spaceBefore ? ' mt-3' : ''}`}>
                   <span className="flex-1 pl-4 text-[11px] text-slate-400 font-bold tracking-widest">
                     {row.label}
                   </span>
