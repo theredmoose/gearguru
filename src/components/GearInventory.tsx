@@ -3,7 +3,7 @@ import { Plus } from 'lucide-react';
 import type { FamilyMember, GearItem } from '../types';
 import { GearCard } from './GearCard';
 import { ScreenHeader } from './ScreenHeader';
-import { BTN_ADD_CLS, BTN_PILL_ACTIVE_CLS, BTN_PILL_INACTIVE_CLS } from '../constants/design';
+import { BTN_ADD_CLS, BTN_PILL_ACTIVE_CLS, BTN_PILL_INACTIVE_CLS, COLOR_BG, COLOR_PRIMARY } from '../constants/design';
 
 interface GearInventoryProps {
   members: FamilyMember[];
@@ -88,13 +88,14 @@ export function GearInventory({
       </div>
 
       {/* Content */}
-      <div className="flex-1 overflow-y-auto bg-[#F8FAFC] px-6 pt-6 pb-8">
+      <div className="flex-1 overflow-y-auto px-6 pt-6 pb-8" style={{ backgroundColor: COLOR_BG }}>
         {filteredItems.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-16 gap-4">
             <p className="text-slate-400 font-bold text-sm">No gear found.</p>
             {filterOwnerId !== 'all' && (
               <button
-                className="px-6 py-3 bg-[#008751] text-white text-sm font-bold rounded-2xl shadow-sm"
+                className="px-6 py-3 text-white text-sm font-bold rounded-2xl shadow-sm"
+                style={{ backgroundColor: COLOR_PRIMARY }}
                 onClick={() => onAddGear(filterOwnerId)}
               >
                 + Add Gear
@@ -112,7 +113,8 @@ export function GearInventory({
                     {member.name}
                   </h2>
                   <button
-                    className="text-xs font-bold text-[#008751] hover:text-emerald-800 transition-colors"
+                    className="text-xs font-bold hover:text-emerald-800 transition-colors"
+                    style={{ color: COLOR_PRIMARY }}
                     onClick={() => onAddGear(member.id)}
                   >
                     + Add
