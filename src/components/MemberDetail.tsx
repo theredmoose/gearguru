@@ -1,14 +1,15 @@
 import { useState, useMemo } from 'react';
-import { Settings, Plus, PlusCircle, ChevronDown, CheckCircle2, AlertCircle, ArrowLeftRight } from 'lucide-react';
-import type { FamilyMember, GearItem, Sport, SkillLevel, AppSettings, BootUnit } from '../types';
+import { Settings, ChevronDown, ArrowLeftRight } from 'lucide-react';
+import type { FamilyMember, GearItem, Sport, GearType, SkillLevel, AppSettings, BootUnit } from '../types';
+import { DEFAULT_SETTINGS } from '../types';
 import type { SizingCard } from '../types/sizing';
+import { GearSectionList } from './GearSectionList';
 import { ScreenHeader } from './ScreenHeader';
 import {
   SECTION_HEADER_CLS, COLOR_PRIMARY, COLOR_ACCENT,
-  BTN_ADD_CLS, BTN_ICON_HEADER_CLS,
-  SURFACE_FLOAT, RADIUS_CARD_LG, RADIUS_CARD, RADIUS_INNER,
+  BTN_ICON_HEADER_CLS,
+  SURFACE_FLOAT, RADIUS_CARD_LG, RADIUS_INNER,
 } from '../constants/design';
-import { GearTypeIcon } from './GearIcons';
 import { GearLoadoutPanel } from './GearLoadoutPanel';
 import { GrowthWarningBadge } from './GrowthWarningBadge';
 import { getShoeSizesFromFootLength } from '../services/shoeSize';
@@ -31,9 +32,9 @@ interface MemberDetailProps {
   onUpdateSettings?: (patch: Partial<AppSettings>) => void;
   onBack: () => void;
   onEdit: () => void;
-  onGetSizing: () => void;
+  onGetSizing?: () => void;
   onOpenConverter: () => void;
-  onAddGear: (sport: Sport) => void;
+  onAddGear: (sport: Sport, gearType?: GearType) => void;
   onEditGear: (item: GearItem) => void;
   onViewHistory?: () => void;
 }
@@ -55,7 +56,6 @@ const LEVEL_OPTIONS: { value: SkillLevel; label: string }[] = [
 
 
 type LengthUnit = 'cm' | 'in';
-const BOOT_UNIT_CYCLE: BootUnit[] = ['mp', 'eu', 'us-men', 'us-women'];
 
 function fmtLength(cm: number, unit: LengthUnit): string {
   return unit === 'in' ? `${Math.round(cm / 2.54)}"` : `${cm} cm`;
@@ -109,11 +109,6 @@ function calculateAge(dateOfBirth: string): number {
   const m = today.getMonth() - birth.getMonth();
   if (m < 0 || (m === 0 && today.getDate() < birth.getDate())) age--;
   return age;
-}
-
-// Derive Ready/Update from gear condition
-function gearFitStatus(item: GearItem): 'Ready' | 'Update' {
-  return item.condition === 'worn' ? 'Update' : 'Ready';
 }
 
 function getSizingCards(
@@ -182,7 +177,6 @@ export function MemberDetail({
   onUpdateSettings,
   onBack,
   onEdit,
-  onGetSizing,
   onOpenConverter,
   onAddGear,
   onEditGear,
@@ -209,22 +203,13 @@ export function MemberDetail({
     member.skillLevels?.[defaultSport] ?? 'intermediate'
   );
 
-  const [lengthUnit, setLengthUnit] = useState<LengthUnit>(settings?.skiLengthUnit ?? 'cm');
-  const [bootUnit, setBootUnit] = useState<BootUnit>(settings?.bootUnit ?? 'mp');
+  const lengthUnit: LengthUnit = settings?.skiLengthUnit ?? 'cm';
+  const bootUnit: BootUnit = settings?.bootUnit ?? 'mp';
   const [heightUnit, setHeightUnit] = useState<'cm' | 'ft'>(
     settings?.heightUnit === 'ft-in' ? 'ft' : 'cm'
   );
   const [weightUnit, setWeightUnit] = useState<'kg' | 'lbs'>(settings?.weightUnit ?? 'kg');
   const [footUnit, setFootUnit] = useState<'cm' | 'in'>('cm');
-
-  function cycleBootUnit() {
-    setBootUnit(u => {
-      const idx = BOOT_UNIT_CYCLE.indexOf(u);
-      const next = BOOT_UNIT_CYCLE[(idx + 1) % BOOT_UNIT_CYCLE.length];
-      onUpdateSettings?.({ bootUnit: next });
-      return next;
-    });
-  }
 
   const handleSlotTap = (slotType: import('../types').GearType) => {
     const existing = gearItems.find(
@@ -430,154 +415,24 @@ export function MemberDetail({
         </div>
 
 
-        {/* ── Sizing ── */}
+        {/* ── Gear Sections ── */}
         <div className="h-5" />
         <div className="mb-8">
           <div className="flex items-center justify-between mb-5 ml-1">
             <h2 className={SECTION_HEADER_CLS} style={{ color: COLOR_PRIMARY }}>
-              Sizing <span style={{ color: COLOR_ACCENT }}>Guide</span>
+              Gear <span style={{ color: COLOR_ACCENT }}>Setup</span>
             </h2>
-            <button
-              onClick={onGetSizing}
-              className="text-xs font-black text-[#008751] uppercase tracking-widest hover:text-emerald-800 transition-colors"
-            >
-              All Sports →
-            </button>
           </div>
-
-          <div className="grid grid-cols-2 gap-4">
-            {sizingCards.map((card) => (
-              <div
-                key={card.label}
-                className={`${SURFACE_FLOAT} ${RADIUS_CARD} p-4 flex items-start gap-3 min-h-[90px] relative overflow-hidden`}
-              >
-                <div className="flex-shrink-0 bg-slate-50 p-1.5 rounded-xl">
-                  <GearTypeIcon type={card.type} className="w-7 h-7" />
-                </div>
-                <div className="flex flex-col flex-1 min-w-0">
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="text-xs text-emerald-700 font-black uppercase tracking-widest">
-                      {card.label}
-                    </span>
-                    {card.toggleKind && (
-                      <button
-                        onClick={() => card.toggleKind === 'length'
-                          ? setLengthUnit(u => u === 'cm' ? 'in' : 'cm')
-                          : cycleBootUnit()
-                        }
-                        className="text-slate-300 hover:text-emerald-400 transition-colors ml-1 flex-shrink-0"
-                        aria-label={`Toggle ${card.label} units`}
-                      >
-                        <ArrowLeftRight className="w-3 h-3" />
-                      </button>
-                    )}
-                  </div>
-                  <div className="space-y-1.5">
-                    {card.items.map((item, i) => {
-                      const parts = splitNumUnit(item.value);
-                      return (
-                        <div key={i} className="flex justify-between items-baseline gap-1 w-full">
-                          <span className="text-xs font-bold text-slate-400 truncate min-w-0">{item.label}</span>
-                          <span className="flex items-baseline gap-[3px] whitespace-nowrap flex-shrink-0">
-                            <span className="text-sm font-black text-slate-900">{parts ? parts.num : item.value}</span>
-                            {parts && <span className="text-xs font-bold text-slate-400">{parts.unit}</span>}
-                          </span>
-                        </div>
-                      );
-                    })}
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* ── Gear Vault ── */}
-        <div className="h-5" />
-        <div>
-          <div className="flex items-center justify-between mb-5 px-1">
-            <h2 className={SECTION_HEADER_CLS} style={{ color: COLOR_PRIMARY }}>
-              Gear <span style={{ color: COLOR_ACCENT }}>Vault</span>
-            </h2>
-            <button
-              onClick={() => onAddGear(selectedSport)}
-              className={BTN_ADD_CLS}
-              aria-label="Add gear"
-            >
-              <Plus className="w-5 h-5" />
-            </button>
-          </div>
-
-          {(() => {
-            const sportLabel = SPORT_OPTIONS.find(o => o.value === selectedSport)?.label ?? selectedSport;
-            const filteredGear = gearItems.filter((item) => item.sports.includes(selectedSport));
-            if (filteredGear.length === 0) {
-              return (
-                <div className={`${SURFACE_FLOAT} ${RADIUS_CARD_LG} flex flex-col items-center gap-2 py-8`}>
-                  <div className={`w-12 h-12 ${RADIUS_INNER} bg-slate-50 flex items-center justify-center`}>
-                    <PlusCircle className="w-6 h-6 text-slate-300" />
-                  </div>
-                  <p className="text-slate-500 text-sm font-bold">
-                    {gearItems.length === 0 ? 'No gear added yet' : `No ${sportLabel} gear yet`}
-                  </p>
-                  <p className="text-slate-300 text-xs">Tap + to add.</p>
-                </div>
-              );
-            }
-            return (
-            <div className="space-y-3">
-              {filteredGear.map((item) => {
-                const status = gearFitStatus(item);
-                const isUpdate = status === 'Update';
-                const spec = [item.size, item.year].filter(Boolean).join(' · ');
-                return (
-                  <button
-                    key={item.id}
-                    onClick={() => onEditGear(item)}
-                    className={`w-full bg-white ${RADIUS_CARD_LG} p-4 flex items-center justify-between shadow-[0_20px_40px_rgba(0,0,0,0.02)] border border-white hover:border-emerald-100 active:scale-[0.98] transition-all text-left`}
-                  >
-                    <div className="flex items-center gap-4">
-                      {/* Icon tile */}
-                      <div className={`w-14 h-14 ${RADIUS_INNER} flex items-center justify-center flex-shrink-0 bg-[#F8FAFC]`}>
-                        <GearTypeIcon type={item.type} className="w-9 h-9" />
-                      </div>
-
-                      {/* Info */}
-                      <div className="min-w-0">
-                        <p className="text-sm font-black text-slate-900 leading-tight truncate mb-0.5">
-                          {item.brand} {item.model}
-                        </p>
-                        <p className="text-xs font-bold text-slate-400 uppercase tracking-widest leading-tight">
-                          {spec}
-                        </p>
-                        {item.photos && item.photos.length > 0 && (
-                          <p className="text-xs text-emerald-500 font-bold mt-0.5">
-                            {item.photos.length} photo{item.photos.length !== 1 ? 's' : ''}
-                          </p>
-                        )}
-                      </div>
-                    </div>
-
-                    {/* Status */}
-                    <div className="flex flex-col items-end gap-1.5 flex-shrink-0 ml-2">
-                      <div className={`text-xs font-black px-2.5 py-1 rounded-lg uppercase tracking-widest ${
-                        isUpdate ? 'bg-orange-100 text-orange-600 animate-pulse' : 'bg-[#E3F9F1] text-[#008751]'
-                      }`}>
-                        {status}
-                      </div>
-                      <div className="w-5 h-5 rounded-full flex items-center justify-center bg-slate-50 border border-slate-100">
-                        {isUpdate
-                          ? <AlertCircle className="w-3.5 h-3.5 text-orange-500" />
-                          : <CheckCircle2 className="w-3.5 h-3.5 text-[#008751]" />
-                        }
-                      </div>
-                    </div>
-                  </button>
-                );
-              })}
-            </div>
-            );
-          })()}
+          <GearSectionList
+            member={member}
+            gearItems={gearItems}
+            selectedSport={selectedSport}
+            sizingCards={sizingCards}
+            settings={settings ?? DEFAULT_SETTINGS}
+            onUpdateSettings={onUpdateSettings ?? (() => {})}
+            onAddGear={(gearType) => onAddGear(selectedSport, gearType)}
+            onEditGear={onEditGear}
+          />
         </div>
       </div>
     </div>
