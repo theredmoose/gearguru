@@ -123,6 +123,11 @@ git worktree remove .worktrees/<branch-name>
 
 Worktrees live in `.worktrees/` (gitignored). Each has its own working directory and index, so concurrent sessions cannot interfere.
 
+**After creating a worktree**, always copy `.env.local` from the repo root so Firebase loads:
+```bash
+cp .env.local .worktrees/<branch-name>/.env.local
+```
+
 ### Bug Fix Protocol
 When the user asks to fix a bug or issue:
 1. **Compact context first** — run `/compact` to compress history and retain the bug description
