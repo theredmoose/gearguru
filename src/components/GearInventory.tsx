@@ -67,7 +67,7 @@ export function GearInventory({
       />
 
       {/* Filter bar */}
-      <div className="px-5 py-3 bg-white border-b border-slate-100">
+      <div className="px-6 py-3 bg-white border-b border-slate-100">
         <div className="flex items-center gap-2 overflow-x-auto scrollbar-none">
           <button
             onClick={() => setFilterOwnerId('all')}
@@ -88,7 +88,7 @@ export function GearInventory({
       </div>
 
       {/* Content */}
-      <div className="flex-1 overflow-y-auto bg-[#F8FAFC] px-6 py-6">
+      <div className="flex-1 overflow-y-auto bg-[#F8FAFC] px-6 pt-6 pb-8">
         {filteredItems.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-16 gap-4">
             <p className="text-slate-400 font-bold text-sm">No gear found.</p>
