@@ -282,21 +282,19 @@ export function MemberDetail({
     ? `${Math.round(m.weight * 2.2046)} lbs`
     : `${m.weight} kg`;
 
-  const statRows = [
+  type StatRow = { label: string; value: string; badge?: string | null; onToggle?: () => void; action?: () => void };
+
+  const statGroup1: StatRow[] = [
     { label: 'Age',    value: `${age} yrs` },
     { label: 'Height', value: heightDisplay, badge: growthBadgeReason, onToggle: () => setHeightUnit(u => u === 'cm' ? 'ft' : 'cm') },
     { label: 'Weight', value: weightDisplay, onToggle: () => setWeightUnit(u => u === 'kg' ? 'lbs' : 'kg') },
-    { label: 'Head',   value: headDisplay, spaceBefore: true },
+  ];
+
+  const statGroup2: StatRow[] = [
+    { label: 'Head', value: headDisplay },
     ...(showHand ? [{ label: 'Hand', value: handDisplay }] : []),
     ...(showFoot ? [{ label: 'Foot', value: shoeDisplay, action: footLength > 0 ? onOpenConverter : undefined, onToggle: footLength > 0 ? () => setFootUnit(u => u === 'cm' ? 'in' : 'cm') : undefined }] : []),
-  ] as Array<{
-    label: string;
-    value: string;
-    badge?: string | null;
-    onToggle?: () => void;
-    action?: () => void;
-    spaceBefore?: boolean;
-  }>;
+  ];
 
   return (
     <div className="member-detail flex flex-col min-h-screen">
@@ -341,8 +339,8 @@ export function MemberDetail({
             </div>
 
             <div className="mb-3 mt-[11px]">
-              {statRows.map((row) => (
-                <div key={row.label} className={`flex items-center border-b border-slate-100 py-2.5${row.spaceBefore ? ' mt-3' : ''}`}>
+              {[...statGroup1, ...statGroup2].map((row, i) => (
+                <div key={row.label} className="flex items-center border-b border-slate-100 py-2.5" style={i === statGroup1.length ? { marginTop: '8px' } : undefined}>
                   <span className="flex-1 pl-4 text-[11px] text-slate-400 font-bold tracking-widest">
                     {row.label}
                   </span>
