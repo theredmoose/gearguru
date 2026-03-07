@@ -5,7 +5,7 @@ import { ScreenHeader } from './ScreenHeader';
 import {
   SECTION_HEADER_CLS, COLOR_PRIMARY, COLOR_ACCENT,
   BTN_ADD_CLS, BTN_ICON_HEADER_CLS,
-  SURFACE_FLOAT, RADIUS_CARD_LG, RADIUS_CARD,
+  SURFACE_FLOAT, RADIUS_CARD_LG, RADIUS_CARD, RADIUS_INNER,
 } from '../constants/design';
 import { GearTypeIcon } from './GearIcons';
 import { GearLoadoutPanel } from './GearLoadoutPanel';
@@ -312,7 +312,7 @@ export function MemberDetail({
       />
 
       {/* Scrollable body */}
-      <div className="flex-1 overflow-y-auto bg-[#F8FAFC] px-6 pt-8 pb-28">
+      <div className="flex-1 overflow-y-auto bg-[#F8FAFC] px-6 pt-6 pb-28">
 
         {/* ── Profile Card ── */}
         <div className={`${SURFACE_FLOAT} ${RADIUS_CARD_LG} p-5 mb-7 flex gap-4`}>
@@ -331,7 +331,7 @@ export function MemberDetail({
 
           {/* Right column: name + stats + history */}
           <div className="flex-1 pt-1 min-w-0">
-            <div className="flex items-center gap-2 mb-3">
+            <div className="flex items-center gap-2 mb-5">
               <h2 className="text-2xl font-black text-slate-900 tracking-tight leading-none truncate">
                 {member.name}
               </h2>
@@ -411,7 +411,7 @@ export function MemberDetail({
                 setSelectedSport(s);
                 setSkillLevel(member.skillLevels?.[s] ?? 'intermediate');
               }}
-              className="w-full bg-white border border-slate-100 rounded-2xl px-3 py-2.5 text-xs font-black text-[#008751] appearance-none focus:outline-none focus:ring-2 focus:ring-emerald-500/20 transition-all cursor-pointer shadow-[0_4px_12px_rgba(0,0,0,0.02)]"
+              className={`w-full bg-white border border-slate-100 ${RADIUS_INNER} px-3 py-2.5 text-xs font-black text-[#008751] appearance-none focus:outline-none focus:ring-2 focus:ring-emerald-500/20 transition-all cursor-pointer shadow-[0_4px_12px_rgba(0,0,0,0.02)]`}
             >
               {SPORT_OPTIONS.map(o => (
                 <option key={o.value} value={o.value}>{o.label}</option>
@@ -424,7 +424,7 @@ export function MemberDetail({
             <select
               value={skillLevel}
               onChange={(e) => setSkillLevel(e.target.value as SkillLevel)}
-              className="w-full bg-white border border-slate-100 rounded-2xl px-3 py-2.5 text-xs font-black text-[#008751] appearance-none focus:outline-none focus:ring-2 focus:ring-emerald-500/20 transition-all cursor-pointer shadow-[0_4px_12px_rgba(0,0,0,0.02)]"
+              className={`w-full bg-white border border-slate-100 ${RADIUS_INNER} px-3 py-2.5 text-xs font-black text-[#008751] appearance-none focus:outline-none focus:ring-2 focus:ring-emerald-500/20 transition-all cursor-pointer shadow-[0_4px_12px_rgba(0,0,0,0.02)]`}
             >
               {LEVEL_OPTIONS.map(o => (
                 <option key={o.value} value={o.value}>{o.label}</option>
@@ -434,8 +434,10 @@ export function MemberDetail({
           </div>
         </div>
 
+
         {/* ── Sizing ── */}
-        <div className="mt-8 mb-8">
+        <div className="h-5" />
+        <div className="mb-8">
           <div className="flex items-center justify-between mb-5 ml-1">
             <h2 className={SECTION_HEADER_CLS} style={{ color: COLOR_PRIMARY }}>
               Sizing <span style={{ color: COLOR_ACCENT }}>Guide</span>
@@ -496,7 +498,8 @@ export function MemberDetail({
         </div>
 
         {/* ── Gear Vault ── */}
-        <div className="mt-8">
+        <div className="h-5" />
+        <div>
           <div className="flex items-center justify-between mb-5 px-1">
             <h2 className={SECTION_HEADER_CLS} style={{ color: COLOR_PRIMARY }}>
               Gear <span style={{ color: COLOR_ACCENT }}>Vault</span>
@@ -515,8 +518,8 @@ export function MemberDetail({
             const filteredGear = gearItems.filter((item) => item.sports.includes(selectedSport));
             if (filteredGear.length === 0) {
               return (
-                <div className="flex flex-col items-center gap-2 py-8 bg-white rounded-[2rem] shadow-[0_15px_30px_rgba(0,0,0,0.02)]">
-                  <div className="w-12 h-12 rounded-2xl bg-slate-50 flex items-center justify-center">
+                <div className={`${SURFACE_FLOAT} ${RADIUS_CARD_LG} flex flex-col items-center gap-2 py-8`}>
+                  <div className={`w-12 h-12 ${RADIUS_INNER} bg-slate-50 flex items-center justify-center`}>
                     <PlusCircle className="w-6 h-6 text-slate-300" />
                   </div>
                   <p className="text-slate-500 text-sm font-bold">
@@ -536,11 +539,11 @@ export function MemberDetail({
                   <button
                     key={item.id}
                     onClick={() => onEditGear(item)}
-                    className="w-full bg-white rounded-[2.5rem] p-4 flex items-center justify-between shadow-[0_20px_40px_rgba(0,0,0,0.02)] border border-white hover:border-emerald-100 active:scale-[0.98] transition-all text-left"
+                    className={`w-full bg-white ${RADIUS_CARD_LG} p-4 flex items-center justify-between shadow-[0_20px_40px_rgba(0,0,0,0.02)] border border-white hover:border-emerald-100 active:scale-[0.98] transition-all text-left`}
                   >
                     <div className="flex items-center gap-4">
                       {/* Icon tile */}
-                      <div className="w-14 h-14 rounded-[1.2rem] flex items-center justify-center flex-shrink-0 bg-[#F8FAFC]">
+                      <div className={`w-14 h-14 ${RADIUS_INNER} flex items-center justify-center flex-shrink-0 bg-[#F8FAFC]`}>
                         <GearTypeIcon type={item.type} className="w-9 h-9" />
                       </div>
 

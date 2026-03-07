@@ -207,26 +207,6 @@ export function GearLoadoutPanel({
           })}
         </svg>
       </div>
-      <div className="loadout-legend">
-        {slots.map((slot) => {
-          const slotState = getSlotState(slot.type, gearItems);
-          return (
-            <button
-              key={slot.type}
-              className={`loadout-legend-item ${slotState.filled ? 'filled' : 'empty'}`}
-              onClick={() => onSlotTap(slot.type)}
-              style={{
-                borderColor: slotState.filled ? getSlotColor(slotState.status) : undefined,
-              }}
-            >
-              <span className="legend-label">{slot.label}</span>
-              {slotState.filled && slotState.item && (
-                <span className="legend-info">{slotState.item.brand} {slotState.item.size}</span>
-              )}
-            </button>
-          );
-        })}
-      </div>
     </div>
   );
 }
