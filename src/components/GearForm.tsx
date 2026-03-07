@@ -257,7 +257,7 @@ export function GearForm({
         className="flex flex-col flex-1 min-h-0"
       >
         {/* Scrollable content */}
-        <div className="flex-1 overflow-y-auto bg-white px-6 py-5 flex flex-col gap-6">
+        <div className="flex-1 overflow-y-auto bg-[#F8FAFC] px-6 pt-6 pb-8 flex flex-col gap-6">
           {error && (
             <div className="bg-red-50 border border-red-200 text-red-600 text-sm font-bold rounded-xl px-4 py-3">
               {error}

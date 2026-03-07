@@ -177,7 +177,7 @@ export function EditMeasurementEntryScreen({
         onBack={onBack}
       />
 
-      <div className="flex-1 overflow-y-auto bg-white px-5 py-5">
+      <div className="flex-1 overflow-y-auto bg-[#F8FAFC] px-6 pt-6 pb-8">
         <form onSubmit={handleSubmit} noValidate className="space-y-4">
           {/* Date */}
           <div>

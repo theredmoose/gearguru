@@ -78,7 +78,7 @@ export function MeasurementHistoryScreen({
         }
       />
 
-      <div className="flex-1 overflow-y-auto bg-white px-4 py-4">
+      <div className="flex-1 overflow-y-auto bg-[#F8FAFC] px-6 pt-6 pb-8">
         {entries.length === 0 ? (
           <p className="text-slate-400 text-sm text-center py-8">
             No measurement history yet. Tap + to add an entry.
