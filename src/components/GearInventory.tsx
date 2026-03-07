@@ -51,7 +51,7 @@ export function GearInventory({
   return (
     <div className="flex flex-col min-h-0 flex-1">
       <ScreenHeader
-        title="Family Gear"
+        title="Gear"
         onBack={onBack}
         right={
           addForOwnerId ? (
@@ -108,7 +108,7 @@ export function GearInventory({
               <div key={member.id}>
                 {/* Group header */}
                 <div className="flex items-center justify-between mb-3">
-                  <h2 className="text-xs font-black text-slate-500 tracking-widest">
+                  <h2 className="text-xs font-black text-slate-500 tracking-widest uppercase">
                     {member.name}
                   </h2>
                   <button
@@ -148,7 +148,7 @@ export function GearInventory({
               />
             ))}
             <button
-              className="w-full flex items-center justify-center py-3.5 border-2 border-dashed border-slate-200 rounded-2xl text-sm font-bold text-slate-400 hover:border-emerald-300 hover:text-emerald-600 transition-all mt-2"
+              className="w-full flex items-center justify-center py-3.5 border-2 border-dashed border-slate-200 rounded-3xl text-sm font-bold text-slate-400 hover:border-[#008751] hover:text-[#008751] transition-all mt-2"
               onClick={() => onAddGear(filterOwnerId)}
             >
               + Add Gear
