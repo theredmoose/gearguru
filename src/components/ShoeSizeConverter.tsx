@@ -61,7 +61,7 @@ export function ShoeSizeConverter({
     <div className="flex flex-col min-h-0 flex-1">
       <ScreenHeader title="Size Converter" onBack={onClose} />
 
-      <div className="flex-1 overflow-y-auto bg-white px-6 py-5 flex flex-col gap-6">
+      <div className="flex-1 overflow-y-auto bg-[#F8FAFC] px-6 pt-6 pb-8 flex flex-col gap-6">
         {/* Input section */}
         <section>
           <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-2">

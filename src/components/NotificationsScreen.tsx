@@ -24,7 +24,7 @@ export function NotificationsScreen({ notifications, onUndismiss, onBack }: Prop
     <div className="flex flex-col min-h-0 flex-1">
       <ScreenHeader title="Dismissed Notifications" onBack={onBack} />
 
-      <div className="flex-1 overflow-y-auto bg-white px-6 py-6">
+      <div className="flex-1 overflow-y-auto bg-[#F8FAFC] px-6 pt-6 pb-8">
         {notifications.length === 0 ? (
           <p className="empty-state">No dismissed notifications.</p>
         ) : (

@@ -54,7 +54,7 @@ export function ResourcesScreen() {
   return (
     <div className="flex flex-col min-h-0 flex-1">
       <ScreenHeader title="Resources" />
-      <div className="flex-1 overflow-y-auto bg-[#F8FAFC] px-5 pt-8 pb-8 flex flex-col gap-[22px]">
+      <div className="flex-1 overflow-y-auto bg-[#F8FAFC] px-6 pt-6 pb-8 flex flex-col gap-[22px]">
         <h2 className={SECTION_HEADER_CLS} style={{ color: COLOR_PRIMARY }}>
           Quick Sizing Reference
         </h2>
