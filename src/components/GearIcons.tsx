@@ -100,6 +100,16 @@ export function SkateIcon({ className = 'w-10 h-10' }: IconProps) {
   );
 }
 
+export function GenericGearIcon({ className = 'w-10 h-10' }: IconProps) {
+  return (
+    <svg viewBox="0 0 64 64" className={className}>
+      <rect x="10" y="18" width="44" height="36" rx="6" fill="#e2e8f0" stroke="#94a3b8" strokeWidth="2" />
+      <path d="M22 18 C22 10 42 10 42 18" fill="none" stroke="#94a3b8" strokeWidth="2" />
+      <line x1="10" y1="30" x2="54" y2="30" stroke="#cbd5e1" strokeWidth="1.5" />
+    </svg>
+  );
+}
+
 // Map from GearType to icon component
 export function GearTypeIcon({ type, className }: { type: string; className?: string }) {
   switch (type) {
@@ -115,6 +125,14 @@ export function GearTypeIcon({ type, className }: { type: string; className?: st
       return <SnowboardIcon className={className} />;
     case 'skate':
       return <SkateIcon className={className} />;
+    case 'jacket':
+    case 'pants':
+    case 'gloves':
+    case 'mittens':
+    case 'socks':
+    case 'goggle':
+    case 'bag':
+      return <GenericGearIcon className={className} />;
     default:
       return <HelmetIcon className={className} />;
   }

@@ -415,13 +415,6 @@ describe('App member operations', () => {
     expect(screen.getByText(/gear/i, { selector: 'h1' })).toBeInTheDocument();
   });
 
-  it('shows sport sizing from detail view', () => {
-    renderApp();
-    fireEvent.click(screen.getByText('Jane Smith'));
-    fireEvent.click(screen.getByText(/all sports/i));
-    expect(screen.getAllByText('Alpine').length).toBeGreaterThanOrEqual(1);
-  });
-
   it('shows shoe size converter from detail view', () => {
     renderApp();
     fireEvent.click(screen.getByText('Jane Smith'));
@@ -432,23 +425,29 @@ describe('App member operations', () => {
   it('shows gear form when Add Gear clicked from detail view', () => {
     renderApp();
     fireEvent.click(screen.getByText('Jane Smith'));
-    fireEvent.click(screen.getByRole('button', { name: /add gear/i }));
+    // New flow: click a section row add button, then "New" in the sheet
+    fireEvent.click(screen.getAllByRole('button', { name: /add gear to/i })[0]);
+    fireEvent.click(screen.getByRole('button', { name: /new gear/i }));
     expect(screen.getByRole('heading', { name: 'Add Gear' })).toBeInTheDocument();
   });
 
-  it('returns to sizing when gear form cancelled from detail view', () => {
+  it('returns to detail when gear form cancelled from detail view', () => {
     renderApp();
     fireEvent.click(screen.getByText('Jane Smith'));
-    fireEvent.click(screen.getByRole('button', { name: /add gear/i }));
+    // New flow: click a section row add button, then "New" in the sheet
+    fireEvent.click(screen.getAllByRole('button', { name: /add gear to/i })[0]);
+    fireEvent.click(screen.getByRole('button', { name: /new gear/i }));
     fireEvent.click(screen.getByRole('button', { name: 'Cancel' }));
-    // from=/family/member-1/sizing → navigates to sizing page
+    // gearDefaultSport is set (alpine), so cancel goes to sizing view
     expect(screen.getAllByText('Alpine').length).toBeGreaterThanOrEqual(1);
   });
 
   it('submits gear form and calls addGearItem', async () => {
     renderApp();
     fireEvent.click(screen.getByText('Jane Smith'));
-    fireEvent.click(screen.getByRole('button', { name: /add gear/i }));
+    // New flow: click a section row add button, then "New" in the sheet
+    fireEvent.click(screen.getAllByRole('button', { name: /add gear to/i })[0]);
+    fireEvent.click(screen.getByRole('button', { name: /new gear/i }));
     fireEvent.change(screen.getByLabelText('Brand'), { target: { value: 'Atomic' } });
     fireEvent.change(screen.getByLabelText('Model'), { target: { value: 'Redster' } });
     fireEvent.change(screen.getByLabelText('Size'), { target: { value: '170' } });

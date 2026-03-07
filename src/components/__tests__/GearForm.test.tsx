@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { GearForm } from '../GearForm';
 import type { GearItem } from '../../types';
 
@@ -403,6 +404,44 @@ describe('GearForm', () => {
           expect.objectContaining({ notes: undefined })
         )
       );
+    });
+  });
+
+  // ============================================
+  // TAGS
+  // ============================================
+  describe('tags field', () => {
+    it('renders tags input field', () => {
+      render(<GearForm ownerId="u1" onSubmit={vi.fn()} onCancel={vi.fn()} />);
+      expect(screen.getByLabelText(/tags/i)).toBeInTheDocument();
+    });
+
+    it('submits tags as array from comma-separated input', async () => {
+      const onSubmit = vi.fn().mockResolvedValue(undefined);
+      render(<GearForm ownerId="u1" onSubmit={onSubmit} onCancel={vi.fn()} />);
+      await userEvent.type(screen.getByLabelText('Brand'), 'Atomic');
+      await userEvent.type(screen.getByLabelText('Model'), 'Redster');
+      await userEvent.type(screen.getByLabelText('Size'), '170');
+      await userEvent.type(screen.getByLabelText(/tags/i), 'carving, powder');
+      await userEvent.click(screen.getByRole('button', { name: /add gear/i }));
+      await waitFor(() => {
+        expect(onSubmit).toHaveBeenCalledWith(
+          expect.objectContaining({ tags: ['carving', 'powder'] })
+        );
+      });
+    });
+
+    it('omits tags field when input is empty', async () => {
+      const onSubmit = vi.fn().mockResolvedValue(undefined);
+      render(<GearForm ownerId="u1" onSubmit={onSubmit} onCancel={vi.fn()} />);
+      await userEvent.type(screen.getByLabelText('Brand'), 'Atomic');
+      await userEvent.type(screen.getByLabelText('Model'), 'Redster');
+      await userEvent.type(screen.getByLabelText('Size'), '170');
+      await userEvent.click(screen.getByRole('button', { name: /add gear/i }));
+      await waitFor(() => {
+        const call = onSubmit.mock.calls[0][0];
+        expect(call.tags).toBeUndefined();
+      });
     });
   });
 

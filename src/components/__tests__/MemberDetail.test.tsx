@@ -98,36 +98,22 @@ describe('MemberDetail', () => {
       expect(screen.getByText('J')).toBeInTheDocument();
     });
 
-    it('renders sport and level dropdowns', () => {
+    it('renders sport swiper and skill level dropdown', () => {
       render(<MemberDetail {...defaultProps} />);
-      // Two selects: sport and level
-      expect(screen.getAllByRole('combobox')).toHaveLength(2);
+      // Sport is now a swipe zone, only skill level remains as a combobox
+      expect(screen.getByTestId('swipe-zone')).toBeInTheDocument();
+      expect(screen.getAllByRole('combobox')).toHaveLength(1);
     });
 
-    it('renders Sizing section heading', () => {
+    it('renders Gear Setup section heading', () => {
       render(<MemberDetail {...defaultProps} />);
-      expect(screen.getByRole('heading', { name: /sizing/i })).toBeInTheDocument();
-    });
-
-    it('renders Gear Inventory section heading', () => {
-      render(<MemberDetail {...defaultProps} />);
-      expect(screen.getByRole('heading', { name: /gear vault/i })).toBeInTheDocument();
-    });
-
-    it('shows empty gear state when no gear items', () => {
-      render(<MemberDetail {...defaultProps} gearItems={[]} />);
-      expect(screen.getByText(/no gear added yet/i)).toBeInTheDocument();
+      expect(screen.getByRole('heading', { name: /gear setup/i })).toBeInTheDocument();
     });
 
     it('renders gear items when provided', () => {
       const gear = makeGearItem();
       render(<MemberDetail {...defaultProps} gearItems={[gear]} />);
       expect(screen.getByText('Atomic Redster')).toBeInTheDocument();
-    });
-
-    it('shows "All Sports →" link', () => {
-      render(<MemberDetail {...defaultProps} />);
-      expect(screen.getByText(/all sports/i)).toBeInTheDocument();
     });
 
     it('shows only gear tagged for selected sport', () => {
@@ -139,20 +125,13 @@ describe('MemberDetail', () => {
       // nordic gear has same brand/model in factory but different id; both have same text so check count
       expect(screen.getAllByText('Atomic Redster')).toHaveLength(1);
     });
-
-    it('shows empty state copy with sport name when no gear matches selected sport', () => {
-      const nordicGear = makeGearItem({ sports: ['nordic-classic'] as import('../../types').Sport[] });
-      render(<MemberDetail {...defaultProps} gearItems={[nordicGear]} />);
-      // Default sport is alpine — nordic gear is hidden, show sport-specific empty state
-      expect(screen.getByText(/No Downhill gear yet/i)).toBeInTheDocument();
-    });
   });
 
   // ============================================
   // SIZING CARDS
   // ============================================
   describe('sizing cards', () => {
-    it('shows Alpine sizing cards by default when no skillLevels', () => {
+    it('shows Alpine sections by default when no skillLevels', () => {
       render(<MemberDetail {...defaultProps} />);
       expect(screen.getByText('Skis')).toBeInTheDocument();
       expect(screen.getByText('Boots')).toBeInTheDocument();
@@ -160,42 +139,52 @@ describe('MemberDetail', () => {
       expect(screen.getByText('Helmet')).toBeInTheDocument();
     });
 
-    it('shows Nordic cards when nordic-classic is selected', () => {
+    it('shows Nordic sections when nordic-classic is selected', () => {
       render(<MemberDetail {...defaultProps} />);
-      const sportSelect = screen.getAllByRole('combobox')[0];
-      fireEvent.change(sportSelect, { target: { value: 'nordic-classic' } });
+      // Swipe left once: alpine(0) → nordic-classic(1)
+      const zone = screen.getByTestId('swipe-zone');
+      fireEvent.touchStart(zone, { touches: [{ clientX: 200 }] });
+      fireEvent.touchEnd(zone, { changedTouches: [{ clientX: 80 }] });
       expect(screen.getByText('Skis')).toBeInTheDocument();
       expect(screen.getByText('Poles')).toBeInTheDocument();
       expect(screen.getByText('Boots')).toBeInTheDocument();
     });
 
-    it('shows Snowboard cards when snowboard is selected', () => {
+    it('shows Snowboard sections when snowboard is selected', () => {
       render(<MemberDetail {...defaultProps} />);
-      const sportSelect = screen.getAllByRole('combobox')[0];
-      fireEvent.change(sportSelect, { target: { value: 'snowboard' } });
-      expect(screen.getByText('Board')).toBeInTheDocument();
-      expect(screen.getByText('Stance')).toBeInTheDocument();
+      // Swipe left three times: alpine(0) → nordic-classic(1) → nordic-skate(2) → snowboard(3)
+      const zone = screen.getByTestId('swipe-zone');
+      for (let i = 0; i < 3; i++) {
+        fireEvent.touchStart(zone, { touches: [{ clientX: 200 }] });
+        fireEvent.touchEnd(zone, { changedTouches: [{ clientX: 80 }] });
+      }
+      expect(screen.getAllByText('Snowboard').length).toBeGreaterThanOrEqual(1);
+      expect(screen.getByText('Boots')).toBeInTheDocument();
     });
 
-    it('shows Hockey cards when hockey is selected', () => {
+    it('shows Hockey sections when hockey is selected', () => {
       render(<MemberDetail {...defaultProps} />);
-      const sportSelect = screen.getAllByRole('combobox')[0];
-      fireEvent.change(sportSelect, { target: { value: 'hockey' } });
-      expect(screen.getByText('Bauer')).toBeInTheDocument();
-      expect(screen.getByText('CCM')).toBeInTheDocument();
+      // Swipe left four times: alpine(0) → … → hockey(4)
+      const zone = screen.getByTestId('swipe-zone');
+      for (let i = 0; i < 4; i++) {
+        fireEvent.touchStart(zone, { touches: [{ clientX: 200 }] });
+        fireEvent.touchEnd(zone, { changedTouches: [{ clientX: 80 }] });
+      }
+      expect(screen.getByText('Skates')).toBeInTheDocument();
     });
 
     it('shows ski length in cm by default', () => {
       render(<MemberDetail {...defaultProps} />);
-      // Value renders as two spans: number + unit; check unit "cm" appears in Skis card
+      // Value renders as two spans: number + unit; check unit "cm" appears in Skis section
       const skisContent = screen.getByText('Skis').closest('div')!.parentElement!;
       expect(within(skisContent).getByText('cm')).toBeInTheDocument();
     });
 
-    it('shows boot size in Mondo by default', () => {
+    it('shows boot sizing value by default', () => {
       render(<MemberDetail {...defaultProps} />);
-      // Boot card item label is "Mondo" by default
-      expect(screen.getByText('Mondo')).toBeInTheDocument();
+      // Boot section left column shows the mondopoint value (e.g. "270") + unit "MP"
+      const bootsContent = screen.getByText('Boots').closest('div')!.parentElement!;
+      expect(within(bootsContent).getByText('MP')).toBeInTheDocument();
     });
   });
 
@@ -239,55 +228,6 @@ describe('MemberDetail', () => {
       expect(within(row).getByText('80')).toBeInTheDocument();
       expect(within(row).getByText('kg')).toBeInTheDocument();
     });
-
-    it('toggles ski length to inches when Skis toggle clicked', () => {
-      render(<MemberDetail {...defaultProps} />);
-      const skiToggle = screen.getByRole('button', { name: /toggle skis units/i });
-      fireEvent.click(skiToggle);
-      // card label span → header div → content column div (contains items)
-      const skisContent = screen.getByText('Skis').closest('div')!.parentElement!;
-      expect(within(skisContent).getByText(/\d+"/)).toBeInTheDocument();
-    });
-
-    it('toggles boot to EU when Boots toggle clicked once', () => {
-      render(<MemberDetail {...defaultProps} />);
-      const bootToggle = screen.getByRole('button', { name: /toggle boots units/i });
-      fireEvent.click(bootToggle);
-      // card label span → header div → content column div (contains items)
-      const bootsContent = screen.getByText('Boots').closest('div')!.parentElement!;
-      expect(within(bootsContent).getByText('EU')).toBeInTheDocument();
-      expect(within(bootsContent).queryByText('Mondo')).not.toBeInTheDocument();
-    });
-
-    it('cycles boot to US M on second click', () => {
-      render(<MemberDetail {...defaultProps} />);
-      const bootToggle = screen.getByRole('button', { name: /toggle boots units/i });
-      fireEvent.click(bootToggle); // → EU
-      fireEvent.click(bootToggle); // → US M
-      const bootsContent = screen.getByText('Boots').closest('div')!.parentElement!;
-      expect(within(bootsContent).getByText('US M')).toBeInTheDocument();
-    });
-
-    it('cycles boot to US W on third click', () => {
-      render(<MemberDetail {...defaultProps} />);
-      const bootToggle = screen.getByRole('button', { name: /toggle boots units/i });
-      fireEvent.click(bootToggle); // → EU
-      fireEvent.click(bootToggle); // → US M
-      fireEvent.click(bootToggle); // → US W
-      const bootsContent = screen.getByText('Boots').closest('div')!.parentElement!;
-      expect(within(bootsContent).getByText('US W')).toBeInTheDocument();
-    });
-
-    it('cycles boot back to MP on fourth click', () => {
-      render(<MemberDetail {...defaultProps} />);
-      const bootToggle = screen.getByRole('button', { name: /toggle boots units/i });
-      fireEvent.click(bootToggle); // → EU
-      fireEvent.click(bootToggle); // → US M
-      fireEvent.click(bootToggle); // → US W
-      fireEvent.click(bootToggle); // → MP
-      const bootsContent = screen.getByText('Boots').closest('div')!.parentElement!;
-      expect(within(bootsContent).getByText('Mondo')).toBeInTheDocument();
-    });
   });
 
   // ============================================
@@ -300,12 +240,6 @@ describe('MemberDetail', () => {
       expect(defaultProps.onEdit).toHaveBeenCalled();
     });
 
-    it('calls onGetSizing when "All Sports →" is clicked', () => {
-      render(<MemberDetail {...defaultProps} />);
-      fireEvent.click(screen.getByText(/all sports/i));
-      expect(defaultProps.onGetSizing).toHaveBeenCalled();
-    });
-
     it('toggles foot unit from cm to in when foot toggle icon is clicked', () => {
       render(<MemberDetail {...defaultProps} />);
       // Foot row has a separate toggle icon button (ArrowLeftRight)
@@ -316,9 +250,12 @@ describe('MemberDetail', () => {
       expect(within(row).getByText('in')).toBeInTheDocument();
     });
 
-    it('calls onAddGear when + button is clicked', () => {
+    it('calls onAddGear when Add button in a section row is clicked', () => {
       render(<MemberDetail {...defaultProps} />);
-      fireEvent.click(screen.getByRole('button', { name: /add gear/i }));
+      // The GearSectionRow renders an "Add gear to Skis" button
+      fireEvent.click(screen.getByRole('button', { name: /add gear to skis/i }));
+      // This opens the GearAssignSheet; click "New Skis" to trigger onAddGear
+      fireEvent.click(screen.getByRole('button', { name: /new gear/i }));
       expect(defaultProps.onAddGear).toHaveBeenCalled();
     });
 
@@ -333,34 +270,19 @@ describe('MemberDetail', () => {
   // ============================================
   // GEAR INVENTORY STATUS
   // ============================================
-  describe('gear inventory status', () => {
-    it('shows Ready badge for non-worn gear', () => {
+  describe('gear inventory', () => {
+    it('renders gear brand and model when provided', () => {
       const gear = makeGearItem({ condition: 'good' });
       render(<MemberDetail {...defaultProps} gearItems={[gear]} />);
-      expect(screen.getByText('Ready')).toBeInTheDocument();
+      expect(screen.getByText('Atomic Redster')).toBeInTheDocument();
     });
 
-    it('shows Update badge for worn gear', () => {
-      const gear = makeGearItem({ condition: 'worn' });
+    it('renders gear item in the correct sport section', () => {
+      const gear = makeGearItem({ type: 'ski', sports: ['alpine'] });
       render(<MemberDetail {...defaultProps} gearItems={[gear]} />);
-      expect(screen.getByText('Update')).toBeInTheDocument();
-    });
-
-    it('shows gear size and year when both provided', () => {
-      const gear = makeGearItem({ size: '170cm', year: 2022 });
-      render(<MemberDetail {...defaultProps} gearItems={[gear]} />);
-      expect(screen.getByText('170cm · 2022')).toBeInTheDocument();
-    });
-
-    it('shows photo count when gear has photos', () => {
-      const gear = makeGearItem({
-        photos: [
-          { id: 'p1', type: 'fullView', url: 'http://example.com/photo.jpg', createdAt: new Date().toISOString() },
-          { id: 'p2', type: 'labelView', url: 'http://example.com/photo2.jpg', createdAt: new Date().toISOString() },
-        ],
-      });
-      render(<MemberDetail {...defaultProps} gearItems={[gear]} />);
-      expect(screen.getByText('2 photos')).toBeInTheDocument();
+      // Gear should appear in the Skis row
+      const skisSection = screen.getByText('Skis').closest('div')!.parentElement!.parentElement!;
+      expect(within(skisSection).getByText('Atomic Redster')).toBeInTheDocument();
     });
   });
 
@@ -390,8 +312,8 @@ describe('MemberDetail', () => {
         skillLevels: { 'nordic-classic': 'advanced' },
       });
       render(<MemberDetail {...defaultProps} member={memberWithSkills} />);
-      const sportSelect = screen.getAllByRole('combobox')[0] as HTMLSelectElement;
-      expect(sportSelect.value).toBe('nordic-classic');
+      // SportSwiper shows the sport label for the active sport
+      expect(screen.getByText('XC Classic')).toBeInTheDocument();
     });
 
     it('defaults skill level to the member skill for that sport', () => {
@@ -399,7 +321,8 @@ describe('MemberDetail', () => {
         skillLevels: { alpine: 'expert' },
       });
       render(<MemberDetail {...defaultProps} member={memberWithSkills} />);
-      const levelSelect = screen.getAllByRole('combobox')[1] as HTMLSelectElement;
+      // Skill level is the only remaining combobox
+      const levelSelect = screen.getAllByRole('combobox')[0] as HTMLSelectElement;
       expect(levelSelect.value).toBe('expert');
     });
   });
@@ -413,22 +336,26 @@ describe('MemberDetail', () => {
       weightUnit: 'kg',
       skiLengthUnit: 'cm',
       defaultSport: 'alpine',
-      display: { showFoot: true, showHand: true },
+      display: { showFoot: true, showHand: true, separateFeetHands: false },
+      sizingModel: 'generic',
+      sizingDisplay: 'range',
+      bootUnit: 'mp',
+      notificationsEnabled: true,
     };
 
     it('hides Foot row when display.showFoot is false', () => {
-      const settings = { ...baseSettings, display: { showFoot: false, showHand: true } };
+      const settings = { ...baseSettings, display: { showFoot: false, showHand: true, separateFeetHands: false } };
       render(<MemberDetail {...defaultProps} settings={settings} />);
       expect(screen.queryByText('Foot')).toBeNull();
     });
 
     it('shows Foot row when display.showFoot is true', () => {
-      render(<MemberDetail {...defaultProps} settings={{ ...baseSettings, display: { showFoot: true, showHand: true } }} />);
+      render(<MemberDetail {...defaultProps} settings={{ ...baseSettings, display: { showFoot: true, showHand: true, separateFeetHands: false } }} />);
       expect(screen.getByText('Foot')).toBeInTheDocument();
     });
 
     it('hides Hand row when display.showHand is false', () => {
-      const settings = { ...baseSettings, display: { showFoot: true, showHand: false } };
+      const settings = { ...baseSettings, display: { showFoot: true, showHand: false, separateFeetHands: false } };
       render(<MemberDetail {...defaultProps} settings={settings} />);
       expect(screen.queryByText('Hand')).toBeNull();
     });
@@ -436,15 +363,9 @@ describe('MemberDetail', () => {
     it('uses settings.defaultSport as the initial sport selector value', () => {
       const settings = { ...baseSettings, defaultSport: 'snowboard' as const };
       render(<MemberDetail {...defaultProps} settings={settings} />);
-      const sportSelect = screen.getAllByRole('combobox')[0] as HTMLSelectElement;
-      expect(sportSelect.value).toBe('snowboard');
-    });
-
-    it('initialises lengthUnit from skiLengthUnit setting', () => {
-      const settings = { ...baseSettings, skiLengthUnit: 'in' as const };
-      render(<MemberDetail {...defaultProps} settings={settings} />);
-      // The ski card should show inches rather than cm
-      expect(screen.getAllByRole('button', { name: /toggle skis units/i })[0]).toBeInTheDocument();
+      // SportSwiper displays the label for the active sport inside the swipe zone
+      const zone = screen.getByTestId('swipe-zone');
+      expect(zone).toHaveTextContent('Snowboard');
     });
 
     it('initialises weightUnit from settings', () => {

@@ -266,6 +266,7 @@ export interface GearItem {
   checkedOutTo?: string;
   checkedOutDate?: string;
   notes?: string;
+  tags?: string[];          // e.g. ['carving'], ['powder', 'race']
   photos?: GearPhoto[];
   extendedDetails?: ExtendedGearDetails;
   createdAt: string;
@@ -280,7 +281,15 @@ export type GearType =
   | 'snowboard'
   | 'skate'
   | 'helmet'
-  | 'other';
+  | 'other'
+  // Apparel & accessories
+  | 'jacket'
+  | 'pants'
+  | 'gloves'
+  | 'mittens'
+  | 'socks'
+  | 'goggle'
+  | 'bag';
 
 // ============================================
 // SIZING RECOMMENDATIONS
@@ -350,6 +359,7 @@ export interface AppSettings {
   sizingModel: SizingModel;
   sizingDisplay: SizingDisplay;
   bootUnit: BootUnit; // preferred unit shown in boot sizing cards
+  sportSections?: Partial<Record<Sport, GearType[]>>;
   defaultDIN?: number; // pre-fills the DIN setting field when adding alpine skis
   notificationsEnabled: boolean;
 }
