@@ -10,6 +10,7 @@ interface GearFormProps {
   item?: GearItem;
   ownerId: string;
   defaultSport?: Sport;
+  defaultGearType?: GearType;
   defaultDIN?: number;
   onSubmit: (data: Omit<GearItem, 'id' | 'userId' | 'createdAt' | 'updatedAt'>) => Promise<void>;
   onCancel: () => void;
@@ -32,6 +33,13 @@ const GEAR_TYPES: { id: GearType; label: string }[] = [
   { id: 'snowboard', label: 'Snowboard' },
   { id: 'skate', label: 'Skates' },
   { id: 'helmet', label: 'Helmet' },
+  { id: 'jacket',  label: 'Jacket' },
+  { id: 'pants',   label: 'Pants' },
+  { id: 'gloves',  label: 'Gloves' },
+  { id: 'mittens', label: 'Mittens' },
+  { id: 'socks',   label: 'Socks' },
+  { id: 'goggle',  label: 'Goggles' },
+  { id: 'bag',     label: 'Bag' },
   { id: 'other', label: 'Other' },
 ];
 
@@ -61,6 +69,7 @@ export function GearForm({
   item,
   ownerId,
   defaultSport,
+  defaultGearType,
   defaultDIN,
   onSubmit,
   onCancel,
@@ -73,7 +82,7 @@ export function GearForm({
       prev.includes(sportId) ? prev.filter((s) => s !== sportId) : [...prev, sportId]
     );
   };
-  const [type, setType] = useState<GearType>(item?.type ?? 'ski');
+  const [type, setType] = useState<GearType>(item?.type ?? defaultGearType ?? 'ski');
   const [brand, setBrand] = useState(item?.brand ?? '');
   const [model, setModel] = useState(item?.model ?? '');
   const [size, setSize] = useState(item?.size ?? '');
@@ -88,6 +97,7 @@ export function GearForm({
   );
   const [status, setStatus] = useState<GearStatus>(item?.status ?? 'available');
   const [location, setLocation] = useState(item?.location ?? '');
+  const [tags, setTags] = useState<string>(item?.tags?.join(', ') ?? '');
 
   // Extended detail fields for alpine skis
   const [profileTip, setProfileTip] = useState(
@@ -197,6 +207,10 @@ export function GearForm({
 
     setSubmitting(true);
 
+    const parsedTags = tags.trim()
+      ? tags.split(',').map(t => t.trim()).filter(Boolean)
+      : undefined;
+
     try {
       let finalExtendedDetails: ExtendedGearDetails | undefined = extendedDetails;
 
@@ -234,6 +248,7 @@ export function GearForm({
         status,
         location: location.trim() || undefined,
         notes: notes.trim() || undefined,
+        tags: parsedTags,
         photos: photos.length > 0 ? photos : undefined,
         extendedDetails: finalExtendedDetails,
       });
@@ -587,6 +602,17 @@ export function GearForm({
                 onChange={(e) => setNotes(e.target.value)}
                 placeholder="Needs waxing, base repair needed"
                 rows={3}
+              />
+            </div>
+            <div className="mt-3">
+              <label htmlFor="gear-tags" className={labelCls}>Tags (comma-separated)</label>
+              <input
+                id="gear-tags"
+                type="text"
+                value={tags}
+                onChange={e => setTags(e.target.value)}
+                placeholder="e.g. carving, powder, race"
+                className={inputCls}
               />
             </div>
           </section>
