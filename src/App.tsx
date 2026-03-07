@@ -35,7 +35,7 @@ import {
 } from './components';
 import type { TopLevelTab } from './components';
 import { useFamilyMembers, useAuth, useGearItems, useSettings, useNotifications } from './hooks';
-import type { FamilyMember, GearItem, Sport, MeasurementEntry } from './types';
+import type { FamilyMember, GearItem, Sport, GearType, MeasurementEntry } from './types';
 
 type View =
   | 'home'
@@ -83,6 +83,7 @@ function App() {
   const [selectedGearItem, setSelectedGearItem] = useState<GearItem | null>(null);
   const [gearOwnerId, setGearOwnerId] = useState<string | null>(null);
   const [gearDefaultSport, setGearDefaultSport] = useState<Sport | undefined>(undefined);
+  const [gearDefaultType, setGearDefaultType] = useState<GearType | null>(null);
   const [selectedMeasurementEntry, setSelectedMeasurementEntry] = useState<MeasurementEntry | null>(null);
   const [verificationResent, setVerificationResent] = useState(false);
 
@@ -145,10 +146,11 @@ function App() {
   };
 
   // ── Gear handlers ────────────────────────────────────────────────
-  const handleAddGearFromSizing = (sport: Sport) => {
+  const handleAddGearFromSizing = (sport: Sport, gearType?: GearType) => {
     if (selectedMember) {
       setGearOwnerId(selectedMember.id);
       setGearDefaultSport(sport);
+      setGearDefaultType(gearType ?? null);
       setSelectedGearItem(null);
       setView('add-gear');
     }
@@ -464,6 +466,7 @@ function App() {
           item={view === 'edit-gear' ? selectedGearItem ?? undefined : undefined}
           ownerId={gearOwnerId}
           defaultSport={gearDefaultSport}
+          defaultGearType={gearDefaultType ?? undefined}
           defaultDIN={settings.defaultDIN}
           onSubmit={handleGearSubmit}
           onCancel={handleGearCancel}
