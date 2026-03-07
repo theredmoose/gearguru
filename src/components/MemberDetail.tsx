@@ -1,6 +1,7 @@
 import { useState, useMemo } from 'react';
 import { Settings, Plus, PlusCircle, ChevronDown, CheckCircle2, AlertCircle, ArrowLeftRight } from 'lucide-react';
 import type { FamilyMember, GearItem, Sport, SkillLevel, AppSettings, BootUnit } from '../types';
+import type { SizingCard } from '../types/sizing';
 import { ScreenHeader } from './ScreenHeader';
 import {
   SECTION_HEADER_CLS, COLOR_PRIMARY, COLOR_ACCENT,
@@ -113,13 +114,6 @@ function calculateAge(dateOfBirth: string): number {
 // Derive Ready/Update from gear condition
 function gearFitStatus(item: GearItem): 'Ready' | 'Update' {
   return item.condition === 'worn' ? 'Update' : 'Ready';
-}
-
-interface SizingCard {
-  label: string;
-  type: 'ski' | 'boot' | 'pole' | 'helmet' | 'snowboard' | 'skate';
-  toggleKind?: 'length' | 'boot';
-  items: { label: string; value: string }[];
 }
 
 function getSizingCards(
