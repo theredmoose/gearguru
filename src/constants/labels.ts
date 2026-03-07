@@ -18,4 +18,12 @@ export const GEAR_TYPE_LABELS: Record<GearType, string> = {
   skate:     'Skates',
   helmet:    'Helmet',
   other:     'Other',
+  // Apparel
+  jacket:   'Jacket',
+  pants:    'Pants',
+  gloves:   'Gloves',
+  mittens:  'Mittens',
+  socks:    'Socks',
+  goggle:   'Goggles',
+  bag:      'Bag',
 };
