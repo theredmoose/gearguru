@@ -98,10 +98,11 @@ describe('MemberDetail', () => {
       expect(screen.getByText('J')).toBeInTheDocument();
     });
 
-    it('renders sport and level dropdowns', () => {
+    it('renders sport swiper and skill level dropdown', () => {
       render(<MemberDetail {...defaultProps} />);
-      // Two selects: sport and level
-      expect(screen.getAllByRole('combobox')).toHaveLength(2);
+      // Sport is now a swipe zone, only skill level remains as a combobox
+      expect(screen.getByTestId('swipe-zone')).toBeInTheDocument();
+      expect(screen.getAllByRole('combobox')).toHaveLength(1);
     });
 
     it('renders Gear Setup section heading', () => {
@@ -140,8 +141,10 @@ describe('MemberDetail', () => {
 
     it('shows Nordic sections when nordic-classic is selected', () => {
       render(<MemberDetail {...defaultProps} />);
-      const sportSelect = screen.getAllByRole('combobox')[0];
-      fireEvent.change(sportSelect, { target: { value: 'nordic-classic' } });
+      // Swipe left once: alpine(0) → nordic-classic(1)
+      const zone = screen.getByTestId('swipe-zone');
+      fireEvent.touchStart(zone, { touches: [{ clientX: 200 }] });
+      fireEvent.touchEnd(zone, { changedTouches: [{ clientX: 80 }] });
       expect(screen.getByText('Skis')).toBeInTheDocument();
       expect(screen.getByText('Poles')).toBeInTheDocument();
       expect(screen.getByText('Boots')).toBeInTheDocument();
@@ -149,17 +152,24 @@ describe('MemberDetail', () => {
 
     it('shows Snowboard sections when snowboard is selected', () => {
       render(<MemberDetail {...defaultProps} />);
-      const sportSelect = screen.getAllByRole('combobox')[0];
-      fireEvent.change(sportSelect, { target: { value: 'snowboard' } });
-      // "Snowboard" appears in both the dropdown option and the section row label
+      // Swipe left three times: alpine(0) → nordic-classic(1) → nordic-skate(2) → snowboard(3)
+      const zone = screen.getByTestId('swipe-zone');
+      for (let i = 0; i < 3; i++) {
+        fireEvent.touchStart(zone, { touches: [{ clientX: 200 }] });
+        fireEvent.touchEnd(zone, { changedTouches: [{ clientX: 80 }] });
+      }
       expect(screen.getAllByText('Snowboard').length).toBeGreaterThanOrEqual(1);
       expect(screen.getByText('Boots')).toBeInTheDocument();
     });
 
     it('shows Hockey sections when hockey is selected', () => {
       render(<MemberDetail {...defaultProps} />);
-      const sportSelect = screen.getAllByRole('combobox')[0];
-      fireEvent.change(sportSelect, { target: { value: 'hockey' } });
+      // Swipe left four times: alpine(0) → … → hockey(4)
+      const zone = screen.getByTestId('swipe-zone');
+      for (let i = 0; i < 4; i++) {
+        fireEvent.touchStart(zone, { touches: [{ clientX: 200 }] });
+        fireEvent.touchEnd(zone, { changedTouches: [{ clientX: 80 }] });
+      }
       expect(screen.getByText('Skates')).toBeInTheDocument();
     });
 
@@ -302,8 +312,8 @@ describe('MemberDetail', () => {
         skillLevels: { 'nordic-classic': 'advanced' },
       });
       render(<MemberDetail {...defaultProps} member={memberWithSkills} />);
-      const sportSelect = screen.getAllByRole('combobox')[0] as HTMLSelectElement;
-      expect(sportSelect.value).toBe('nordic-classic');
+      // SportSwiper shows the sport label for the active sport
+      expect(screen.getByText('XC Classic')).toBeInTheDocument();
     });
 
     it('defaults skill level to the member skill for that sport', () => {
@@ -311,7 +321,8 @@ describe('MemberDetail', () => {
         skillLevels: { alpine: 'expert' },
       });
       render(<MemberDetail {...defaultProps} member={memberWithSkills} />);
-      const levelSelect = screen.getAllByRole('combobox')[1] as HTMLSelectElement;
+      // Skill level is the only remaining combobox
+      const levelSelect = screen.getAllByRole('combobox')[0] as HTMLSelectElement;
       expect(levelSelect.value).toBe('expert');
     });
   });
@@ -352,8 +363,9 @@ describe('MemberDetail', () => {
     it('uses settings.defaultSport as the initial sport selector value', () => {
       const settings = { ...baseSettings, defaultSport: 'snowboard' as const };
       render(<MemberDetail {...defaultProps} settings={settings} />);
-      const sportSelect = screen.getAllByRole('combobox')[0] as HTMLSelectElement;
-      expect(sportSelect.value).toBe('snowboard');
+      // SportSwiper displays the label for the active sport inside the swipe zone
+      const zone = screen.getByTestId('swipe-zone');
+      expect(zone).toHaveTextContent('Snowboard');
     });
 
     it('initialises weightUnit from settings', () => {

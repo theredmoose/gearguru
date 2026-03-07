@@ -12,6 +12,7 @@ import {
 } from '../constants/design';
 import { GearLoadoutPanel } from './GearLoadoutPanel';
 import { GrowthWarningBadge } from './GrowthWarningBadge';
+import { SportSwiper } from './SportSwiper';
 import { getShoeSizesFromFootLength } from '../services/shoeSize';
 import { shouldWarnGrowth, isMeasurementStale, analyzeGrowthTrend } from '../services/growthAnalysis';
 import {
@@ -381,25 +382,19 @@ export function MemberDetail({
         </div>
 
         {/* ── Sport & Skill Level ── */}
-        <div className="flex gap-3 mb-6">
-          <div className="flex-1 relative">
-            <label className="text-xs text-emerald-700 font-black uppercase tracking-widest block mb-1 ml-1">Sport</label>
-            <select
+        <div className="mb-6">
+          <div className={`${SURFACE_FLOAT} ${RADIUS_CARD_LG} p-4 mb-3`}>
+            <label className="text-xs text-emerald-700 font-black uppercase tracking-widest block mb-3 text-center">Sport</label>
+            <SportSwiper
+              sports={SPORT_OPTIONS.map(o => o.value)}
               value={selectedSport}
-              onChange={(e) => {
-                const s = e.target.value as Sport;
+              onChange={(s) => {
                 setSelectedSport(s);
                 setSkillLevel(member.skillLevels?.[s] ?? 'intermediate');
               }}
-              className={`w-full bg-white border border-slate-100 ${RADIUS_INNER} px-3 py-2.5 text-xs font-black text-[#008751] appearance-none focus:outline-none focus:ring-2 focus:ring-emerald-500/20 transition-all cursor-pointer shadow-[0_4px_12px_rgba(0,0,0,0.02)]`}
-            >
-              {SPORT_OPTIONS.map(o => (
-                <option key={o.value} value={o.value}>{o.label}</option>
-              ))}
-            </select>
-            <ChevronDown className="absolute right-3 bottom-3 w-3 h-3 text-emerald-400 pointer-events-none" />
+            />
           </div>
-          <div className="flex-1 relative">
+          <div className="relative">
             <label className="text-xs text-emerald-700 font-black uppercase tracking-widest block mb-1 ml-1">Skill Level</label>
             <select
               value={skillLevel}
