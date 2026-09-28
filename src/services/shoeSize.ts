@@ -43,17 +43,19 @@ function toCm(size: ShoeSize): number {
     case 'mondopoint':
       return size.value / 10;
     case 'eu':
-      // EU = (cm + 1.5) × 1.5, so cm = (EU / 1.5) - 1.5
-      return size.value / 1.5 - 1.5;
+      // EU = (cm × 1.5) + 2 (ISO formula from docs/requirements/Gear Guru.xlsx:
+      // (cm + 2×0.667) / 0.667), so cm = (EU - 2) / 1.5
+      return (size.value - 2) / 1.5;
     case 'uk':
-      // UK = (cm - 22) × 3, so cm = (UK / 3) + 22
-      return size.value / 3 + 22;
+      // UK = (cm - 19.5) × 13/11, fit to the ISO 19407:2015 mondopoint
+      // table in docs/requirements/Gear Guru.xlsx, so cm = (UK × 11/13) + 19.5
+      return (size.value * 11) / 13 + 19.5;
     case 'us-men':
-      // US Men = UK + 1, UK = (cm - 22) × 3
-      return (size.value - 1) / 3 + 22;
+      // US Men = UK + 1
+      return ((size.value - 1) * 11) / 13 + 19.5;
     case 'us-women':
-      // US Women = US Men + 1.5
-      return (size.value - 2.5) / 3 + 22;
+      // US Women = UK + 2 (per the ISO table; US Women = US Men + 1)
+      return ((size.value - 2) * 11) / 13 + 19.5;
   }
 }
 
@@ -67,13 +69,13 @@ function fromCm(cm: number, system: SizeSystem): number {
     case 'mondopoint':
       return Math.round(cm * 10);
     case 'eu':
-      return round((cm + 1.5) * 1.5, 0.5);
+      return round(cm * 1.5 + 2, 0.5);
     case 'uk':
-      return round((cm - 22) * 3, 0.5);
+      return round((cm - 19.5) * (13 / 11), 0.5);
     case 'us-men':
-      return round((cm - 22) * 3 + 1, 0.5);
+      return round((cm - 19.5) * (13 / 11) + 1, 0.5);
     case 'us-women':
-      return round((cm - 22) * 3 + 2.5, 0.5);
+      return round((cm - 19.5) * (13 / 11) + 2, 0.5);
   }
 }
 
