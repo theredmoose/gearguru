@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { ChevronDown } from 'lucide-react';
-import type { GearItem, GearType, Sport, GearPhoto, ExtendedGearDetails, AlpineSkiDetails, SkiProfile, GearStatus } from '../types';
+import type { GearItem, GearType, Sport, GearPhoto, ExtendedGearDetails, AlpineSkiDetails, GearStatus } from '../types';
 import { PhotoCapture } from './PhotoCapture';
 import { analyzeGearPhotos } from '../services/gearAnalysis';
 import { validateYear, parseSkiProfile } from '../services/validation';
