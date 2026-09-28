@@ -103,12 +103,14 @@ export function validateOptionalHandSize(value: number | string | undefined): st
   return null;
 }
 
-export function validateOptionalArmLength(value: string): string | null {
-  return optionalMaxCmStr(value, 120, 'Arm length');
+export function validateOptionalArmLength(value: number | string | undefined): string | null {
+  if (typeof value === 'string') return optionalMaxCmStr(value, 120, 'Arm length');
+  return optionalMaxCmNum(value, 120, 'Arm length');
 }
 
-export function validateOptionalInseam(value: string): string | null {
-  return optionalMaxCmStr(value, 120, 'Inseam');
+export function validateOptionalInseam(value: number | string | undefined): string | null {
+  if (typeof value === 'string') return optionalMaxCmStr(value, 120, 'Inseam');
+  return optionalMaxCmNum(value, 120, 'Inseam');
 }
 
 export function validateYear(year: string): string | null {

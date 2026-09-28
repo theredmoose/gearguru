@@ -4,7 +4,7 @@ import type { FamilyMember, Sport } from '../types';
 import { shouldWarnGrowth, isMeasurementStale, analyzeGrowthTrend } from '../services/growthAnalysis';
 import { getShoeSizesFromFootLength } from '../services/shoeSize';
 import { GrowthWarningBadge } from './GrowthWarningBadge';
-import { STAT_ROW_CLS, STAT_LABEL_CLS, STAT_VALUE_CLS, BTN_ICON_INLINE_CLS, BTN_ICON_DANGER_CLS } from '../constants/design';
+import { STAT_LABEL_CLS, STAT_VALUE_CLS, BTN_ICON_INLINE_CLS, BTN_ICON_DANGER_CLS } from '../constants/design';
 
 interface MemberCardProps {
   member: FamilyMember;
