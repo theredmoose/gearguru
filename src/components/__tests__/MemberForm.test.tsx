@@ -253,6 +253,46 @@ describe('MemberForm', () => {
   });
 
   // ============================================
+  // METRIC / IMPERIAL TOGGLE
+  // ============================================
+  describe('metric/imperial toggle', () => {
+    it('shows imperial height and weight fields when toggled, hiding the metric ones', () => {
+      render(<MemberForm {...defaultProps} />);
+      fireEvent.click(screen.getByRole('button', { name: /switch between metric and imperial/i }));
+      expect(screen.getByLabelText(/height \(ft\)/i)).toBeInTheDocument();
+      expect(screen.getByLabelText(/height \(in\)/i)).toBeInTheDocument();
+      expect(screen.getByLabelText(/weight \(lbs\)/i)).toBeInTheDocument();
+      expect(screen.queryByLabelText(/height \(cm\)/i)).not.toBeInTheDocument();
+      expect(screen.queryByLabelText(/weight \(kg\)/i)).not.toBeInTheDocument();
+    });
+
+    it('pre-fills imperial fields converted from the stored metric measurements', () => {
+      render(<MemberForm {...defaultProps} member={FAMILY_MEMBERS.john} />);
+      fireEvent.click(screen.getByRole('button', { name: /switch between metric and imperial/i }));
+      expect(screen.getByLabelText(/height \(ft\)/i)).toHaveValue(5);
+      expect(screen.getByLabelText(/height \(in\)/i)).toHaveValue(10.9);
+      expect(screen.getByLabelText(/weight \(lbs\)/i)).toHaveValue(176.4);
+    });
+
+    it('converts an imperial entry back to metric cm/kg on submit', async () => {
+      render(<MemberForm {...defaultProps} />);
+      fireEvent.change(screen.getByLabelText(/name/i), { target: { value: 'Sam' } });
+      fireEvent.change(screen.getByLabelText(/date of birth/i), { target: { value: '1990-01-01' } });
+      fireEvent.click(screen.getByRole('button', { name: /switch between metric and imperial/i }));
+      fireEvent.change(screen.getByLabelText(/height \(ft\)/i), { target: { value: '6' } });
+      fireEvent.change(screen.getByLabelText(/height \(in\)/i), { target: { value: '0' } });
+      fireEvent.change(screen.getByLabelText(/weight \(lbs\)/i), { target: { value: '200' } });
+      fireEvent.change(screen.getByLabelText(/^foot length \(cm\)$/i), { target: { value: '27' } });
+      fireEvent.click(screen.getByRole('button', { name: /add member/i }));
+
+      await waitFor(() => expect(defaultProps.onSubmit).toHaveBeenCalled());
+      const [payload] = defaultProps.onSubmit.mock.calls[0];
+      expect(payload.measurements.height).toBeCloseTo(182.9, 1);
+      expect(payload.measurements.weight).toBeCloseTo(90.7, 1);
+    });
+  });
+
+  // ============================================
   // SEPARATE FEET/HANDS TOGGLE
   // ============================================
   describe('foot/hand mode', () => {
