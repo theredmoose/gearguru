@@ -13,7 +13,7 @@ function getOperationErrorMessage(err: unknown, context: 'load' | 'save' = 'save
   if (err instanceof Error && err.message) return err.message;
   return 'Something went wrong. Please try again.';
 }
-import { Settings, Plus } from 'lucide-react';
+import { Settings, Plus, ArrowLeftRight } from 'lucide-react';
 import { SECTION_HEADER_CLS, COLOR_PRIMARY, COLOR_ACCENT, BTN_ADD_CLS } from './constants/design';
 import {
   MemberForm,
@@ -78,6 +78,7 @@ function App() {
 
   const [view, setView] = useState<View>('home');
   const [activeTab, setActiveTab] = useState<TopLevelTab>('family');
+  const [unitSystem, setUnitSystem] = useState<'metric' | 'imperial'>('metric');
   const [operationError, setOperationError] = useState<string | null>(null);
   const [selectedMember, setSelectedMember] = useState<FamilyMember | null>(null);
   const [selectedGearItem, setSelectedGearItem] = useState<GearItem | null>(null);
@@ -305,13 +306,23 @@ function App() {
                     <h2 className={SECTION_HEADER_CLS} style={{ color: COLOR_PRIMARY }}>
                       Your <span style={{ color: COLOR_ACCENT }}>Family</span>
                     </h2>
-                    <button
-                      onClick={() => { setSelectedMember(null); setView('add'); }}
-                      className={BTN_ADD_CLS}
-                      aria-label="Add Family Member"
-                    >
-                      <Plus className="w-5 h-5" />
-                    </button>
+                    <div className="flex items-center gap-2">
+                      <button
+                        onClick={() => setUnitSystem(u => u === 'metric' ? 'imperial' : 'metric')}
+                        className="flex items-center gap-1.5 h-11 px-3 bg-slate-50 border border-slate-100 rounded-2xl text-emerald-700 shadow-sm hover:bg-white transition-all text-xs font-black uppercase tracking-wide"
+                        aria-label="Switch between metric and imperial units"
+                      >
+                        <ArrowLeftRight className="w-4 h-4" />
+                        {unitSystem === 'metric' ? 'Metric' : 'Imperial'}
+                      </button>
+                      <button
+                        onClick={() => { setSelectedMember(null); setView('add'); }}
+                        className={BTN_ADD_CLS}
+                        aria-label="Add Family Member"
+                      >
+                        <Plus className="w-5 h-5" />
+                      </button>
+                    </div>
                   </div>
 
                   <div className="flex flex-col gap-5">
@@ -319,6 +330,7 @@ function App() {
                       <MemberCard
                         key={member.id}
                         member={member}
+                        unitSystem={unitSystem}
                         onSelect={handleSelectMember}
                         onEdit={handleEditMember}
                         onDelete={handleDeleteMember}

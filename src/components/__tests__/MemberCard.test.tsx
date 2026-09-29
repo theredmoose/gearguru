@@ -6,6 +6,7 @@ import { FAMILY_MEMBERS } from '@tests/fixtures/familyMembers';
 describe('MemberCard', () => {
   const defaultProps = {
     member: FAMILY_MEMBERS.john,
+    unitSystem: 'metric' as const,
     onSelect: vi.fn(),
     onEdit: vi.fn(),
     onDelete: vi.fn(),
@@ -33,6 +34,19 @@ describe('MemberCard', () => {
       render(<MemberCard {...defaultProps} />);
       expect(screen.getByText('180')).toBeInTheDocument();
       expect(screen.getByText('80')).toBeInTheDocument();
+    });
+
+    it('displays height and weight in imperial units when unitSystem is imperial', () => {
+      render(<MemberCard {...defaultProps} unitSystem="imperial" />);
+      expect(screen.getByText(`5'11"`)).toBeInTheDocument();
+      expect(screen.getByText('176')).toBeInTheDocument();
+      expect(screen.getByText('lbs')).toBeInTheDocument();
+    });
+
+    it('only the shoe stat has its own unit toggle; height and weight follow unitSystem', () => {
+      render(<MemberCard {...defaultProps} />);
+      expect(screen.getAllByRole('button', { name: /toggle .* units/i })).toHaveLength(1);
+      expect(screen.getByRole('button', { name: /toggle shoe units/i })).toBeInTheDocument();
     });
   });
 

@@ -8,6 +8,7 @@ import { STAT_LABEL_CLS, STAT_VALUE_CLS, BTN_ICON_INLINE_CLS, BTN_ICON_DANGER_CL
 
 interface MemberCardProps {
   member: FamilyMember;
+  unitSystem: 'metric' | 'imperial';
   onSelect: (member: FamilyMember) => void;
   onEdit: (member: FamilyMember) => void;
   onDelete: (member: FamilyMember) => void;
@@ -31,9 +32,7 @@ function calculateAge(dateOfBirth: string): number {
   return age;
 }
 
-export function MemberCard({ member, onSelect, onEdit, onDelete }: MemberCardProps) {
-  const [heightUnit, setHeightUnit] = useState<'cm' | 'ft'>('cm');
-  const [weightUnit, setWeightUnit] = useState<'kg' | 'lbs'>('kg');
+export function MemberCard({ member, unitSystem, onSelect, onEdit, onDelete }: MemberCardProps) {
   const [shoeUnit, setShoeUnit] = useState<'mp' | 'eu' | 'us' | 'cm'>('mp');
 
   const age = calculateAge(member.dateOfBirth);
@@ -51,7 +50,7 @@ export function MemberCard({ member, onSelect, onEdit, onDelete }: MemberCardPro
 
   const sports = Object.keys(member.skillLevels ?? {}) as Sport[];
 
-  const heightDisplay = heightUnit === 'ft'
+  const heightDisplay = unitSystem === 'imperial'
     ? (() => {
         const totalInches = measurements.height / 2.54;
         const feet = Math.floor(totalInches / 12);
@@ -60,7 +59,7 @@ export function MemberCard({ member, onSelect, onEdit, onDelete }: MemberCardPro
       })()
     : `${measurements.height} cm`;
 
-  const weightDisplay = weightUnit === 'lbs'
+  const weightDisplay = unitSystem === 'imperial'
     ? `${Math.round(measurements.weight * 2.2046)} lbs`
     : `${measurements.weight} kg`;
 
@@ -76,8 +75,8 @@ export function MemberCard({ member, onSelect, onEdit, onDelete }: MemberCardPro
     : '';
 
   const statRows = [
-    { label: 'Height', value: heightDisplay, onToggle: () => setHeightUnit(u => u === 'cm' ? 'ft' : 'cm') },
-    { label: 'Weight', value: weightDisplay, onToggle: () => setWeightUnit(u => u === 'kg' ? 'lbs' : 'kg') },
+    { label: 'Height', value: heightDisplay, onToggle: undefined },
+    { label: 'Weight', value: weightDisplay, onToggle: undefined },
     ...(mondopoint > 0 ? [{ label: 'Shoe', value: shoeDisplay, onToggle: () => setShoeUnit(u => u === 'mp' ? 'eu' : u === 'eu' ? 'us' : u === 'us' ? 'cm' : 'mp') }] : []),
   ];
 
