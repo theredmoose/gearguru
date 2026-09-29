@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { ArrowLeftRight } from 'lucide-react';
 import type { FamilyMember, Measurements } from '../types';
 import { ScreenHeader } from './ScreenHeader';
 import {
@@ -36,6 +37,24 @@ const inputCls =
 const labelCls = 'block text-xs font-black text-slate-500 uppercase tracking-widest mb-1';
 const sectionTitleCls = 'block text-xs font-black text-slate-400 uppercase tracking-widest pb-2 mb-3 border-b border-slate-100';
 
+// Height/weight unit conversion — the canonical stored value is always cm/kg;
+// these only translate what the imperial fields show and write back.
+function cmToFeetInches(cm: number): { feet: number; inches: number } {
+  const totalInches = cm / 2.54;
+  const feet = Math.floor(totalInches / 12);
+  const inches = Math.round((totalInches % 12) * 10) / 10;
+  return { feet, inches };
+}
+function feetInchesToCm(feet: number, inches: number): number {
+  return Math.round((feet * 12 + inches) * 2.54 * 10) / 10;
+}
+function kgToLbs(kg: number): number {
+  return Math.round(kg * 2.2046 * 10) / 10;
+}
+function lbsToKg(lbs: number): number {
+  return Math.round((lbs / 2.2046) * 10) / 10;
+}
+
 export function MemberForm({ member, onSubmit, onCancel, separateFeetHands = false }: MemberFormProps) {
   const [name, setName] = useState(member?.name ?? '');
   const [dateOfBirth, setDateOfBirth] = useState(member?.dateOfBirth ?? '');
@@ -45,6 +64,7 @@ export function MemberForm({ member, onSubmit, onCancel, separateFeetHands = fal
   const [measurements, setMeasurements] = useState<Measurements>(
     member?.measurements ?? emptyMeasurements
   );
+  const [unitSystem, setUnitSystem] = useState<'metric' | 'imperial'>('metric');
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -194,40 +214,107 @@ export function MemberForm({ member, onSubmit, onCancel, separateFeetHands = fal
 
           {/* Body Measurements */}
           <section>
-            <h3 className={sectionTitleCls}>Body Measurements</h3>
-            <div className="grid grid-cols-2 gap-3">
-              <div>
-                <label htmlFor="height" className={labelCls}>Height (cm)</label>
-                <input
-                  id="height"
-                  type="number"
-                  className={inputCls}
-                  value={measurements.height || ''}
-                  onChange={(e) =>
-                    updateMeasurement('height', parseFloat(e.target.value) || 0)
-                  }
-                  min="0"
-                  max="300"
-                  step="0.5"
-                />
-              </div>
-
-              <div>
-                <label htmlFor="weight" className={labelCls}>Weight (kg)</label>
-                <input
-                  id="weight"
-                  type="number"
-                  className={inputCls}
-                  value={measurements.weight || ''}
-                  onChange={(e) =>
-                    updateMeasurement('weight', parseFloat(e.target.value) || 0)
-                  }
-                  min="0"
-                  max="300"
-                  step="0.5"
-                />
-              </div>
+            <div className="flex items-center justify-between pb-2 mb-3 border-b border-slate-100">
+              <h3 className={`${sectionTitleCls} !pb-0 !mb-0 !border-0`}>Body Measurements</h3>
+              <button
+                type="button"
+                onClick={() => setUnitSystem((u) => (u === 'metric' ? 'imperial' : 'metric'))}
+                className="flex items-center gap-1.5 h-8 px-2.5 rounded-lg bg-slate-50 border border-slate-100 text-emerald-700 text-xs font-black uppercase tracking-wide"
+                aria-label="Switch between metric and imperial units"
+              >
+                <ArrowLeftRight className="w-3.5 h-3.5" />
+                {unitSystem === 'metric' ? 'Metric' : 'Imperial'}
+              </button>
             </div>
+            {unitSystem === 'metric' ? (
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label htmlFor="height" className={labelCls}>Height (cm)</label>
+                  <input
+                    id="height"
+                    type="number"
+                    className={inputCls}
+                    value={measurements.height || ''}
+                    onChange={(e) =>
+                      updateMeasurement('height', parseFloat(e.target.value) || 0)
+                    }
+                    min="0"
+                    max="300"
+                    step="0.5"
+                  />
+                </div>
+
+                <div>
+                  <label htmlFor="weight" className={labelCls}>Weight (kg)</label>
+                  <input
+                    id="weight"
+                    type="number"
+                    className={inputCls}
+                    value={measurements.weight || ''}
+                    onChange={(e) =>
+                      updateMeasurement('weight', parseFloat(e.target.value) || 0)
+                    }
+                    min="0"
+                    max="300"
+                    step="0.5"
+                  />
+                </div>
+              </div>
+            ) : (
+              <div className="grid grid-cols-4 gap-3">
+                <div>
+                  <label htmlFor="heightFeet" className={labelCls}>Height (ft)</label>
+                  <input
+                    id="heightFeet"
+                    type="number"
+                    className={inputCls}
+                    value={measurements.height ? cmToFeetInches(measurements.height).feet || '' : ''}
+                    onChange={(e) => {
+                      const feet = parseFloat(e.target.value) || 0;
+                      const { inches } = cmToFeetInches(measurements.height);
+                      updateMeasurement('height', feetInchesToCm(feet, inches));
+                    }}
+                    min="0"
+                    max="9"
+                    step="1"
+                  />
+                </div>
+
+                <div>
+                  <label htmlFor="heightInches" className={labelCls}>Height (in)</label>
+                  <input
+                    id="heightInches"
+                    type="number"
+                    className={inputCls}
+                    value={measurements.height ? cmToFeetInches(measurements.height).inches || '' : ''}
+                    onChange={(e) => {
+                      const inches = parseFloat(e.target.value) || 0;
+                      const { feet } = cmToFeetInches(measurements.height);
+                      updateMeasurement('height', feetInchesToCm(feet, inches));
+                    }}
+                    min="0"
+                    max="11.9"
+                    step="0.5"
+                  />
+                </div>
+
+                <div className="col-span-2">
+                  <label htmlFor="weightLbs" className={labelCls}>Weight (lbs)</label>
+                  <input
+                    id="weightLbs"
+                    type="number"
+                    className={inputCls}
+                    value={measurements.weight ? kgToLbs(measurements.weight) || '' : ''}
+                    onChange={(e) =>
+                      updateMeasurement('weight', lbsToKg(parseFloat(e.target.value) || 0))
+                    }
+                    min="0"
+                    max="660"
+                    step="0.5"
+                  />
+                </div>
+              </div>
+            )}
           </section>
 
           {/* Foot Measurements */}
